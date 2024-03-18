@@ -1,0 +1,20 @@
+﻿@if (ViewBag.CurrentView == "Index")
+{
+    <a class="item" href="@Url.Action("CreateTeam", "Home")">Nieuw team</a>
+}
+else if (ViewBag.CurrentView == "ManageTeam")
+{
+    <a class="item" href="@Url.Action("ManageTeam", "Home", new { add = "true" })">Speler toevoegen</a>
+    <a class="item" href="@Url.Action("ScheduleOverview", "Home")">Schema overzicht</a>
+}
+else if (ViewBag.CurrentView == "ScheduleOverview")
+{
+    <div class="item legenda-item" data-status="matchday"><div class="legenda-color legenda-match-day"></div> Wedstrijd dag</div>
+    <a class="item" href="#" onclick="copyToClipboard('Hello World')">Deel link</a>
+    <a class="item" href="#">Schema genereren</a>
+}
+else if (ViewBag.CurrentView == "ReportAvailability")
+{
+    <div class="item legenda-item" data-status="available"><div class="legenda-color legenda-available"></div> Beschikbaar</div>
+    <div class="item legenda-item" data-status="unavailable"><div class="legenda-color legenda-unavailable"></div> Niet beschikbaar</div>
+}

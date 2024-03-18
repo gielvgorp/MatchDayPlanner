@@ -1,0 +1,36 @@
+﻿@if(ViewBag.CurrentView == "Index")
+{
+    <div class="stats-item">
+        <p class="name">Aantal teams:</p>
+        <p class="value">0</p>
+    </div>
+}else if(ViewBag.CurrentView == "ManageTeam")
+{
+    <div class="stats-item">
+        <p class="name">Aantal spelers:</p>
+        <p class="value">0</p>
+    </div>
+    <div class="stats-item">
+        <p class="name">Team captain:</p>
+        <p class="value">Giel van Gorp</p>
+    </div>
+    <div class="stats-item">
+        <p class="name">Schema status:</p>
+        <p class="value">Niet gepubliceerd</p>
+    </div>
+}
+else if (ViewBag.CurrentView == "ScheduleOverview")
+{
+    <div class="stats-item">
+        <p class="name">Aantal verhinderingen:</p>
+        <p class="value">0</p>
+    </div>
+    <div class="stats-item">
+        <p class="name">Aantal doorgegeven:</p>
+        <p class="value">1/4</p>
+    </div>
+    <div class="stats-item">
+        <p class="name">Schema status:</p>
+        <p class="value">Niet gepubliceerd</p>
+    </div>
+}

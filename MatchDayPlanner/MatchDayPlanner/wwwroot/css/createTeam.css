@@ -1,0 +1,39 @@
+﻿.form-container{
+    background: var(--gray-a);
+    border-radius: 10px;
+    margin: auto;
+    width: min(500px, 80%);
+    height: auto;
+    padding: 20px 40px;
+}
+
+.form-container .form-group{
+    width: min(500px, 80%) !important;
+    padding-top: 20px;
+}
+
+.form-container input{
+    background: none;
+    border: none;
+    border-bottom: 2px solid white;
+    border-radius: unset;
+    display: block;
+    outline: none;
+    width: 100%;
+    color: var(--gray);
+    padding-top: 5px;
+    padding-left: 5px;  
+    font-size: .8rem;
+}
+
+.form-container button{
+    display: block;
+    margin: auto;
+    background: var(--gray-a);
+    width: min(150px, 80%);
+    height: 40px;
+    border-radius: 10px;
+    outline: none;
+    border: none;
+    margin-top: 30px;
+}

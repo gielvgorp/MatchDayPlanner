@@ -1,0 +1,32 @@
+﻿@{
+    ViewData["Title"] = "Team beheren";
+}
+<link rel="stylesheet" href="~/css/manageTeam.css" asp-append-version="true" />
+
+<div class="page-content players">
+    <div class="player-container">
+        <h6 class="player-name text">
+            Giel van Gorp
+            <span class="player-role">Captain</span>
+        </h6>
+        <p class="player-email text">info@gielvgorp.nl</p>
+        <div class="manage-player text">
+            <a class="text" href="@Url.Action("ManageTeam", "Home")">
+                <i class="fa-solid fa-ellipsis-vertical"></i>
+            </a>
+        </div>
+    </div>
+    @if (ViewBag.AddPlayer)
+    {
+        @using (Html.BeginForm("AddPlayer", "Home", FormMethod.Post, new { @style = "width: 100%"}))
+        {
+            <div class="player-container add-player">
+                <input class="text" placeholder="John Doe" />
+                <input class="text" placeholder="Johndoe@example.com" />
+                <div class="submit text">
+                    <button class="text">Toevoegen</button>
+                </div>
+            </div>
+        }
+    }
+</div>

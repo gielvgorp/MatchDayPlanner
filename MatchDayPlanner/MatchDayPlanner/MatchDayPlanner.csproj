@@ -6,4 +6,16 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Content Remove="wwwroot\js\ScheduleOverview.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\js\ScheduleOverview.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\js\ScheduleOverview.js" />
+  </ItemGroup>
+
 </Project>

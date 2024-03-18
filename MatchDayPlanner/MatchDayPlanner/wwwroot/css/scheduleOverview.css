@@ -1,0 +1,88 @@
+﻿.cal-grid{
+    display: grid;
+    grid-template-columns: repeat(2, 600px);
+    grid-template-rows: auto-fill;
+    grid-column-gap: 40px;
+}
+
+.cal-month{
+    width: 100%;
+    height: auto;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.cal-days {
+    background: var(--gray-a);
+    border-radius: 10px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-column-gap: 10px;
+    grid-row-gap: 10px;
+    padding: 20px;
+    flex: 1;
+}
+
+.cal-day-cell {
+    width: 50px;
+    height: 50px;
+    background: rgba(128, 128, 128, 50%);
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.cal-day-cell[data-status=available] {
+    background: var(--available-bg) !important;
+}
+
+.cal-day-cell[data-status=unavailable] {
+    background: var(--unavailable-bg) !important;
+}
+
+.cal-day-cell[data-status=matchday] {
+    background: #2271b1 !important;
+}
+
+.legenda-match-day {
+    background: #2271b1 !important;
+}
+
+.cal-month-name{
+    padding-bottom: 10px !important;
+}
+
+.day-cell-disabled {
+    pointer-events: none;
+    background: #71797E;
+}
+
+.legenda-item{
+    display: flex;
+    justify-content: end;
+    align-items: end;
+    padding: 5px;
+    cursor: pointer;
+}
+
+.legenda-available{
+    background: var(--available-bg);
+}
+
+.legenda-unavailable{
+    background: var(--unavailable-bg);
+}
+
+.legenda-color {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+.legenda-item[selected]{
+    border-bottom: 1px solid white;
+}

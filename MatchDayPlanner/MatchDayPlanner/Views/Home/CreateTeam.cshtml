@@ -1,0 +1,21 @@
+﻿@{
+    ViewData["Title"] = "Nieuw team maken";
+}
+
+
+@model CreateTeamViewModel
+<link rel="stylesheet" href="~/css/createTeam.css" asp-append-version="true" />
+<div class="page-content teams">
+    <div class="form-container">
+        <h4 class="text">Wat is de naam van het team?</h4>
+        @using (Html.BeginForm("CreateTeam", "Home", FormMethod.Post))
+        {
+            <div class="form-group">
+                <label class="form-label text">Team naam</label>
+                <input class="text" asp-for="TeamName" type="text" />
+                <span asp-validation-for="TeamName" class="text-danger pt-1"></span>
+            </div>
+            <button class="text">Aanmaken</button>
+        }
+    </div>
+</div>

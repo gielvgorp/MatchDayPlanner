@@ -15,6 +15,41 @@ namespace MatchDayPlanner.Controllers
 
         public IActionResult Index()
         {
+            ViewBag.CurrentView = "Index";
+            return View();
+        }
+
+        public IActionResult CreateTeam()
+        {
+            ViewBag.CurrentView = "CreateTeam";
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult CreateTeam(CreateTeamViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                return RedirectToAction("Index");
+            }
+
+            return View();
+        }
+
+        public IActionResult ManageTeam(bool add)
+        {
+            ViewBag.CurrentView = "ManageTeam";
+            ViewBag.AddPlayer = add;
+            return View();
+        }
+
+        public IActionResult AddPlayer()
+        {
+            return RedirectToAction("ManageTeam", "Home", new { add = "true" });
+        }
+
+        public IActionResult ScheduleOverview()
+        {
             return View();
         }
 

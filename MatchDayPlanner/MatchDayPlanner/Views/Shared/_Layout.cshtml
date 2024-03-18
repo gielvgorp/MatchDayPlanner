@@ -12,6 +12,9 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/MatchDayPlanner.styles.css" asp-append-version="true" />
+
+    <!-- Font awesome -->
+    <script src="https://kit.fontawesome.com/d66c1fe273.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <header>
@@ -19,46 +22,19 @@
             <h3 class="title">@ViewData["Title"]</h3>
             @if (ViewData["SubTitle"] != null)
             {
-                <p class="sub-title">Hertog Anneke</p>
+                <p class="sub-title">@ViewData["SubTitle"]</p>
             }
         </div>
         <div class="header-bottom">
             <div class="header-stats-container">
-                <div class="stats-item">
-                    <p class="name">Aantal teams:</p>
-                    <p class="value">0</p>
-                </div>
+                @Html.Partial("_HeaderStatsPartialView")
             </div>
             <div class="menu-items">
-                <a class="item" href="#">Nieuw team</a>
-                <a class="item" href="#">Link delen</a>
+                @Html.Partial("_HeaderPartialView")
             </div>
         </div>
-       @*  <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">MatchDayPlanner</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav> *@
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+    @RenderBody()
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

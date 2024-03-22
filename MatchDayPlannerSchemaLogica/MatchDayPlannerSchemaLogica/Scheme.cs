@@ -4,7 +4,7 @@ public class Scheme
 {
     public Team team {  get; set; }
     public List<MatchDay> matchDays { set; get; }
-    public int numberOfPlayers = 4;
+    public int numberOfPlayers = 3;
     public int error = 0;
 
     public Scheme(Team c_team, List<MatchDay> c_matchDays)
@@ -18,7 +18,6 @@ public class Scheme
     private void GenerateScheme()
     {
         CalculateAmountOfMatchesPerPlayer();
-
 
         List<DateTime> matchDaysDateTime = matchDays.Select(md => md.matchDayDateTime).ToList();
 
@@ -61,7 +60,7 @@ public class Scheme
 
     void MakeSchemeLayout(MatchDay matchDay)
     {
-        List<TeamMember> membersAvailable = GetMembersAreAvailableOnDate(matchDay.matchDayDateTime).Where(m => m.amountOfMatches > 0).OrderByDescending(m => m.amountOfMatches).Take(numberOfPlayers).ToList();
+        List<TeamMember> membersAvailable = GetMembersAreAvailableOnDate(matchDay.matchDayDateTime).Where(m => m.amountOfMatches > 0).OrderByDescending(m => m.numberOfPreventions).OrderByDescending(m => m.amountOfMatches).Take(numberOfPlayers).ToList();
 
         Console.WriteLine("Planned in for: " + matchDay.matchDayDateTime);
         membersAvailable.ForEach(r =>
@@ -97,9 +96,9 @@ public class Scheme
 
     void CalculateAmountOfMatchesPerPlayer()
     {
-        int totalPlayersNeeded = matchDays.Count * numberOfPlayers;
-        int matchesPerPlayer = totalPlayersNeeded / team.members.Count;
-        team.members.ForEach(m => m.amountOfMatches = matchesPerPlayer);
+        decimal totalPlayersNeeded = matchDays.Count * numberOfPlayers;
+        decimal matchesPerPlayer = Math.Ceiling(totalPlayersNeeded / team.members.Count);
+        team.members.ForEach(m => m.amountOfMatches = (int)matchesPerPlayer);
 
         Console.WriteLine("Matches per player: " + matchesPerPlayer);
     }

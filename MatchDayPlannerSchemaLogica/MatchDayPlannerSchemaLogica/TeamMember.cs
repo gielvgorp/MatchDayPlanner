@@ -6,6 +6,13 @@ public class TeamMember
     public Guid teamID { get; set; }
     public string memberName { get; set; }
     public List<MatchDay> preventions { get; set; }
+    public int numberOfPreventions
+    {
+        get
+        {
+            return this.preventions.Count;
+        }
+    }
     public bool isCaptain { get; set; }
     public int amountOfMatches { get; set; }
 

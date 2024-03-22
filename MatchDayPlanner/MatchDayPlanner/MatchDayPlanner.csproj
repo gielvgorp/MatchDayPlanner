@@ -7,14 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\js\prevention.js" />
     <Content Remove="wwwroot\js\ScheduleOverview.js" />
   </ItemGroup>
 
   <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\js\prevention.js" />
     <_ContentIncludedByDefault Remove="wwwroot\js\ScheduleOverview.js" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\js\prevention.js" />
     <None Include="wwwroot\js\ScheduleOverview.js" />
   </ItemGroup>
 

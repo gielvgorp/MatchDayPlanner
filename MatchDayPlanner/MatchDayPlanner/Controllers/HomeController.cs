@@ -53,6 +53,11 @@ namespace MatchDayPlanner.Controllers
             return View();
         }
 
+        public IActionResult SchemePrevention()
+        {
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();

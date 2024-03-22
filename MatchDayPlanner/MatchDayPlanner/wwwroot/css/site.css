@@ -122,3 +122,9 @@ header .sub-title {
     padding-bottom: 0 !important;
     margin-bottom: 0 !important;
 }
+
+.f-center{
+    display: flex;
+    justify-content: center;
+    align-content: center;
+}

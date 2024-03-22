@@ -1,0 +1,37 @@
+﻿@{
+    ViewData["Title"] = "Verhindering";
+    ViewBag.CurrentView = "SchemePrevention";
+}
+<link rel="stylesheet" href="~/css/prevention.css" asp-append-version="true" />
+<script defer src="~/js/prevention.js"></script>
+
+<div class="page-content f-center">
+    <div class="prevention-main-container">
+        <div class="progress-bar">
+            <div class="value"></div>
+        </div>
+        <div class="prevention-content">
+            <div class="content">
+                <div class="step-wizard f-center" data-step="1" style="flex-direction: column">
+                    <div class="form-group w-75 m-auto">
+                        <h6 class="text py-2">Wat is je naam?</h6>
+                        <select class="form-select">
+                            <option>Giel</option>
+                            <option>Giel</option>
+                            <option>Giel</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="step-wizard" data-step="2">
+                    <h1 class="text">Test message</h1>
+                </div>
+                <div class="step-wizard" data-step="3">
+                </div>
+            </div>
+            <div class="prevention-bottom-nav">
+                <button onclick="previousStep()" class="text">Vorige</button>
+                <button onclick="nextStep()" class="text">Volgende</button>
+            </div>
+        </div>
+    </div>
+</div>

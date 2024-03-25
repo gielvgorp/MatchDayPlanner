@@ -1,21 +1,19 @@
 using MatchDayPlanner.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using MatchDayPlannerCore;
+using System.Data;
 
 namespace MatchDayPlanner.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
-        {
-            _logger = logger;
-        }
-
+        Database database = new Database();
         public IActionResult Index()
         {
-            return View();
+            List<TeamViewModel> teams = database.Query<TeamViewModel>("SELECT * FROM Teams");
+            ViewBag.NumberOfTeams = teams.Count();
+            return View(teams);   
         }
 
         public IActionResult Privacy()

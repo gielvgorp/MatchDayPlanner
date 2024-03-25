@@ -1,3 +1,10 @@
 ﻿@{
     ViewData["Title"] = "Team's overview";
 }
+
+@model List<TeamViewModel>
+
+@foreach(TeamViewModel team in Model)
+{
+    <p>@team.teamName</p>
+}

@@ -1,42 +1,21 @@
 ﻿@{
     ViewData["Title"] = "Team's overview";
 }
+
+@model List<TeamViewModel>
+
 <link rel="stylesheet" href="~/css/index.css" asp-append-version="true" />
 <div class="page-content teams">
-    <div class="team-container">
-        <h6 class="team-name text">Hertog Anneke</h6>
-        <p class="members text">8 leden</p>
-        <div class="manage-team text">
-            <a class="text" href="@Url.Action("ManageTeam", "Home")">
-                <i class="fa-solid fa-ellipsis-vertical"></i>
-            </a>
+    @foreach (TeamViewModel team in Model)
+    {
+        <div class="team-container">
+            <h6 class="team-name text">@team.teamName</h6>
+            <p class="members text">@team.members.Count Leden</p>
+            <div class="manage-team text">
+                <a class="text" href="@Url.Action("ManageTeam", "Home", new { ID = team.teamID})">
+                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                </a>
+            </div>
         </div>
-    </div>
-    <div class="team-container">
-        <h6 class="team-name text">Hertog Anneke</h6>
-        <p class="members text">8 leden</p>
-        <div class="manage-team text">
-            <a class="text" href="@Url.Action("ManageTeam", "Home")">
-                <i class="fa-solid fa-ellipsis-vertical"></i>
-            </a>
-        </div>
-    </div>
-    <div class="team-container">
-        <h6 class="team-name text">Hertog Anneke</h6>
-        <p class="members text">8 leden</p>
-        <div class="manage-team text">
-            <a class="text" href="@Url.Action("ManageTeam", "Home")">
-                <i class="fa-solid fa-ellipsis-vertical"></i>
-            </a>
-        </div>
-    </div>
-    <div class="team-container">
-        <h6 class="team-name text">Hertog Anneke</h6>
-        <p class="members text">8 leden</p>
-        <div class="manage-team text">
-            <a class="text" href="@Url.Action("ManageTeam", "Home")">
-                <i class="fa-solid fa-ellipsis-vertical"></i>
-            </a>
-        </div>
-    </div>
+    }
 </div>

@@ -12,7 +12,11 @@ namespace MatchDayPlanner.Controllers
         public IActionResult Index()
         {
             ViewBag.CurrentView = "Index";
-            return View();
+            List<TeamViewModel> teams = database.Query<TeamViewModel>("SELECT * FROM Teams");
+            teams.ForEach(team => team.members = database.Query<TeamMemberViewModel>(string.Format("SELECT * FROM TeamMembers WHERE teamID = '{0}'", team.teamID)));
+            ViewBag.NumberOfTeams = teams.Count();
+
+            return View(teams);
         }
 
         public IActionResult CreateTeam()
@@ -26,17 +30,22 @@ namespace MatchDayPlanner.Controllers
         {
             if (ModelState.IsValid)
             {
+                List<TeamViewModel> teams = new List<TeamViewModel> { new TeamViewModel { teamID = Guid.NewGuid(), captainID = Guid.NewGuid(), teamName = model.TeamName } };
+                database.Insert(teams, "Teams");
+
                 return RedirectToAction("Index");
             }
 
             return View();
         }
 
-        public IActionResult ManageTeam(bool add)
+        public IActionResult ManageTeam(bool add, Guid ID)
         {
             ViewBag.CurrentView = "ManageTeam";
             ViewBag.AddPlayer = add;
-            return View();
+
+            List<TeamMemberViewModel> members = database.Query<TeamMemberViewModel>(string.Format("SELECT * FROM TeamMembers WHERE teamID = '{0}'", ID));
+            return View(members);
         }
 
         public IActionResult AddPlayer()

@@ -21,4 +21,8 @@
     <None Include="wwwroot\js\ScheduleOverview.js" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MatchDayPlannerCore\MatchDayPlannerCore.csproj" />
+  </ItemGroup>
+
 </Project>

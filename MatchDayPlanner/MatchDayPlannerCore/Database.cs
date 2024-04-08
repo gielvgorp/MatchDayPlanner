@@ -45,7 +45,28 @@ namespace MatchDayPlannerCore
 
                 foreach (DataColumn col in dataTable.Columns)
                 {
-                    typeof(T).GetProperty(col.ColumnName)?.SetValue(obj, row[col.ColumnName]);
+                    var property = typeof(T).GetProperty(col.ColumnName);
+
+                    if (property != null)
+                    {
+                        object value = row[col.ColumnName];
+
+                        if (value != DBNull.Value)
+                        {
+                            property.SetValue(obj, value);
+                        }
+                        else
+                        {
+                            if (property.PropertyType.IsValueType)
+                            {
+                                property.SetValue(obj, Activator.CreateInstance(property.PropertyType));
+                            }
+                            else
+                            {
+                                property.SetValue(obj, null);
+                            }
+                        }
+                    }
                 }
 
                 list.Add(obj);
@@ -53,6 +74,7 @@ namespace MatchDayPlannerCore
 
             return list;
         }
+
 
         public void Insert(string query)
         {

@@ -53,5 +53,25 @@ namespace MatchDayPlannerCore
 
             return list;
         }
+
+        public void Insert(string query)
+        {
+            try
+            {
+                using (SqlConnection conneciton = new SqlConnection(connectionString))
+                {
+                    conneciton.Open();
+                    using (SqlCommand command = new SqlCommand(query, conneciton))
+                    {
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exeption" + ex.ToString());
+                throw;
+            }
+        }
     }
 }

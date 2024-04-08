@@ -54,34 +54,23 @@ namespace MatchDayPlannerCore
             return list;
         }
 
-        public void Insert<T>(List<T> items, string table)
+        public void Insert(string query)
         {
-            string insertQuery = $"INSERT INTO {table} VALUES ";
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            try
             {
-                connection.Open();
-
-                foreach (var item in items)
+                using (SqlConnection conneciton = new SqlConnection(connectionString))
                 {
-                    string values = "";
-                    foreach (var property in typeof(T).GetProperties())
-                    {
-                        if (property.GetValue(item) != null)
-                        {
-                            values += $"'{property.GetValue(item)}',";
-                        }
-                      
-                    }
-                    values = values.TrimEnd(',');
-
-                    string query = $"{insertQuery} ({values})";
-
-                    using (SqlCommand command = new SqlCommand(query, connection))
+                    conneciton.Open();
+                    using (SqlCommand command = new SqlCommand(query, conneciton))
                     {
                         command.ExecuteNonQuery();
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exeption" + ex.ToString());
+                throw;
             }
         }
     }

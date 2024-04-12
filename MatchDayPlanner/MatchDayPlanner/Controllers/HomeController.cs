@@ -79,7 +79,7 @@ namespace MatchDayPlanner.Controllers
             }
             else if (submitButton == "delete")
             {
-
+                database.Delete(string.Format("DELETE FROM teamMembers WHERE memberID = '{0}'", model.memberID));
             }
 
             return RedirectToAction("ManageTeam", "Home", new { add = false, ID = teamID });

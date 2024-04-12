@@ -30,8 +30,8 @@ namespace MatchDayPlanner.Controllers
         {
             if (ModelState.IsValid)
             {
-                List<TeamViewModel> teams = new List<TeamViewModel> { new TeamViewModel { teamID = Guid.NewGuid(), teamCaptainID = Guid.NewGuid(), teamName = model.TeamName } };
-                database.Insert(teams, "Teams");
+                List<TeamViewModel> teams = new List<TeamViewModel> { new TeamViewModel { teamID = Guid.NewGuid(), captainID = Guid.NewGuid(), teamName = model.TeamName } };
+                database.Insert(string.Format("INSERT INTO Teams (teamName) VALUES ('{0}')", model.TeamName));
 
                 return RedirectToAction("Index");
             }
@@ -43,6 +43,7 @@ namespace MatchDayPlanner.Controllers
         {
             ViewBag.CurrentView = "ManageTeam";
             ViewBag.AddPlayer = add;
+            ViewBag.TeamID = ID;
 
             TeamViewModel team = database.Query<TeamViewModel>(string.Format("SELECT * FROM Teams WHERE teamID = '{0}'", ID)).FirstOrDefault();
             team.members = database.Query<TeamMemberViewModel>(string.Format("SELECT * FROM TeamMembers WHERE teamID = '{0}'", team.teamID));
@@ -70,12 +71,19 @@ namespace MatchDayPlanner.Controllers
             return new JsonResult(Ok("success"));
         }
 
+        [HttpPost]
+        public IActionResult AddPlayer(string playerName, string playerEmail, string teamID)
+        {
+            database.Insert(string.Format("INSERT INTO TeamMembers (teamID, memberName, memberEmail) VALUES ('{0}', '{1}', '{2}')", teamID, playerName, playerEmail));
+            return RedirectToAction("ManageTeam", "Home", new { add = "true", ID = teamID });
+        }
+
         public IActionResult AddPlayer()
         {
             return RedirectToAction("ManageTeam", "Home", new { add = "true" });
         }
 
-        public IActionResult ScheduleOverview()
+        public IActionResult ScheduleOverview(Guid teamID)
         {
             return View();
         }

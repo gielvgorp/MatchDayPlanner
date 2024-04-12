@@ -5,7 +5,7 @@
 else if (ViewBag.CurrentView == "ManageTeam")
 {
     <a class="item" href="@Url.Action("ManageTeam", "Home", new { add = "true" })">Speler toevoegen</a>
-    <a class="item" href="@Url.Action("ScheduleOverview", "Home")">Schema overzicht</a>
+    <a class="item" href="@Url.Action("ScheduleOverview", "Home", new { teamID = Guid.NewGuid() })">Schema overzicht</a>
 }
 else if (ViewBag.CurrentView == "ScheduleOverview")
 {

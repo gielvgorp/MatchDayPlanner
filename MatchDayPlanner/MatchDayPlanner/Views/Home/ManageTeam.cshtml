@@ -15,7 +15,7 @@
             </h6>
             <p class="player-email text">@member.memberEmail</p>
             <div class="manage-player text">
-                <a class="text" href="../../player/edit/@member.teamID/@Model.teamID">
+                <a class="text" href="@Url.Action("EditPlayer", "Home", new { memberID = member.memberID, teamID = Model.teamID })">
                     <i class="fa-solid fa-ellipsis-vertical"></i>
                 </a>
             </div>

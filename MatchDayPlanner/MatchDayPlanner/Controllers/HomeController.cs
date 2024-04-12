@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using MatchDayPlannerCore;
 using System.Data;
+using System.Transactions;
 
 namespace MatchDayPlanner.Controllers
 {
@@ -30,7 +31,7 @@ namespace MatchDayPlanner.Controllers
         {
             if (ModelState.IsValid)
             {
-                List<TeamViewModel> teams = new List<TeamViewModel> { new TeamViewModel { teamID = Guid.NewGuid(), captainID = Guid.NewGuid(), teamName = model.TeamName } };
+                List<TeamViewModel> teams = new List<TeamViewModel> { new TeamViewModel { teamID = Guid.NewGuid(), teamCaptainID = Guid.NewGuid(), teamName = model.TeamName } };
                 database.Insert(string.Format("INSERT INTO Teams (teamName) VALUES ('{0}')", model.TeamName));
 
                 return RedirectToAction("Index");
@@ -61,7 +62,27 @@ namespace MatchDayPlanner.Controllers
                 return RedirectToAction("MangeTeam", "Home", new { add = false, ID = teamID });
             }
 
-            return View();
+            return View(member);
+        }
+
+        [HttpPost("/player/edit/{teamID}/{memberID}")]
+        public IActionResult EditPlayer(TeamMemberViewModel model, Guid teamID, Guid memberID, string submitButton)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            if (submitButton == "save")
+            {
+
+            }
+            else if (submitButton == "delete")
+            {
+
+            }
+
+            return RedirectToAction("ManageTeam", "Home", new { add = false, ID = teamID });
         }
 
         [HttpPost]

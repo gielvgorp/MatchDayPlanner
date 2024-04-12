@@ -40,19 +40,20 @@ namespace MatchDayPlanner.Controllers
             return View();
         }
 
-        public IActionResult ManageTeam(bool add, Guid ID)
+        [HttpGet("/manage-team/{teamID}/{add}")]
+        public IActionResult ManageTeam(bool add, Guid teamID)
         {
             ViewBag.CurrentView = "ManageTeam";
             ViewBag.AddPlayer = add;
-            ViewBag.TeamID = ID;
+            ViewBag.TeamID = teamID;
 
-            TeamViewModel team = database.Query<TeamViewModel>(string.Format("SELECT * FROM Teams WHERE teamID = '{0}'", ID)).FirstOrDefault();
-            team.members = database.Query<TeamMemberViewModel>(string.Format("SELECT * FROM TeamMembers WHERE teamID = '{0}'", team.teamID));
+            TeamViewModel team = database.Query<TeamViewModel>(string.Format("SELECT * FROM Teams WHERE teamID = '{0}'", teamID)).FirstOrDefault();
+            team.members = database.Query<TeamMemberViewModel>(string.Format("SELECT * FROM TeamMembers WHERE teamID = '{0}'", teamID));
 
             return View(team);
         }
 
-        [HttpGet("/player/edit/{teamID}/{memberID}")]
+        [HttpGet("/manage-team/player/{teamID}/{memberID}")]
         public IActionResult EditPlayer(Guid teamID, Guid memberID)
         {
             TeamMemberViewModel member = database.Query<TeamMemberViewModel>(string.Format("SELECT * FROM TeamMembers WHERE memberID = '{0}'", memberID)).FirstOrDefault();
@@ -65,8 +66,8 @@ namespace MatchDayPlanner.Controllers
             return View(member);
         }
 
-        [HttpPost("/player/edit/{teamID}/{memberID}")]
-        public IActionResult EditPlayer(TeamMemberViewModel model, Guid teamID, Guid memberID, string submitButton)
+        [HttpPost("/manage-team/player/{teamID}/{memberID}")]
+        public IActionResult EditPlayer(TeamMemberViewModel model, Guid teamID, Guid memberID, string submitButton, string isCaptain = "off")
         {
             if (!ModelState.IsValid)
             {
@@ -75,14 +76,25 @@ namespace MatchDayPlanner.Controllers
 
             if (submitButton == "save")
             {
+                database.Update(string.Format("UPDATE teamMembers SET memberName = '{0}', memberEmail = '{1}' WHERE memberID = '{2}'", model.memberName, model.memberEmail, model.memberID));
 
+                if (isCaptain == "on")
+                {
+                    database.Update(string.Format("UPDATE teams SET teamCaptainID = '{0}' WHERE teamID = '{1}'", model.memberID, teamID));
+                }
             }
             else if (submitButton == "delete")
             {
+                TeamViewModel captain = database.Query<TeamViewModel>(string.Format("SELECT * FROM teams where teamID = '{0}'", model.teamID)).FirstOrDefault();
+                if (captain.teamCaptainID == model.memberID)
+                {
+                    database.Update(string.Format("UPDATE teams SET teamCaptainID = NULL WHERE teamID = '{0}'", model.teamID));
+                }
+
                 database.Delete(string.Format("DELETE FROM teamMembers WHERE memberID = '{0}'", model.memberID));
             }
 
-            return RedirectToAction("ManageTeam", "Home", new { add = false, ID = teamID });
+            return RedirectToAction("ManageTeam", "Home", new { add = false, teamID = teamID });
         }
 
         [HttpPost]
@@ -96,7 +108,7 @@ namespace MatchDayPlanner.Controllers
         public IActionResult AddPlayer(string playerName, string playerEmail, string teamID)
         {
             database.Insert(string.Format("INSERT INTO TeamMembers (teamID, memberName, memberEmail) VALUES ('{0}', '{1}', '{2}')", teamID, playerName, playerEmail));
-            return RedirectToAction("ManageTeam", "Home", new { add = "true", ID = teamID });
+            return RedirectToAction("ManageTeam", "Home", new { add = "true", teamID = teamID });
         }
 
         public IActionResult AddPlayer()

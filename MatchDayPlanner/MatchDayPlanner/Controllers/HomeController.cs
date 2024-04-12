@@ -13,6 +13,7 @@ namespace MatchDayPlanner.Controllers
         {
             List<TeamViewModel> teams = database.Query<TeamViewModel>("SELECT * FROM Teams");
             ViewBag.NumberOfTeams = teams.Count();
+
             return View(teams);   
         }
 

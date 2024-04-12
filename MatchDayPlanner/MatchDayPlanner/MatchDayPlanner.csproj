@@ -7,7 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MatchDayPlannerCore\MatchDayPlannerCore.csproj" />
+    <ProjectReference Include="..\MatchDayPlanner.Core\MatchDayPlanner.Core.csproj" />
+    <ProjectReference Include="..\MatchDayPlanner.DAL\MatchDayPlanner.DAL.csproj" />
   </ItemGroup>
 
 </Project>

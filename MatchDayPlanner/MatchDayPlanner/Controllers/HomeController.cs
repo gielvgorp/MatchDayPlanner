@@ -30,7 +30,7 @@ namespace MatchDayPlanner.Controllers
         {
             if (ModelState.IsValid)
             {
-                List<TeamViewModel> teams = new List<TeamViewModel> { new TeamViewModel { teamID = Guid.NewGuid(), captainID = Guid.NewGuid(), teamName = model.TeamName } };
+                List<TeamViewModel> teams = new List<TeamViewModel> { new TeamViewModel { teamID = Guid.NewGuid(), teamCaptainID = Guid.NewGuid(), teamName = model.TeamName } };
                 database.Insert(teams, "Teams");
 
                 return RedirectToAction("Index");
@@ -44,8 +44,30 @@ namespace MatchDayPlanner.Controllers
             ViewBag.CurrentView = "ManageTeam";
             ViewBag.AddPlayer = add;
 
-            List<TeamMemberViewModel> members = database.Query<TeamMemberViewModel>(string.Format("SELECT * FROM TeamMembers WHERE teamID = '{0}'", ID));
-            return View(members);
+            TeamViewModel team = database.Query<TeamViewModel>(string.Format("SELECT * FROM Teams WHERE teamID = '{0}'", ID)).FirstOrDefault();
+            team.members = database.Query<TeamMemberViewModel>(string.Format("SELECT * FROM TeamMembers WHERE teamID = '{0}'", team.teamID));
+
+            return View(team);
+        }
+
+        [HttpGet("/player/edit/{teamID}/{memberID}")]
+        public IActionResult EditPlayer(Guid teamID, Guid memberID)
+        {
+            TeamMemberViewModel member = database.Query<TeamMemberViewModel>(string.Format("SELECT * FROM TeamMembers WHERE memberID = '{0}'", memberID)).FirstOrDefault();
+
+            if (member == null)
+            {
+                return RedirectToAction("MangeTeam", "Home", new { add = false, ID = teamID });
+            }
+
+            return View();
+        }
+
+        [HttpPost]
+        public JsonResult UpdateMatchDays(List<string> matchdays, Guid schemeID)
+        {
+            List<SchemeMatchDayViewModel> result = database.Query<SchemeMatchDayViewModel>(string.Format("SELECT * FROM SchemeMatchDay WHERE schemeID = '{0}'", schemeID));
+            return new JsonResult(Ok("success"));
         }
 
         public IActionResult AddPlayer()

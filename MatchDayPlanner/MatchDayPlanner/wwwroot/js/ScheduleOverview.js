@@ -16,6 +16,32 @@ $(document).ready(function () {
     })
 });
 
+function matchDaySaveChanges() {
+    var dates = [];
+
+    $(".cal-day-cell[data-status='matchday']").each(function () {
+        // Get the date attribute of the current element and push it to the dates array
+        var date = $(this).data("date");
+        dates.push(date);
+    });
+
+    console.log(dates);
+
+    $.ajax({
+        url: "/Home/UpdateMatchDays",
+        type: "post",
+        data: {
+            matchdays: dates
+        },
+        success: function (response) {
+            console.log('test success');
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.log('test failed');
+        }
+    });
+}
+
 // generates calendar based on start month and many months
 function generateCalendar(startIndex, amount) {
     for (var z = 0; z < amount; z++) {
@@ -55,6 +81,7 @@ function generateCalendar(startIndex, amount) {
 
         for (var i = 0; i < number_of_month; i++) {
             var day_cell = document.createElement('div');
+            day_cell.setAttribute("data-date", `${i + 1}/${currentDate.getMonth() + 1}/${currentDate.getFullYear()}`);
             day_cell.classList.add("cal-day-cell");
 
             var day_cell_heading = document.createElement('h5');

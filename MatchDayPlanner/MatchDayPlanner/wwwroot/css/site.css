@@ -128,3 +128,41 @@ header .sub-title {
     justify-content: center;
     align-content: center;
 }
+
+.item.dropdown-container{
+    position: relative;
+    height: 24px;
+    width: 120px;
+}
+
+.dropdown-content{
+    width: auto;
+    min-width: 100%;
+    background: white;
+    position: absolute;
+    right: 0;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    display: none;
+    padding-top: 10px;
+}
+
+.dropdown-row{
+    width: 100%;
+    min-height: 50px;
+    padding: 0px 10px;
+    border-bottom: 1px solid gray;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+}
+
+.dropdown-row .name{
+    color: black;
+    font-family: var(--font);
+    text-decoration: none;
+}
+
+.dropdown-container:hover .dropdown-content{
+    display: block;
+}

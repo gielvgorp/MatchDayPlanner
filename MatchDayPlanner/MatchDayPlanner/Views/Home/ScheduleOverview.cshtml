@@ -2,11 +2,33 @@
     ViewData["Title"] = "Schema overzicht";
     ViewBag.CurrentView = "ScheduleOverview";
 }
+
+@using System.Globalization;
+@model ScheduleViewModel
+
 <link rel="stylesheet" href="~/css/scheduleOverview.css" asp-append-version="true" />
 <script defer src="~/js/ScheduleOverview.js"></script>
 
 <div class="page-content">
     <div class="cal-grid">
-        
+        @for (int i = Model.startDate.Month; i < Model.endDate.Month + 1; i++)
+        {
+            <div class="call-month">
+                <h3 class="text cal-month-name">@(new DateOnly(Model.startDate.Year, i, 1).ToString("MMMM yyyy", CultureInfo.CreateSpecificCulture("nl"))) </h3>
+                <div class="cal-days">
+                    @for (int y = 0; y < (int)new DateTime(Model.startDate.Year, i, 1).DayOfWeek - 2; y++)
+                    {
+                        <div class="day-cell-disabled cal-day-cell"></div>
+                    }
+
+                    @for (int x = 0; x < DateTime.DaysInMonth(Model.startDate.Year, i); x++)
+                    {
+                        <div class="cal-day-cell" data-date="@(x + 1)/@i/@Model.startDate.Year" onclick="changeMatchDay(this)">
+                            <h5 class="text">@(x+1)</h5>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
     </div>
 </div>

@@ -1,6 +1,6 @@
 var available_status = "";
 $(document).ready(function () {
-    generateCalendar(2, 4);
+    //generateCalendar(2, 4);
 
     $(".legenda-item").on("click", function () {
         var status = $(this).data("status");
@@ -40,6 +40,14 @@ function matchDaySaveChanges() {
             console.log('test failed');
         }
     });
+}
+function changeMatchDay(elem) {
+    var status = $(elem).attr("data-status");
+    if (available_status === "") {
+
+    }
+    else if (status == available_status) $(elem).removeAttr("data-status");
+    else $(elem).attr("data-status", available_status);
 }
 
 // generates calendar based on start month and many months
@@ -91,12 +99,7 @@ function generateCalendar(startIndex, amount) {
 
             // add event on click to day cell
             day_cell.onclick = function () {
-                var status = $(this).attr("data-status");
-                if (available_status === "") {
-                    
-                }
-                else if (status == available_status) $(this).removeAttr("data-status");
-                else $(this).attr("data-status", available_status);
+                
             };
 
             cal_days.appendChild(day_cell);

@@ -5,7 +5,20 @@
 else if (ViewBag.CurrentView == "ManageTeam")
 {
     <a class="item" href="@Url.Action("ManageTeam", "Home", new { add = "true" })">Speler toevoegen</a>
-    <a class="item" href="@Url.Action("ScheduleOverview", "Home", new { teamID = Guid.NewGuid() })">Schema overzicht</a>
+    <div class="item dropdown-container">
+        <span>Schema's</span>
+        <div class="dropdown-content">
+            @foreach (ScheduleViewModel schedule in (List<ScheduleViewModel>)ViewBag.Schedules)
+            {
+                <div class="dropdown-row">
+                    <a class="name" href="@Url.Action("ScheduleOverview", "Home", new { scheduleID = schedule.schemeID })">@schedule.scheduleName</a>
+                </div>
+            }
+            <div class="dropdown-row">
+                <a class="name" href="@Url.Action("CreateGameSchedule", "Home", new { teamID = ViewBag.TeamID })"><i class="fa-solid fa-plus"></i> Nieuw</a>
+            </div>
+        </div>
+    </div>
 }
 else if (ViewBag.CurrentView == "ScheduleOverview")
 {

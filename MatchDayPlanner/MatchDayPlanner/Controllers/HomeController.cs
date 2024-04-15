@@ -46,6 +46,7 @@ namespace MatchDayPlanner.Controllers
             ViewBag.CurrentView = "ManageTeam";
             ViewBag.AddPlayer = add;
             ViewBag.TeamID = teamID;
+            ViewBag.Schedules = database.Query<ScheduleViewModel>(string.Format("SELECT * FROM GameSchedules WHERE teamID = '{0}'", teamID));
 
             TeamViewModel team = database.Query<TeamViewModel>(string.Format("SELECT * FROM Teams WHERE teamID = '{0}'", teamID)).FirstOrDefault();
             team.members = database.Query<TeamMemberViewModel>(string.Format("SELECT * FROM TeamMembers WHERE teamID = '{0}'", teamID));
@@ -111,14 +112,37 @@ namespace MatchDayPlanner.Controllers
             return RedirectToAction("ManageTeam", "Home", new { add = "true", teamID = teamID });
         }
 
+        [HttpGet("/team/add/{teamID}")]
+        public IActionResult CreateGameSchedule(Guid TeamID)
+        {
+            CreateScheduleViewModel model = new CreateScheduleViewModel();
+            model.TeamID = TeamID;
+            return View();
+        }
+
+        [HttpPost("/team/add/{teamID}")]
+        public IActionResult CreateGameSchedule(CreateScheduleViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            database.Insert(string.Format("INSERT INTO GameSchedules (teamID, scheduleName, schemeDeadline, numberOfPresent, startDate, endDate) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}')", model.TeamID, model.ScheduleName, model.Deadline, model.numberOfPresent, model.DateStart, model.DateEnd));
+
+            return View();
+        }
+
         public IActionResult AddPlayer()
         {
             return RedirectToAction("ManageTeam", "Home", new { add = "true" });
         }
 
-        public IActionResult ScheduleOverview(Guid teamID)
+        public IActionResult ScheduleOverview(Guid scheduleID)
         {
-            return View();
+            ScheduleViewModel model = database.Query<ScheduleViewModel>(string.Format("SELECT * FROM GameSchedules WHERE schemeID = '{0}'", scheduleID)).FirstOrDefault();
+
+            return View(model);
         }
 
         public IActionResult SchemePrevention()

@@ -12,7 +12,6 @@ $(document).ready(function () {
             available_status = $(this).data("status");
             $(this).attr("selected", "");
         }
-       
     })
 });
 
@@ -41,13 +40,37 @@ function matchDaySaveChanges() {
         }
     });
 }
-function changeMatchDay(elem) {
+function changeMatchDay(elem, schemeID) {
     var status = $(elem).attr("data-status");
     if (available_status === "") {
 
     }
-    else if (status == available_status) $(elem).removeAttr("data-status");
-    else $(elem).attr("data-status", available_status);
+    else if (status == available_status) {
+        $(elem).removeAttr("data-status");
+        setMatchday(false, $(elem).attr("data-date"), schemeID)
+    }
+    else {
+        $(elem).attr("data-status", available_status);
+        setMatchday(true, $(elem).attr("data-date"), schemeID)
+    }
+}
+
+function setMatchday(add, date, schemeID) {
+    $.ajax({
+        url: "/Home/UpdateMatchDays",
+        type: "post",
+        data: {
+            date: date,
+            add: add,
+            schemeID: schemeID
+        },
+        success: function (response) {
+            console.log('test success');
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.log('test failed');
+        }
+    });
 }
 
 // generates calendar based on start month and many months

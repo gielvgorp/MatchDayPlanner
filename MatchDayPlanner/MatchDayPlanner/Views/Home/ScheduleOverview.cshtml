@@ -23,7 +23,7 @@
 
                     @for (int x = 0; x < DateTime.DaysInMonth(Model.startDate.Year, i); x++)
                     {
-                        <div class="cal-day-cell" data-date="@(x + 1)/@i/@Model.startDate.Year" onclick="changeMatchDay(this)">
+                        <div class="cal-day-cell" data-date="@i/@(x + 1)/@Model.startDate.Year" onclick="changeMatchDay(this, '@Model.schemeID')">
                             <h5 class="text">@(x+1)</h5>
                         </div>
                     }

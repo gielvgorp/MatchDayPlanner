@@ -99,9 +99,18 @@ namespace MatchDayPlanner.Controllers
         }
 
         [HttpPost]
-        public JsonResult UpdateMatchDays(List<string> matchdays, Guid schemeID)
+        public JsonResult UpdateMatchDays(string date, bool add, Guid schemeID)
         {
-            List<SchemeMatchDayViewModel> result = database.Query<SchemeMatchDayViewModel>(string.Format("SELECT * FROM SchemeMatchDay WHERE schemeID = '{0}'", schemeID));
+            if (add)
+            {
+                database.Insert(string.Format("INSERT INTO SchemeMatchDay (schemeID, matchDayDateTime) VALUES ('{0}', '{1}')", schemeID, date));
+            }
+            else
+            {
+                database.Delete(string.Format("DELETE FROM SchemeMatchDay WHERE schemeID = '{0}' AND matchDayDateTime = '{1}'", schemeID, date));
+            }
+            
+            //List<SchemeMatchDayViewModel> result = database.Query<SchemeMatchDayViewModel>(string.Format("SELECT * FROM SchemeMatchDay WHERE schemeID = '{0}'", schemeID));
             return new JsonResult(Ok("success"));
         }
 

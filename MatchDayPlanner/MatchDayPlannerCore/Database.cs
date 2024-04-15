@@ -75,7 +75,6 @@ namespace MatchDayPlannerCore
             return list;
         }
 
-
         public void Insert(string query)
         {
             try

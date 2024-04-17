@@ -3,16 +3,30 @@ using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using MatchDayPlannerCore;
 using System.Data;
+using Microsoft.AspNetCore.Identity;
+using MatchDayPlanner.Areas.Identity.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MatchDayPlanner.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         Database database = new Database();
+        private readonly UserManager<ApplicationUser> _userManager;
+
+        public HomeController(UserManager<ApplicationUser> userManager)
+        {
+            _userManager = userManager;
+        }
+
         public IActionResult Index()
         {
             ViewBag.CurrentView = "Index";
-            List<TeamViewModel> teams = database.Query<TeamViewModel>("SELECT * FROM Teams");
+            ViewData["SubTitle"] = "Welkom terug, " + _userManager.GetUserName(this.User) +"!";
+
+
+            List<TeamViewModel> teams = database.Query<TeamViewModel>(string.Format("SELECT * FROM Teams WHERE teamCreatedBy = '{0}'", _userManager.GetUserId(this.User)));
             teams.ForEach(team => team.members = database.Query<TeamMemberViewModel>(string.Format("SELECT * FROM TeamMembers WHERE teamID = '{0}'", team.teamID)));
             ViewBag.NumberOfTeams = teams.Count();
 
@@ -31,7 +45,7 @@ namespace MatchDayPlanner.Controllers
             if (ModelState.IsValid)
             {
                 List<TeamViewModel> teams = new List<TeamViewModel> { new TeamViewModel { teamID = Guid.NewGuid(), captainID = Guid.NewGuid(), teamName = model.TeamName } };
-                database.Insert(string.Format("INSERT INTO Teams (teamName) VALUES ('{0}')", model.TeamName));
+                database.Insert(string.Format("INSERT INTO Teams (teamName, teamCreatedBy) VALUES ('{0}', '{1}')", model.TeamName, _userManager.GetUserId(this.User)));
 
                 return RedirectToAction("Index");
             }

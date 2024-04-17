@@ -1,4 +1,10 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@using MatchDayPlanner.Areas.Identity.Data
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -17,23 +23,28 @@
     <script src="https://kit.fontawesome.com/d66c1fe273.js" crossorigin="anonymous"></script>
 </head>
 <body>
-    <header>
-        <div class="header-top">
-            <h3 class="title">@ViewData["Title"]</h3>
-            @if (ViewData["SubTitle"] != null)
-            {
-                <p class="sub-title">@ViewData["SubTitle"]</p>
-            }
-        </div>
-        <div class="header-bottom">
-            <div class="header-stats-container">
-                @Html.Partial("_HeaderStatsPartialView")
+    
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <header>
+            <div class="header-top">
+                <h3 class="title">@ViewData["Title"]</h3>
+                @if (ViewData["SubTitle"] != null)
+                {
+                    <p class="sub-title">@ViewData["SubTitle"]</p>
+                }
             </div>
-            <div class="menu-items">
-                @Html.Partial("_HeaderPartialView")
+            <div class="header-bottom">
+                <div class="header-stats-container">
+                    @Html.Partial("_HeaderStatsPartialView")
+                </div>
+                <div class="menu-items">
+                    @Html.Partial("_HeaderPartialView")
+                </div>
             </div>
-        </div>
-    </header>
+        </header>
+    }
+    
     @RenderBody()
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

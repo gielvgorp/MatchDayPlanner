@@ -1,11 +1,13 @@
 using MatchDayPlanner.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using MatchDayPlannerCore;
+using MatchDayPlanner.Core;
 using System.Data;
 using Microsoft.AspNetCore.Identity;
 using MatchDayPlanner.Areas.Identity.Data;
 using Microsoft.AspNetCore.Authorization;
+using MatchDayPlanner.DAL;
+using MatchDayPlanner.Core.Interfaces;
 
 namespace MatchDayPlanner.Controllers
 {

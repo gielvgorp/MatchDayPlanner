@@ -2,36 +2,63 @@
     ViewData["Title"] = "Verhindering";
     ViewBag.CurrentView = "SchemePrevention";
 }
+<link rel="stylesheet" href="~/css/scheduleOverview.css" asp-append-version="true" />
 <link rel="stylesheet" href="~/css/prevention.css" asp-append-version="true" />
+
+<script defer src="~/js/scheduleOverview.js"></script>
 <script defer src="~/js/prevention.js"></script>
 
 <div class="page-content f-center">
-    <div class="prevention-main-container">
-        <div class="progress-bar">
-            <div class="value"></div>
-        </div>
-        <div class="prevention-content">
-            <div class="content">
-                <div class="step-wizard f-center" data-step="1" style="flex-direction: column">
-                    <div class="form-group w-75 m-auto">
-                        <h6 class="text py-2">Wat is je naam?</h6>
-                        <select class="form-select">
-                            <option>Giel</option>
-                            <option>Giel</option>
-                            <option>Giel</option>
-                        </select>
+   <div class="prevention-main-container" data-current-step="1">
+       <div class="prevention-value-bar">
+           <div class="prevention-value"></div>
+            <span id="value-txt">33%</span>
+       </div>
+       <div class="prevention-main-content overflow-auto">
+            <div class="step-wizard f-center" data-step="1" style="flex-direction: column">
+                <div class="form-group w-75 m-auto">
+                    <h6 class="text">Wat is je naam?</h6>
+                    <select class="form-select mt-2">
+                        <option>Giel</option>
+                        <option>Giel</option>
+                        <option>Giel</option>
+                    </select>
+                </div>
+           </div>
+           <div class="step-wizard">
+                <div class="prevention-cal-container">
+                    <div class="cal-grid">
+
+                    </div>
+                    <div class="prevention-cal-legenda p-3">
+                        <h6 class="title">Legenda</h6>
+                        <div class="legenda-container">
+                            <div class="legenda-item">
+                                <div class="legenda-color"></div>
+                                <span class="legenda-text fw-bold">Niet beschikbaar</span>
+                            </div>
+                            <div class="legenda-item">
+                                <div class="legenda-color"></div>
+                                <span class="legenda-text fw-bold">Beschikbaar</span>
+                            </div>
+                            <div class="legenda-item">
+                                <div class="legenda-color"></div>
+                                <span class="legenda-text fw-bold">Niet gereageerd</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="step-wizard" data-step="2">
-                    <h1 class="text">Test message</h1>
+           </div>
+            <div class="step-wizard f-center" data-step="3" style="flex-direction: column">
+                <div class="form-group w-75 m-auto">
+                    <h6 class="text">Voeg opmerking toe</h6>
+                   <input type="text" class="form-control mt-2"/>
                 </div>
-                <div class="step-wizard" data-step="3">
-                </div>
-            </div>
-            <div class="prevention-bottom-nav">
-                <button onclick="previousStep()" class="text">Vorige</button>
-                <button onclick="nextStep()" class="text">Volgende</button>
-            </div>
-        </div>
-    </div>
+           </div>
+       </div>
+       <div class="prevention-bottom">
+            <button onclick="previousStep()">Vorige</button>
+            <button onclick="nextStep()">Volgende</button>
+       </div>
+   </div>
 </div>

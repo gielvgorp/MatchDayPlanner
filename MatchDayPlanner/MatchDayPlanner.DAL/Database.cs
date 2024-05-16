@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
 
-namespace MatchDayPlanner.Core
+namespace MatchDayPlanner.DAL
 {
     public class Database
     {
@@ -44,7 +44,28 @@ namespace MatchDayPlanner.Core
 
                 foreach (DataColumn col in dataTable.Columns)
                 {
-                    typeof(T).GetProperty(col.ColumnName)?.SetValue(obj, row[col.ColumnName]);
+                    var property = typeof(T).GetProperty(col.ColumnName);
+
+                    if (property != null)
+                    {
+                        object value = row[col.ColumnName];
+
+                        if (value != DBNull.Value)
+                        {
+                            property.SetValue(obj, value);
+                        }
+                        else
+                        {
+                            if (property.PropertyType.IsValueType)
+                            {
+                                property.SetValue(obj, Activator.CreateInstance(property.PropertyType));
+                            }
+                            else
+                            {
+                                property.SetValue(obj, null);
+                            }
+                        }
+                    }
                 }
 
                 list.Add(obj);
@@ -53,7 +74,8 @@ namespace MatchDayPlanner.Core
             return list;
         }
 
-        public void Insert(string query)
+
+        public bool Insert(string query)
         {
             try
             {
@@ -62,7 +84,8 @@ namespace MatchDayPlanner.Core
                     conneciton.Open();
                     using (SqlCommand command = new SqlCommand(query, conneciton))
                     {
-                        command.ExecuteNonQuery();
+                        int rowsAffected = command.ExecuteNonQuery();
+                        return rowsAffected > 0;
                     }
                 }
             }

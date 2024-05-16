@@ -128,3 +128,70 @@ header .sub-title {
     justify-content: center;
     align-content: center;
 }
+
+.item.dropdown-container{
+    position: relative;
+    height: 24px;
+    width: 120px;
+}
+
+.dropdown-content {
+    width: auto;
+    min-width: 100%;
+    background: rgba(217, 217, 217, 50%);
+    position: absolute;
+    right: 0;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    display: none;
+    border: 1px solid white;
+}
+
+.dropdown-row{
+    width: 100%;
+    min-height: 50px;
+    padding: 0px 10px;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+}
+
+.dropdown-row:not(:last-child) {
+    border-bottom: 1px solid gray;
+}
+
+.dropdown-row .name{
+    color: white;
+    font-family: var(--font);
+    text-decoration: none;
+}
+
+.dropdown-container:hover .dropdown-content{
+    display: block;
+}
+
+.legenda-item {
+    display: flex;
+    justify-content: end;
+    align-items: end;
+    padding: 5px;
+    cursor: pointer;
+}
+
+.legenda-available {
+    background: var(--available-bg);
+}
+
+.legenda-unavailable {
+    background: var(--unavailable-bg);
+}
+
+.legenda-color {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+.legenda-item[selected] {
+    border-bottom: 1px solid white;
+}

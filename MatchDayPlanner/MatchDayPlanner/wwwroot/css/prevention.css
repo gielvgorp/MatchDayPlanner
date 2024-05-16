@@ -77,15 +77,19 @@
 }
 
 .legenda-item:first-child .legenda-color {
-    background: #FF4646;
+    background: var(--unavailable-bg);
 }
 
 .legenda-item:nth-child(2) .legenda-color {
-    background: #75FF7A;
+    background: var(--available-bg);
 }
 
 .legenda-item:nth-child(3) .legenda-color {
-    background: #8D8D8D;
+    background: var(--no-response-bg);
+}
+
+.legenda-item:nth-child(4) .legenda-color {
+    background: var(--matchday-bg);
 }
 
 .legenda-text {
@@ -145,4 +149,20 @@
 .cal-grid{
     flex: 1;
     grid-template-columns: repeat(1, 600px);
+}
+
+.cal-cell[data-status='available'] {
+    background: var(--available-bg);
+}
+
+.cal-cell[data-status='unavailable'] {
+    background: var(--unavailable-bg);
+}
+
+.cal-cell[data-status='no-response'] {
+    background: var(--no-response-bg);
+}
+
+.cal-day-cell.matchday {
+    background: var(--matchday-bg);
 }

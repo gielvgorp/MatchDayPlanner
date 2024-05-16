@@ -23,7 +23,7 @@ else if (ViewBag.CurrentView == "ManageTeam")
 else if (ViewBag.CurrentView == "ScheduleOverview")
 {
     <div class="item legenda-item" data-status="matchday"><div class="legenda-color legenda-match-day"></div> Wedstrijd dag</div>
-    <a class="item" href="#" onclick="copyToClipboard('Hello World')">Deel link</a>
+    <a class="item" href="#" onclick="copyToClipboard('@ViewBag.SharedURL')">Deel link</a>
     <a class="item" href="#" onclick="matchDaySaveChanges()">Opslaan</a>
     <a class="item" href="#">Schema genereren</a>
 }

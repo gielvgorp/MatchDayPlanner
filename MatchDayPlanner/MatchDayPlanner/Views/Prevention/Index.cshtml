@@ -2,6 +2,8 @@
     ViewData["Title"] = "Verhindering";
     ViewBag.CurrentView = "SchemePrevention";
 }
+@using System.Globalization;
+@model PreventionViewModel
 <link rel="stylesheet" href="~/css/scheduleOverview.css" asp-append-version="true" />
 <link rel="stylesheet" href="~/css/prevention.css" asp-append-version="true" />
 
@@ -19,31 +21,53 @@
                 <div class="form-group w-75 m-auto">
                     <h6 class="text">Wat is je naam?</h6>
                     <select class="form-select mt-2">
-                        <option>Giel</option>
-                        <option>Giel</option>
-                        <option>Giel</option>
+                        @foreach(TeamMemberViewModel player in Model.Team.members){
+                            <option>@player.memberName</option>
+                        }
                     </select>
                 </div>
            </div>
            <div class="step-wizard">
                 <div class="prevention-cal-container">
                     <div class="cal-grid">
+                        @for (int i = Model.Scheme.startDate.Month; i < Model.Scheme.endDate.Month + 1; i++)
+                        {
+                            <div class="call-month">
+                                <h3 class="text cal-month-name">@(new DateOnly(Model.Scheme.startDate.Year, i, 1).ToString("MMMM yyyy", CultureInfo.CreateSpecificCulture("nl"))) </h3>
+                                <div class="cal-days">
+                                    @for (int y = 0; y < (int)new DateTime(Model.Scheme.startDate.Year, i, 1).DayOfWeek - 2; y++)
+                                    {
+                                        <div class="day-cell-disabled cal-day-cell"></div>
+                                    }
 
+                                    @for (int x = 0; x < DateTime.DaysInMonth(Model.Scheme.startDate.Year, i); x++)
+                                    {
+                                        <div class="@(Model.SchemeMatchDay.Select(m => m.matchDayDateTime).Contains(new DateTime(Model.Scheme.startDate.Year, i, (x + 1))) ? "cal-day-cell matchday" : "cal-day-cell")" data-date="@i/@(x + 1)/@Model.Scheme.startDate.Year" onclick="setAvailability(this, '@Model.Scheme.schemeID')">
+                                            <h5 class="text">@(x + 1)</h5>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
                     </div>
                     <div class="prevention-cal-legenda p-3">
                         <h6 class="title">Legenda</h6>
                         <div class="legenda-container">
-                            <div class="legenda-item">
+                            <div class="legenda-item" data-status="unavailable">
                                 <div class="legenda-color"></div>
                                 <span class="legenda-text fw-bold">Niet beschikbaar</span>
                             </div>
-                            <div class="legenda-item">
+                            <div class="legenda-item" data-status="available">
                                 <div class="legenda-color"></div>
                                 <span class="legenda-text fw-bold">Beschikbaar</span>
                             </div>
-                            <div class="legenda-item">
+                            <div class="legenda-item" data-status="no-response">
                                 <div class="legenda-color"></div>
                                 <span class="legenda-text fw-bold">Niet gereageerd</span>
+                            </div>
+                            <div class="legenda-item pe-none" data-status="no-response">
+                                <div class="legenda-color"></div>
+                                <span class="legenda-text fw-bold">Matchday</span>
                             </div>
                         </div>
                     </div>

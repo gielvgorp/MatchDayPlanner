@@ -12,7 +12,7 @@ $(document).ready(function () {
             available_status = $(this).data("status");
             $(this).attr("selected", "");
         }
-    })
+    });
 });
 
 function matchDaySaveChanges() {

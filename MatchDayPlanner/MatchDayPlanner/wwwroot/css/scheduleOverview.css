@@ -45,7 +45,7 @@
 }
 
 .cal-day-cell[data-status=matchday] {
-    background: #2271b1 !important;
+    background: var(--matchday-bg) !important;
 }
 
 .legenda-match-day {

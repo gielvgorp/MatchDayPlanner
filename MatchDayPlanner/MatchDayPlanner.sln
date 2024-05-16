@@ -4,10 +4,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.8.34511.84
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MatchDayPlanner", "MatchDayPlanner\MatchDayPlanner.csproj", "{2FE4F95B-62B4-4815-A26F-9C33D66C448E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8311BBC4-8DA2-4894-80EF-46AA532A0870} = {8311BBC4-8DA2-4894-80EF-46AA532A0870}
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchDayPlanner.Core", "MatchDayPlanner.Core\MatchDayPlanner.Core.csproj", "{26BF2AA4-7106-43E8-AD0B-D9811B4148EE}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchDayPlanner.DAL", "MatchDayPlanner.DAL\MatchDayPlanner.DAL.csproj", "{AC3833FA-107F-47F9-942C-B133255461C7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchDayPlannerCore", "MatchDayPlannerCore\MatchDayPlannerCore.csproj", "{8311BBC4-8DA2-4894-80EF-46AA532A0870}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,14 +20,10 @@ Global
 		{2FE4F95B-62B4-4815-A26F-9C33D66C448E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2FE4F95B-62B4-4815-A26F-9C33D66C448E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2FE4F95B-62B4-4815-A26F-9C33D66C448E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{26BF2AA4-7106-43E8-AD0B-D9811B4148EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{26BF2AA4-7106-43E8-AD0B-D9811B4148EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{26BF2AA4-7106-43E8-AD0B-D9811B4148EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{26BF2AA4-7106-43E8-AD0B-D9811B4148EE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AC3833FA-107F-47F9-942C-B133255461C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AC3833FA-107F-47F9-942C-B133255461C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AC3833FA-107F-47F9-942C-B133255461C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AC3833FA-107F-47F9-942C-B133255461C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8311BBC4-8DA2-4894-80EF-46AA532A0870}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8311BBC4-8DA2-4894-80EF-46AA532A0870}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8311BBC4-8DA2-4894-80EF-46AA532A0870}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8311BBC4-8DA2-4894-80EF-46AA532A0870}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

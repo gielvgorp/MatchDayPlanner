@@ -1,54 +1,22 @@
 using MatchDayPlanner.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using MatchDayPlanner.Core;
+using MatchDayPlannerCore;
 using System.Data;
-using Microsoft.AspNetCore.Identity;
-using MatchDayPlanner.Areas.Identity.Data;
-using Microsoft.AspNetCore.Authorization;
-using MatchDayPlanner.DAL;
-using MatchDayPlanner.Core.Interfaces;
-using MatchDayPlanner.Core.Dto;
 
 namespace MatchDayPlanner.Controllers
 {
-    [Authorize]
     public class HomeController : Controller
     {
         Database database = new Database();
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ITeamRepository _teamRepository;
-
-        public HomeController(UserManager<ApplicationUser> userManager)
-        {
-            _teamRepository = new TeamRepository();
-            _userManager = userManager;
-        }
-
         public IActionResult Index()
         {
             ViewBag.CurrentView = "Index";
-            ViewData["SubTitle"] = "Welkom terug, " + _userManager.GetUserName(this.User) + "!";
-
-
-            List<TeamDto> teams = _teamRepository.GetTeamsById(Guid.Parse(_userManager.GetUserId(this.User)));
-            List<TeamViewModel> model = teams.Select(t => new TeamViewModel
-            {
-                teamName = t.teamName,
-                teamCaptainID = t.teamCaptainID,
-                teamID = t.teamID
-            }).ToList();
-
-            model.ForEach(team => team.members = _teamRepository.GetTeamMembers(team.teamID).Select(t => new TeamMemberViewModel
-            {
-                teamID = t.teamID,
-                memberID = t.memberID,
-                memberEmail = t.memberEmail,
-                memberName = t.memberName
-            }).ToList());
-
+            List<TeamViewModel> teams = database.Query<TeamViewModel>("SELECT * FROM Teams");
+            teams.ForEach(team => team.members = database.Query<TeamMemberViewModel>(string.Format("SELECT * FROM TeamMembers WHERE teamID = '{0}'", team.teamID)));
             ViewBag.NumberOfTeams = teams.Count();
-            return View(model);
+
+            return View(teams);
         }
 
         public IActionResult CreateTeam()
@@ -62,35 +30,22 @@ namespace MatchDayPlanner.Controllers
         {
             if (ModelState.IsValid)
             {
-                List<TeamViewModel> teams = new List<TeamViewModel> { new TeamViewModel { teamID = Guid.NewGuid(), teamCaptainID = Guid.NewGuid(), teamName = model.TeamName } };
-                bool result = _teamRepository.CreateTeam(model.TeamName, Guid.Parse(_userManager.GetUserId(this.User)));
+                List<TeamViewModel> teams = new List<TeamViewModel> { new TeamViewModel { teamID = Guid.NewGuid(), captainID = Guid.NewGuid(), teamName = model.TeamName } };
+                database.Insert(string.Format("INSERT INTO Teams (teamName) VALUES ('{0}')", model.TeamName));
 
-                if (result) return RedirectToAction("Index");
+                return RedirectToAction("Index");
             }
 
-            return View(model);
+            return View();
         }
 
-        public IActionResult ManageTeam(bool add, Guid teamID)
+        public IActionResult ManageTeam(bool add, Guid ID)
         {
-            List<TeamMemberViewModel> members = _teamRepository.GetTeamMembers(teamID).Select(t => new TeamMemberViewModel
-            {
-                teamID = t.teamID,
-                memberID = t.memberID,
-                memberEmail = t.memberEmail,
-                memberName = t.memberName
-            }).ToList();
-
             ViewBag.CurrentView = "ManageTeam";
             ViewBag.AddPlayer = add;
-            ViewBag.TeamID = teamID;
+            ViewBag.TeamID = ID;
 
-            ViewBag.CaptainName = _teamRepository.GetTeamCaptain(teamID)?.memberName ?? "Onbekend";
-            ViewBag.GameScheduleStatus = "Onbekend";
-            ViewBag.NumberOfPlayers = members.Count();
-
-           
-
+            List<TeamMemberViewModel> members = database.Query<TeamMemberViewModel>(string.Format("SELECT * FROM TeamMembers WHERE teamID = '{0}'", ID));
             return View(members);
         }
 

@@ -3,7 +3,7 @@
     public class ScheduleViewModel
     {
         public Guid schemeID { get; set; }
-        public Guid teamdID { get; set; }
+        public Guid teamID { get; set; }
         public string scheduleName { get; set; }
         public DateTime schemeDeadline {  get; set; }
         public int numberOfPresent {  get; set; }

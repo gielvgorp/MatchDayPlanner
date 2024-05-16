@@ -7,6 +7,8 @@
     --gray-a: rgba(217, 217, 217, 25%);
     --available-bg: #32de84;
     --unavailable-bg: #fd5c63;
+    --matchday-bg: #2271b1;
+    --no-response-bg: rgba(128, 128, 128, 50%);
     --font: "Montserrat", sans-serif;
 }
 

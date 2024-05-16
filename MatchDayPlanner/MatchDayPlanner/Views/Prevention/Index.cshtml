@@ -2,36 +2,101 @@
     ViewData["Title"] = "Verhindering";
     ViewBag.CurrentView = "SchemePrevention";
 }
+@using System.Globalization;
+@model PreventionViewModel
+<link rel="stylesheet" href="~/css/scheduleOverview.css" asp-append-version="true" />
 <link rel="stylesheet" href="~/css/prevention.css" asp-append-version="true" />
+
+<script defer src="~/js/scheduleOverview.js"></script>
 <script defer src="~/js/prevention.js"></script>
 
 <div class="page-content f-center">
-    <div class="prevention-main-container">
-        <div class="progress-bar">
-            <div class="value"></div>
-        </div>
-        <div class="prevention-content">
-            <div class="content">
-                <div class="step-wizard f-center" data-step="1" style="flex-direction: column">
-                    <div class="form-group w-75 m-auto">
-                        <h6 class="text py-2">Wat is je naam?</h6>
-                        <select class="form-select">
-                            <option>Giel</option>
-                            <option>Giel</option>
-                            <option>Giel</option>
-                        </select>
+   <div class="prevention-main-container" data-current-step="1">
+       <div class="prevention-value-bar">
+           <div class="prevention-value"></div>
+            <span id="value-txt">33%</span>
+       </div>
+       <div class="prevention-main-content overflow-auto">
+            <div class="step-wizard f-center" data-step="1" style="flex-direction: column">
+                <div class="form-group w-75 m-auto">
+                    <h6 class="text">Wat is je naam?</h6>
+                    <select id="player-select" class="form-select mt-2">
+                        @foreach(TeamMemberViewModel player in Model.Team.members){
+                            <option value="@player.memberID">@player.memberName</option>
+                        }
+                    </select>
+                </div>
+           </div>
+           <div class="step-wizard">
+                <div class="prevention-cal-container">
+                    <div class="cal-grid">
+                        @for (int i = Model.Scheme.startDate.Month; i < Model.Scheme.endDate.Month + 1; i++)
+                        {
+                            <div class="call-month">
+                                <h3 class="text cal-month-name">@(new DateOnly(Model.Scheme.startDate.Year, i, 1).ToString("MMMM yyyy", CultureInfo.CreateSpecificCulture("nl"))) </h3>
+                                <div class="cal-days">
+                                    @for (int y = 0; y < (int)new DateTime(Model.Scheme.startDate.Year, i, 1).DayOfWeek - 2; y++)
+                                    {
+                                        <div class="day-cell-disabled cal-day-cell"></div>
+                                    }
+
+                                    @for (int x = 0; x < DateTime.DaysInMonth(Model.Scheme.startDate.Year, i); x++)
+                                    {
+                                        // Calculate the target date
+                                        var targetDate = new DateTime(Model.Scheme.startDate.Year, i, (x + 1));
+                                        // Find the specific match day that matches the target date
+                                        var matchDay = Model.SchemeMatchDay.FirstOrDefault(m => m.matchDayDateTime.Date == targetDate.Date);
+                                        // Determine if a match day was found
+                                        bool isMatchDay = matchDay != null;
+    
+                                        <div class="@(isMatchDay ? "cal-day-cell matchday" : "cal-day-cell")"
+                                             data-date="@i/@(x + 1)/@(Model.Scheme.startDate.Year)"
+                                             data-matchday="@(isMatchDay ? matchDay.matchDayID : "")" onclick="setAvailability(this, '@Model.Scheme.schemeID')">
+                                            <h5 class="text">@(x + 1)</h5>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="prevention-cal-legenda p-3">
+                        <h6 class="title">Legenda</h6>
+                        <div class="legenda-container">
+                            <div class="legenda-item" data-status="unavailable">
+                                <div class="legenda-color"></div>
+                                <span class="legenda-text fw-bold">Niet beschikbaar</span>
+                            </div>
+                            <div class="legenda-item" data-status="available">
+                                <div class="legenda-color"></div>
+                                <span class="legenda-text fw-bold">Beschikbaar</span>
+                            </div>
+                            <div class="legenda-item" data-status="no-response">
+                                <div class="legenda-color"></div>
+                                <span class="legenda-text fw-bold">Niet gereageerd</span>
+                            </div>
+                            <div class="legenda-item pe-none" data-status="no-response">
+                                <div class="legenda-color"></div>
+                                <span class="legenda-text fw-bold">Matchday</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="step-wizard" data-step="2">
-                    <h1 class="text">Test message</h1>
+           </div>
+            <div class="step-wizard f-center" data-step="3" style="flex-direction: column">
+                <div class="form-group w-75 m-auto">
+                    <h6 class="text">Voeg opmerking toe</h6>
+                    <form action="/prevention/SubmitPrevention" method="post" id="prevention-comment-form">
+                        <input id="prevention-schemeID" type="hidden" name="schemeID" value="@Model.Scheme.schemeID" />
+                        <input id="prevention-memberID" type="hidden" name="memberID" id="prevention-memberID" />
+                        <input id="prevention-comment-input" type="text" class="form-control mt-2" name="comment" />
+                    </form>
+                    
                 </div>
-                <div class="step-wizard" data-step="3">
-                </div>
-            </div>
-            <div class="prevention-bottom-nav">
-                <button onclick="previousStep()" class="text">Vorige</button>
-                <button onclick="nextStep()" class="text">Volgende</button>
-            </div>
-        </div>
-    </div>
+           </div>
+       </div>
+       <div class="prevention-bottom">
+            <button id="prevention-previous-btn" onclick="previousStep(); getAvailabilityOfSelectedPlayer('@Model.Scheme.schemeID'); getPreventionComment('@Model.Scheme.schemeID')">Vorige</button>
+            <button id="prevention-next-btn" onclick="nextStep(); getAvailabilityOfSelectedPlayer('@Model.Scheme.schemeID'); getPreventionComment('@Model.Scheme.schemeID')">Volgende</button>
+       </div>
+   </div>
 </div>

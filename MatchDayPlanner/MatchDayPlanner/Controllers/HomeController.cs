@@ -151,7 +151,7 @@ namespace MatchDayPlanner.Controllers
         public IActionResult ScheduleOverview(Guid scheduleID)
         {
             ScheduleViewModel model = database.Query<ScheduleViewModel>(string.Format("SELECT * FROM GameSchedules WHERE schemeID = '{0}'", scheduleID)).FirstOrDefault();
-
+            ViewBag.SharedURL = string.Format("https://localhost:7294/prevention/{0}/{1}", model.teamID, model.schemeID);
             return View(model);
         }
 

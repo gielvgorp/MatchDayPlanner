@@ -7,11 +7,11 @@
     <div class="matchday-status-container">
         <div class="status-item">
             <span class="name">Aanwezig: </span>
-            <span>@Model.PreventionList.Where(p => p.IsPresent).Count()</span>
+            <span>@(Model.PreventionList.Where(p => p.IsPresent)?.Count() == null ? "0" : Model.PreventionList.Where(p => p.IsPresent)?.Count().ToString())</span>
         </div>
          <div class="status-item">
             <span class="name">Afwezig: </span>
-            <span>@Model.PreventionList.Where(p => p.IsPresent == false).Count()</span>
+            <span>@(Model.PreventionList.Where(p => p.IsPresent == false).Count() == null ? "0" : Model.PreventionList.Where(p => p.IsPresent == false).Count().ToString())</span>
         </div>
         <div class="status-item">
             <span class="name">Niet gereageerd: </span>

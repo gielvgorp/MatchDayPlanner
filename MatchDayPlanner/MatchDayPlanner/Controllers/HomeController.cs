@@ -189,8 +189,10 @@ namespace MatchDayPlanner.Controllers
 
         public IActionResult ScheduleOverview(Guid scheduleID)
         {
-            ScheduleViewModel model = database.Query<ScheduleViewModel>(string.Format("SELECT * FROM GameSchedules WHERE schemeID = '{0}'", scheduleID)).FirstOrDefault();
-            ViewBag.SharedURL = string.Format("https://localhost:7294/prevention/{0}/{1}", model.teamID, model.schemeID);
+            ScheduleOverviewViewModel model = new ScheduleOverviewViewModel();
+            model.Scheme = database.Query<ScheduleViewModel>(string.Format("SELECT * FROM GameSchedules WHERE schemeID = '{0}'", scheduleID)).FirstOrDefault();
+            model.SchemeMatchDay = database.Query<SchemeMatchDayViewModel>(string.Format("SELECT * FROM SchemeMatchDay WHERE schemeID = '{0}'", scheduleID));
+            ViewBag.SharedURL = string.Format("https://localhost:7294/prevention/{0}/{1}", model.Scheme.teamID, model.Scheme.schemeID);
             return View(model);
         }
 

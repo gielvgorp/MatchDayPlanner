@@ -42,14 +42,16 @@ function matchDaySaveChanges() {
 }
 function changeMatchDay(elem, schemeID) {
     var status = $(elem).attr("data-status");
-    if (available_status === "") {
 
+    if (available_status === "") {  // if no matchday is selected
+        const date = $(elem).attr("data-date").replace(/\//g, "-");
+        window.location = "../MatchDayOverview/" + schemeID + "/" + date;
     }
-    else if (status == available_status) {
+    else if (status == available_status) {      // remove matchday
         $(elem).removeAttr("data-status");
         setMatchday(false, $(elem).attr("data-date"), schemeID)
     }
-    else {
+    else {  // set matchday
         $(elem).attr("data-status", available_status);
         setMatchday(true, $(elem).attr("data-date"), schemeID)
     }

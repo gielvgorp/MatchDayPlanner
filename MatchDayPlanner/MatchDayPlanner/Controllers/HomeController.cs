@@ -154,8 +154,11 @@ namespace MatchDayPlanner.Controllers
             return View(model);
         }
 
-        public IActionResult SchemePrevention()
+        [HttpGet("/MatchDayOverview/{schemeID}/{date}")]
+        public IActionResult MatchDayOverview(Guid schemeID, DateTime date)
         {
+            MatchDayOverviewModel model = new MatchDayOverviewModel();
+
             return View();
         }
 

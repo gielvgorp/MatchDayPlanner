@@ -169,3 +169,29 @@ header .sub-title {
 .dropdown-container:hover .dropdown-content{
     display: block;
 }
+
+.legenda-item {
+    display: flex;
+    justify-content: end;
+    align-items: end;
+    padding: 5px;
+    cursor: pointer;
+}
+
+.legenda-available {
+    background: var(--available-bg);
+}
+
+.legenda-unavailable {
+    background: var(--unavailable-bg);
+}
+
+.legenda-color {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+.legenda-item[selected] {
+    border-bottom: 1px solid white;
+}

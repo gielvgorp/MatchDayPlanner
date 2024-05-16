@@ -20,9 +20,9 @@
             <div class="step-wizard f-center" data-step="1" style="flex-direction: column">
                 <div class="form-group w-75 m-auto">
                     <h6 class="text">Wat is je naam?</h6>
-                    <select class="form-select mt-2">
+                    <select id="player-select" class="form-select mt-2">
                         @foreach(TeamMemberViewModel player in Model.Team.members){
-                            <option>@player.memberName</option>
+                            <option value="@player.memberID">@player.memberName</option>
                         }
                     </select>
                 </div>
@@ -42,7 +42,16 @@
 
                                     @for (int x = 0; x < DateTime.DaysInMonth(Model.Scheme.startDate.Year, i); x++)
                                     {
-                                        <div class="@(Model.SchemeMatchDay.Select(m => m.matchDayDateTime).Contains(new DateTime(Model.Scheme.startDate.Year, i, (x + 1))) ? "cal-day-cell matchday" : "cal-day-cell")" data-date="@i/@(x + 1)/@Model.Scheme.startDate.Year" onclick="setAvailability(this, '@Model.Scheme.schemeID')">
+                                        // Calculate the target date
+                                        var targetDate = new DateTime(Model.Scheme.startDate.Year, i, (x + 1));
+                                        // Find the specific match day that matches the target date
+                                        var matchDay = Model.SchemeMatchDay.FirstOrDefault(m => m.matchDayDateTime.Date == targetDate.Date);
+                                        // Determine if a match day was found
+                                        bool isMatchDay = matchDay != null;
+    
+                                        <div class="@(isMatchDay ? "cal-day-cell matchday" : "cal-day-cell")"
+                                             data-date="@i/@(x + 1)/@(Model.Scheme.startDate.Year)"
+                                             data-matchday="@(isMatchDay ? matchDay.matchDayID : "")" onclick="setAvailability(this, '@Model.Scheme.schemeID')">
                                             <h5 class="text">@(x + 1)</h5>
                                         </div>
                                     }
@@ -76,13 +85,18 @@
             <div class="step-wizard f-center" data-step="3" style="flex-direction: column">
                 <div class="form-group w-75 m-auto">
                     <h6 class="text">Voeg opmerking toe</h6>
-                   <input type="text" class="form-control mt-2"/>
+                    <form action="/prevention/SubmitPrevention" method="post" id="prevention-comment-form">
+                        <input id="prevention-schemeID" type="hidden" name="schemeID" value="@Model.Scheme.schemeID" />
+                        <input id="prevention-memberID" type="hidden" name="memberID" id="prevention-memberID" />
+                        <input id="prevention-comment-input" type="text" class="form-control mt-2" name="comment" />
+                    </form>
+                    
                 </div>
            </div>
        </div>
        <div class="prevention-bottom">
-            <button onclick="previousStep()">Vorige</button>
-            <button onclick="nextStep()">Volgende</button>
+            <button id="prevention-previous-btn" onclick="previousStep(); getAvailabilityOfSelectedPlayer('@Model.Scheme.schemeID'); getPreventionComment('@Model.Scheme.schemeID')">Vorige</button>
+            <button id="prevention-next-btn" onclick="nextStep(); getAvailabilityOfSelectedPlayer('@Model.Scheme.schemeID'); getPreventionComment('@Model.Scheme.schemeID')">Volgende</button>
        </div>
    </div>
 </div>

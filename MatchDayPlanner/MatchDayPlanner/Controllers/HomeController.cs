@@ -1,15 +1,16 @@
 using MatchDayPlanner.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using MatchDayPlannerCore;
+using MatchDayPlanner.Core;
 using System.Data;
 using System.Transactions;
+using MatchDayPlanner.DAL;
+using MatchDayPlanner.Core.Interfaces;
 
 namespace MatchDayPlanner.Controllers
 {
     public class HomeController : Controller
     {
-        Database database = new Database();
         public IActionResult Index()
         {
             ViewBag.CurrentView = "Index";

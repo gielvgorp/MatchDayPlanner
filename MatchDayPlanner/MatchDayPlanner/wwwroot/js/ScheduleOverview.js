@@ -1,6 +1,6 @@
 var available_status = "";
 $(document).ready(function () {
-    //generateCalendar(2, 4);
+    generateCalendar(2, 4);
 
     $(".legenda-item").on("click", function () {
         var status = $(this).data("status");
@@ -12,68 +12,9 @@ $(document).ready(function () {
             available_status = $(this).data("status");
             $(this).attr("selected", "");
         }
+       
     })
 });
-
-function matchDaySaveChanges() {
-    var dates = [];
-
-    $(".cal-day-cell[data-status='matchday']").each(function () {
-        // Get the date attribute of the current element and push it to the dates array
-        var date = $(this).data("date");
-        dates.push(date);
-    });
-
-    console.log(dates);
-
-    $.ajax({
-        url: "/Home/UpdateMatchDays",
-        type: "post",
-        data: {
-            matchdays: dates
-        },
-        success: function (response) {
-            console.log('test success');
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-            console.log('test failed');
-        }
-    });
-}
-function changeMatchDay(elem, schemeID) {
-    var status = $(elem).attr("data-status");
-
-    if (available_status === "") {  // if no matchday is selected
-        const date = $(elem).attr("data-date").replace(/\//g, "-");
-        window.location = "../MatchDayOverview/" + schemeID + "/" + date;
-    }
-    else if (status == available_status) {      // remove matchday
-        $(elem).removeAttr("data-status");
-        setMatchday(false, $(elem).attr("data-date"), schemeID)
-    }
-    else {  // set matchday
-        $(elem).attr("data-status", available_status);
-        setMatchday(true, $(elem).attr("data-date"), schemeID)
-    }
-}
-
-function setMatchday(add, date, schemeID) {
-    $.ajax({
-        url: "/Home/UpdateMatchDays",
-        type: "post",
-        data: {
-            date: date,
-            add: add,
-            schemeID: schemeID
-        },
-        success: function (response) {
-            console.log('test success');
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-            console.log('test failed');
-        }
-    });
-}
 
 // generates calendar based on start month and many months
 function generateCalendar(startIndex, amount) {
@@ -114,7 +55,6 @@ function generateCalendar(startIndex, amount) {
 
         for (var i = 0; i < number_of_month; i++) {
             var day_cell = document.createElement('div');
-            day_cell.setAttribute("data-date", `${i + 1}/${currentDate.getMonth() + 1}/${currentDate.getFullYear()}`);
             day_cell.classList.add("cal-day-cell");
 
             var day_cell_heading = document.createElement('h5');
@@ -124,7 +64,12 @@ function generateCalendar(startIndex, amount) {
 
             // add event on click to day cell
             day_cell.onclick = function () {
-                
+                var status = $(this).attr("data-status");
+                if (available_status === "") {
+                    
+                }
+                else if (status == available_status) $(this).removeAttr("data-status");
+                else $(this).attr("data-status", available_status);
             };
 
             cal_days.appendChild(day_cell);

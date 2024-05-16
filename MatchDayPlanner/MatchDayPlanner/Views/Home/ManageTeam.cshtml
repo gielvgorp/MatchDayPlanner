@@ -1,4 +1,4 @@
-﻿@model TeamViewModel
+﻿@model List<TeamMemberViewModel>
 
 @{
     ViewData["Title"] = "Team beheren";
@@ -6,16 +6,16 @@
 <link rel="stylesheet" href="~/css/manageTeam.css" asp-append-version="true" />
 
 <div class="page-content players">
-    @foreach (TeamMemberViewModel member in Model.members)
+    @foreach (TeamMemberViewModel member in Model)
     {
         <div class="player-container">
             <h6 class="player-name text">
                 @member.memberName
-                <span class="player-role">@if (member.memberID == Model.teamCaptainID) @("Captain") else @("Speler") </span>
+                <span class="player-role">Captain</span>
             </h6>
             <p class="player-email text">@member.memberEmail</p>
             <div class="manage-player text">
-                <a class="text" href="@Url.Action("EditPlayer", "Home", new { memberID = member.memberID, teamID = Model.teamID })">
+                <a class="text" href="@Url.Action("ManageTeam", "Home")">
                     <i class="fa-solid fa-ellipsis-vertical"></i>
                 </a>
             </div>

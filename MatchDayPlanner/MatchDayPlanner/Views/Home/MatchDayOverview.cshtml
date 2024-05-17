@@ -7,25 +7,32 @@
     <div class="matchday-status-container">
         <div class="status-item">
             <span class="name">Aanwezig: </span>
-            <span>@(Model.PreventionList.Where(p => p.IsPresent)?.Count() == null ? "0" : Model.PreventionList.Where(p => p.IsPresent)?.Count().ToString())</span>
+            <span>@(Model.PreventionList.Where(p => p.IsPresent == MemberPrevention.PreventionStatus.Available)?.Count() == null ? "0" : Model.PreventionList.Where(p => p.IsPresent == MemberPrevention.PreventionStatus.Available)?.Count().ToString())</span>
         </div>
          <div class="status-item">
             <span class="name">Afwezig: </span>
-            <span>@(Model.PreventionList.Where(p => p.IsPresent == false).Count() == null ? "0" : Model.PreventionList.Where(p => p.IsPresent == false).Count().ToString())</span>
+            <span>@(Model.PreventionList.Where(p => p.IsPresent == MemberPrevention.PreventionStatus.Unavailable).Count() == null ? "0" : Model.PreventionList.Where(p => p.IsPresent == MemberPrevention.PreventionStatus.Unavailable).Count().ToString())</span>
         </div>
         <div class="status-item">
             <span class="name">Niet gereageerd: </span>
-            <span>0</span>
+            <span>@(Model.PreventionList.Where(p => p.IsPresent == MemberPrevention.PreventionStatus.NoResponse).Count() == null ? "0" : Model.PreventionList.Where(p => p.IsPresent == MemberPrevention.PreventionStatus.NoResponse).Count().ToString())</span>
         </div>
     </div>
     <div class="prevention-main-container">
         <div class="prevention-list-container">
-            @foreach (var item in Model.PreventionList)
+            @if (Model.PreventionList.Count > 0)
             {
-                <div class="prevention-list-item @if (item.IsPresent) @("available") else @("unavailable")">
-                    <i class="fa-solid fa-user"></i>
-                    <p>@item.TeamMember.memberName | @if (item.IsPresent) @("Aanwezig") else @("Afwezig")</p>
-                </div>
+                @foreach (var item in Model.PreventionList)
+                {
+                    <div class="prevention-list-item @if (item.IsPresent == MemberPrevention.PreventionStatus.Available) @("available") else if(item.IsPresent == MemberPrevention.PreventionStatus.Unavailable) @("unavailable")">
+                        <i class="fa-solid fa-user"></i>
+                        <p>@item.TeamMember.memberName | @if (item.IsPresent == MemberPrevention.PreventionStatus.Available) @("Aanwezig") else if(item.IsPresent == MemberPrevention.PreventionStatus.Unavailable) @("Afwezig") else @("Niet gereageerd")</p>
+                    </div>
+                }
+            }
+            else
+            {
+                <h4 style="color: white; font-family: var(--font)">Geen resultaat!</h4>
             }
         </div>
         <div class="legenda-container">

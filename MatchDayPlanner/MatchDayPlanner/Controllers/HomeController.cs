@@ -200,8 +200,35 @@ namespace MatchDayPlanner.Controllers
         public IActionResult MatchDayOverview(Guid schemeID, DateTime date)
         {
             MatchDayOverviewModel model = new MatchDayOverviewModel();
+            model.MatchDay = database.Query<SchemeMatchDayViewModel>(string.Format("SELECT * FROM SchemeMatchDay WHERE schemeID = '{0}' AND matchDayDateTime = '{1}'", schemeID, date)).FirstOrDefault();
+            
+            if (model.MatchDay != null)
+            {
+                var preventions = database.Query<ScheduleLayoutViewModel>(string.Format("SELECT * FROM ScheduleLayout WHERE schemeID = '{0}' AND matchDayID = '{1}'", model.MatchDay.schemeID, model.MatchDay.matchDayID));
+                var teamMembers = database.Query<TeamMemberViewModel>(string.Format("SELECT * FROM TeamMembers as tm INNER JOIN GameSchedules as gm on gm.schemeID = '{0}' and gm.teamID = tm.teamID", model.MatchDay.schemeID));
 
-            return View();
+                foreach (var item in preventions)
+                {
+                    var member = teamMembers.FirstOrDefault(tm => tm.memberID.Equals(item.memberID));
+                    teamMembers.Remove(member);
+                    model.PreventionList.Add(new MemberPrevention
+                    {
+                        TeamMember = member,
+                        IsPresent = (MemberPrevention.PreventionStatus)item.isPresent
+                    });
+                }
+
+                foreach (var member in teamMembers)
+                {
+                    model.PreventionList.Add(new MemberPrevention
+                    {
+                        TeamMember = member,
+                        IsPresent = MemberPrevention.PreventionStatus.NoResponse
+                    });
+                }
+            }
+
+            return View(model);
         }
 
         public IActionResult Privacy()

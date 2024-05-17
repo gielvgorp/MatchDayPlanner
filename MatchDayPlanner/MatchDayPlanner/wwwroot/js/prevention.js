@@ -1,5 +1,5 @@
 var current_step = 0;
-var available_status = "available";
+var available_status = "";
 
 function nextStep() {
     if (current_step < $(".step-wizard").length - 1) {
@@ -66,6 +66,7 @@ function calculateBarValue() {
 
 function getAvailabilityOfSelectedPlayer(schemeID) {
     const playerID = $("#player-select").val();
+    $(".cal-day-cell").attr("data-status", "");
     $.ajax({
         url: "/prevention/GetPrevention",
         type: "post",
@@ -95,16 +96,18 @@ function getAvailabilityOfSelectedPlayer(schemeID) {
 function setAvailability(elem, schemeID) {
     const playerID = $("#player-select").val();
     var status = $(elem).attr("data-status");
-    if (available_status === "") {
+    if ($(elem).hasClass("matchday")) {
+        if (available_status === "") {
 
-    }
-    else if (status == available_status) {
-        $(elem).removeAttr("data-status");
-        setPrevention(false, $(elem).attr("data-date"), schemeID, playerID)
-    }
-    else {
-        $(elem).attr("data-status", available_status);
-        setPrevention(true, $(elem).attr("data-date"), schemeID, playerID)
+        }
+        else if (status == available_status) {
+            $(elem).removeAttr("data-status");
+            setPrevention(false, $(elem).attr("data-date"), schemeID, playerID)
+        }
+        else {
+            $(elem).attr("data-status", available_status);
+            setPrevention(true, $(elem).attr("data-date"), schemeID, playerID)
+        }
     }
 }
 

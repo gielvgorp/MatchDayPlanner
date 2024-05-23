@@ -1,8 +1,8 @@
-﻿using MatchDayPlanner.Models;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Reflection;
 using MatchDayPlanner.DAL;
+using MatchDayPlanner.Models.ViewModels;
 
 namespace MatchDayPlanner.Controllers
 {

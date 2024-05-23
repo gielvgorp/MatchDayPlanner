@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MatchDayPlanner.Models
+namespace MatchDayPlanner.Models.ViewModels
 {
     public class CreateTeamViewModel
     {

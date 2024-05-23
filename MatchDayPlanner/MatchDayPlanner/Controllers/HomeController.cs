@@ -1,4 +1,3 @@
-using MatchDayPlanner.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using MatchDayPlanner.Core;
@@ -7,22 +6,27 @@ using System.Transactions;
 using Microsoft.AspNetCore.Identity;
 using MatchDayPlanner.Areas.Identity.Data;
 using Microsoft.AspNetCore.Authorization;
-using MatchDayPlanner.DAL;
 using MatchDayPlanner.Core.Interfaces;
 using MatchDayPlanner.Core.Dto;
+using MatchDayPlanner.Models.ViewModels;
+using MatchDayPlanner.Core.Models.Entities;
+using MatchDayPlanner.Core.Services;
 
 namespace MatchDayPlanner.Controllers
 {
     [Authorize]
     public class HomeController : Controller
     {
-        Database database = new Database();
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ITeamRepository _teamRepository;
+        private readonly TeamService _teamService;
+        private readonly GameScheduleService _gameScheduleService;
+        private readonly MatchDayService _matchdayService;
 
         public HomeController(UserManager<ApplicationUser> userManager)
         {
-            _teamRepository = new TeamRepository();
+            _teamService = new TeamService();
+            _gameScheduleService = new GameScheduleService();
+            _matchdayService = new MatchDayService();
             _userManager = userManager;
         }
 
@@ -32,7 +36,7 @@ namespace MatchDayPlanner.Controllers
             ViewData["SubTitle"] = "Welkom terug, " + _userManager.GetUserName(this.User) + "!";
 
 
-            List<TeamDto> teams = _teamRepository.GetTeamsById(Guid.Parse(_userManager.GetUserId(this.User)));
+            List<Team> teams = _teamService.GetAllTeams(Guid.Parse(_userManager.GetUserId(this.User)));
             List<TeamViewModel> model = teams.Select(t => new TeamViewModel
             {
                 teamName = t.teamName,
@@ -40,10 +44,10 @@ namespace MatchDayPlanner.Controllers
                 teamID = t.teamID
             }).ToList();
 
-            model.ForEach(team => team.members = _teamRepository.GetTeamMembers(team.teamID).Select(t => new TeamMemberViewModel
+            model.ForEach(team => team.members = _teamService.GetTeamMembers(team.teamID).Select(t => new TeamMemberViewModel
             {
                 teamID = t.teamID,
-                memberID = t.memberID,
+                memberID = t.teamMemberID,
                 memberEmail = t.memberEmail,
                 memberName = t.memberName
             }).ToList());
@@ -64,9 +68,7 @@ namespace MatchDayPlanner.Controllers
             if (ModelState.IsValid)
             {
                 List<TeamViewModel> teams = new List<TeamViewModel> { new TeamViewModel { teamID = Guid.NewGuid(), teamCaptainID = Guid.NewGuid(), teamName = model.TeamName } };
-                bool result = _teamRepository.CreateTeam(model.TeamName, Guid.Parse(_userManager.GetUserId(this.User)));
-
-                if (result) return RedirectToAction("Index");
+                _teamService.CreateTeam(model.TeamName, Guid.Parse(_userManager.GetUserId(this.User)));
             }
 
             return View(model);
@@ -75,10 +77,10 @@ namespace MatchDayPlanner.Controllers
         [HttpGet("/manage-team/{teamID}/{add}")]
         public IActionResult ManageTeam(bool add, Guid teamID)
         {
-            List<TeamMemberViewModel> members = _teamRepository.GetTeamMembers(teamID).Select(t => new TeamMemberViewModel
+            List<TeamMemberViewModel> members = _teamService.GetTeamMembers(teamID).Select(t => new TeamMemberViewModel
             {
                 teamID = t.teamID,
-                memberID = t.memberID,
+                memberID = t.teamMemberID,
                 memberEmail = t.memberEmail,
                 memberName = t.memberName
             }).ToList();
@@ -86,25 +88,46 @@ namespace MatchDayPlanner.Controllers
             ViewBag.CurrentView = "ManageTeam";
             ViewBag.AddPlayer = add;
             ViewBag.TeamID = teamID;
-            ViewBag.Schedules = database.Query<ScheduleViewModel>(string.Format("SELECT * FROM GameSchedules WHERE teamID = '{0}'", teamID));
+            ViewBag.Schedules = _gameScheduleService.GetGameSchedules(teamID);
 
-            TeamViewModel team = database.Query<TeamViewModel>(string.Format("SELECT * FROM Teams WHERE teamID = '{0}'", teamID)).FirstOrDefault();
-            team.members = database.Query<TeamMemberViewModel>(string.Format("SELECT * FROM TeamMembers WHERE teamID = '{0}'", teamID));
+            Team team = _teamService.GetTeamByID(teamID);
 
-            return View(team);
+            TeamViewModel model = new TeamViewModel
+            {
+                teamID = team.teamID,
+                teamName = team.teamName,
+                teamCaptainID = team.teamCaptainID,
+                members = team.teamMembers.Select(tm => new TeamMemberViewModel
+                {
+                    memberID = tm.teamMemberID,
+                    memberEmail = tm.memberEmail,
+                    memberName = tm.memberName,
+                    teamID = tm.teamID,
+                }).ToList()
+            };
+
+            return View(model);
         }
 
         [HttpGet("/manage-team/player/{teamID}/{memberID}")]
         public IActionResult EditPlayer(Guid teamID, Guid memberID)
         {
-            TeamMemberViewModel member = database.Query<TeamMemberViewModel>(string.Format("SELECT * FROM TeamMembers WHERE memberID = '{0}'", memberID)).FirstOrDefault();
+            TeamMember member = _teamService.GetTeamMemberByID(memberID);
 
             if (member == null)
             {
                 return RedirectToAction("MangeTeam", "Home", new { add = false, ID = teamID });
             }
 
-            return View(member);
+            TeamMemberViewModel model = new TeamMemberViewModel
+            {
+                memberID = member.teamMemberID,
+                memberEmail = member.memberEmail,
+                memberName = member.memberName,
+                teamID = teamID
+            };
+
+            return View(model);
         }
 
         [HttpPost("/manage-team/player/{teamID}/{memberID}")]
@@ -117,22 +140,31 @@ namespace MatchDayPlanner.Controllers
 
             if (submitButton == "save")
             {
-                database.Update(string.Format("UPDATE teamMembers SET memberName = '{0}', memberEmail = '{1}' WHERE memberID = '{2}'", model.memberName, model.memberEmail, model.memberID));
+                TeamMember member = new TeamMember
+                {
+                    teamMemberID = model.memberID,
+                    memberEmail = model.memberEmail,
+                    memberName = model.memberName,
+                    teamID = model.teamID
+                };
+
+                _teamService.UpdateTeamMember(member);
 
                 if (isCaptain == "on")
                 {
-                    database.Update(string.Format("UPDATE teams SET teamCaptainID = '{0}' WHERE teamID = '{1}'", model.memberID, teamID));
+                    _teamService.UpdateTeamCaptain(model.memberID, model.teamID);
                 }
             }
             else if (submitButton == "delete")
             {
-                TeamViewModel captain = database.Query<TeamViewModel>(string.Format("SELECT * FROM teams where teamID = '{0}'", model.teamID)).FirstOrDefault();
+                Team captain = _teamService.GetTeamByID(teamID);
+               
                 if (captain.teamCaptainID == model.memberID)
                 {
-                    database.Update(string.Format("UPDATE teams SET teamCaptainID = NULL WHERE teamID = '{0}'", model.teamID));
+                    _teamService.UpdateTeamCaptain(Guid.Empty, teamID);
                 }
 
-                database.Delete(string.Format("DELETE FROM teamMembers WHERE memberID = '{0}'", model.memberID));
+                _teamService.DeleteTeamMember(model.memberID);
             }
 
             return RedirectToAction("ManageTeam", "Home", new { add = false, teamID = teamID });
@@ -143,21 +175,20 @@ namespace MatchDayPlanner.Controllers
         {
             if (add)
             {
-                database.Insert(string.Format("INSERT INTO SchemeMatchDay (schemeID, matchDayDateTime) VALUES ('{0}', '{1}')", schemeID, date));
+                _matchdayService.AddMatchday(schemeID, date);
             }
             else
             {
-                database.Delete(string.Format("DELETE FROM SchemeMatchDay WHERE schemeID = '{0}' AND matchDayDateTime = '{1}'", schemeID, date));
+                _matchdayService.RemoveMatchday(schemeID, date);
             }
-            
-            //List<SchemeMatchDayViewModel> result = database.Query<SchemeMatchDayViewModel>(string.Format("SELECT * FROM SchemeMatchDay WHERE schemeID = '{0}'", schemeID));
+
             return new JsonResult(Ok("success"));
         }
 
         [HttpPost]
         public IActionResult AddPlayer(string playerName, string playerEmail, string teamID)
         {
-            database.Insert(string.Format("INSERT INTO TeamMembers (teamID, memberName, memberEmail) VALUES ('{0}', '{1}', '{2}')", teamID, playerName, playerEmail));
+            _teamService.AddTeamMember(Guid.Parse(teamID), playerName, playerEmail);
             return RedirectToAction("ManageTeam", "Home", new { add = "true", teamID = teamID });
         }
 
@@ -177,7 +208,17 @@ namespace MatchDayPlanner.Controllers
                 return View(model);
             }
 
-            database.Insert(string.Format("INSERT INTO GameSchedules (teamID, scheduleName, schemeDeadline, numberOfPresent, startDate, endDate) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}')", model.TeamID, model.ScheduleName, model.Deadline, model.numberOfPresent, model.DateStart, model.DateEnd));
+            GameSchedules schedule = new GameSchedules
+            {
+                teamID = model.TeamID,
+                ScheduleName = model.ScheduleName,
+                startDate = model.DateStart,
+                endDate = model.DateEnd,
+                schemeDeadline = model.Deadline,
+                numberOfPresent = model.numberOfPresent
+            };
+
+            _gameScheduleService.Create(schedule);
 
             return View();
         }
@@ -190,8 +231,9 @@ namespace MatchDayPlanner.Controllers
         public IActionResult ScheduleOverview(Guid scheduleID)
         {
             ScheduleOverviewViewModel model = new ScheduleOverviewViewModel();
-            model.Scheme = database.Query<ScheduleViewModel>(string.Format("SELECT * FROM GameSchedules WHERE schemeID = '{0}'", scheduleID)).FirstOrDefault();
-            model.SchemeMatchDay = database.Query<SchemeMatchDayViewModel>(string.Format("SELECT * FROM SchemeMatchDay WHERE schemeID = '{0}'", scheduleID));
+            model.Scheme = _gameScheduleService.GetGameScheduleByID(scheduleID);
+            model.SchemeMatchDay = _matchdayService.GetAllMatchDays(scheduleID);
+            model.SchemeMatchDay = 
             ViewBag.SharedURL = string.Format("https://localhost:7294/prevention/{0}/{1}", model.Scheme.teamID, model.Scheme.schemeID);
             return View(model);
         }

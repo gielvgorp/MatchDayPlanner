@@ -1,4 +1,6 @@
-﻿@if (ViewBag.CurrentView == "Index")
+﻿@using MatchDayPlanner.Models.ViewModels
+
+@if (ViewBag.CurrentView == "Index")
 {
     <a class="item" href="@Url.Action("CreateTeam", "Home")">Nieuw team</a>
 }

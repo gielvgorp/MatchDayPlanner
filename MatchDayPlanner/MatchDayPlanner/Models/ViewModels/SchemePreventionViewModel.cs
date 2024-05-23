@@ -1,4 +1,4 @@
-﻿namespace MatchDayPlanner.Models
+﻿namespace MatchDayPlanner.Models.ViewModels
 {
     public class SchemePreventionViewModel
     {

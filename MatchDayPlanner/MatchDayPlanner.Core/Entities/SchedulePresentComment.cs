@@ -1,6 +1,6 @@
-﻿namespace MatchDayPlanner.Models
+﻿namespace MatchDayPlanner.Core.Models.Entities
 {
-    public class SchedulePresentCommentViewModel
+    public class SchedulePresentComment
     {
         public Guid schemeID { get; set; }
         public Guid memberID { get; set; }

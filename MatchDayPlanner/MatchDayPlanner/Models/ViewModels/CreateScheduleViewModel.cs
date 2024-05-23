@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MatchDayPlanner.Models
+namespace MatchDayPlanner.Models.ViewModels
 {
     public class CreateScheduleViewModel
     {
@@ -14,6 +14,6 @@ namespace MatchDayPlanner.Models
         [Display(Name = "Einde periode"), Required]
         public DateOnly DateEnd { get; set; }
         [Display(Name = "Aantal verplichte aanwezige"), Required]
-        public int numberOfPresent {  get; set; }
+        public int numberOfPresent { get; set; }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace MatchDayPlanner.Models.ViewModels
+﻿using MatchDayPlanner.Core.Models.Entities;
+
+namespace MatchDayPlanner.Models.ViewModels
 {
     public class MemberPrevention
     {
@@ -8,7 +10,7 @@
             Unavailable = 2,
             NoResponse = 3
         }
-        public TeamMemberViewModel TeamMember { get; set; }
+        public TeamMember TeamMember { get; set; }
         public PreventionStatus IsPresent { get; set; } = PreventionStatus.Available;
     }
 }

@@ -36,19 +36,40 @@ namespace MatchDayPlanner.Core.Services
             return _matchDayRepository.GetAllMatchDays(teamID);
         }
 
-        public List<SchemeMatchDay> GetAllPresents(Guid matchdayID)
+        public List<ScheduleLayout> GetAllPresents(Guid matchdayID)
         {
             return _matchDayRepository.GetAllPresents(matchdayID);
         }
 
-        public List<SchemeMatchDay> GetAllAbsents(Guid matchdayID)
+        public List<ScheduleLayout> GetAllAbsents(Guid matchdayID)
         {
             return _matchDayRepository.GetAllAbsents(matchdayID);
         }
 
-        public List<SchemeMatchDay> GetAllNoResponses(Guid matchdayID)
+      /*  public List<SchemeMatchDay> GetAllNoResponses(Guid matchdayID)
         {
             return _matchDayRepository.GetAllNoResponses(matchdayID);
+        }*/
+
+        public SchemeMatchDay GetMatchday(Guid schemeID, DateTime date)
+        {
+            return _matchDayRepository.GetMatchday(schemeID, date);
+        }
+
+        public List<ScheduleLayout> GetPreventions(Guid matchDayID)
+        {
+            List<ScheduleLayout> result = new List<ScheduleLayout>();
+            foreach (var present in GetAllPresents(matchDayID))
+            {
+                result.Add(present);
+            }
+
+            foreach (var absent in GetAllAbsents(matchDayID))
+            {
+                result.Add(absent);
+            }
+
+            return result;
         }
     }
 }

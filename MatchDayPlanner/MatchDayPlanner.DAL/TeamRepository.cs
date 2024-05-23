@@ -83,5 +83,10 @@ namespace MatchDayPlanner.DAL
         {
             database.Insert(string.Format("INSERT INTO TeamMembers (teamID, memberName, memberEmail) VALUES ('{0}', '{1}', '{2}')", teamID, playerName, playerEmail));
         }
+
+        public List<TeamMember> GetTeamMembersBySchemeID(Guid schemeID)
+        {
+            return database.Query<TeamMember>(string.Format("SELECT * FROM TeamMembers as tm INNER JOIN GameSchedules as gm on gm.schemeID = '{0}' and gm.teamID = tm.teamID", schemeID));
+        }
     }
 }

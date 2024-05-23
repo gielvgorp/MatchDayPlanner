@@ -6,6 +6,6 @@
         public Guid schemeID { get; set; }
         public Guid matchDayID { get; set; }
         public Guid memberID { get; set; }
-        public string isPresent { get; set; }
+        public int isPresent { get; set; }
     }
 }

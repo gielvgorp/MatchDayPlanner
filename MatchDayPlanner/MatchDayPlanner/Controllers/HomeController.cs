@@ -233,7 +233,6 @@ namespace MatchDayPlanner.Controllers
             ScheduleOverviewViewModel model = new ScheduleOverviewViewModel();
             model.Scheme = _gameScheduleService.GetGameScheduleByID(scheduleID);
             model.SchemeMatchDay = _matchdayService.GetAllMatchDays(scheduleID);
-            model.SchemeMatchDay = 
             ViewBag.SharedURL = string.Format("https://localhost:7294/prevention/{0}/{1}", model.Scheme.teamID, model.Scheme.schemeID);
             return View(model);
         }
@@ -242,16 +241,16 @@ namespace MatchDayPlanner.Controllers
         public IActionResult MatchDayOverview(Guid schemeID, DateTime date)
         {
             MatchDayOverviewModel model = new MatchDayOverviewModel();
-            model.MatchDay = database.Query<SchemeMatchDayViewModel>(string.Format("SELECT * FROM SchemeMatchDay WHERE schemeID = '{0}' AND matchDayDateTime = '{1}'", schemeID, date)).FirstOrDefault();
+            model.MatchDay = _matchdayService.GetMatchday(schemeID, date);
             
             if (model.MatchDay != null)
             {
-                var preventions = database.Query<ScheduleLayoutViewModel>(string.Format("SELECT * FROM ScheduleLayout WHERE schemeID = '{0}' AND matchDayID = '{1}'", model.MatchDay.schemeID, model.MatchDay.matchDayID));
-                var teamMembers = database.Query<TeamMemberViewModel>(string.Format("SELECT * FROM TeamMembers as tm INNER JOIN GameSchedules as gm on gm.schemeID = '{0}' and gm.teamID = tm.teamID", model.MatchDay.schemeID));
+                var preventions = _matchdayService.GetPreventions(model.MatchDay.matchDayID); //database.Query<ScheduleLayoutViewModel>(string.Format("SELECT * FROM ScheduleLayout WHERE schemeID = '{0}' AND matchDayID = '{1}'", model.MatchDay.schemeID, model.MatchDay.matchDayID));
+                var teamMembers = _teamService.GetTeamMembersBySchemeID(model.MatchDay.schemeID);
 
                 foreach (var item in preventions)
                 {
-                    var member = teamMembers.FirstOrDefault(tm => tm.memberID.Equals(item.memberID));
+                    var member = teamMembers.FirstOrDefault(tm => tm.teamMemberID.Equals(item.memberID));
                     teamMembers.Remove(member);
                     model.PreventionList.Add(new MemberPrevention
                     {

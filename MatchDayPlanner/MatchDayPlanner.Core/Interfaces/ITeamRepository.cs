@@ -22,5 +22,6 @@ namespace MatchDayPlanner.Core.Interfaces
         public void UpdateTeamCaptain(Guid memberID, Guid teamID);
         public void DeleteTeamMember(Guid memberID);
         public void AddTeamMember(Guid teamID, string playerName, string playerEmail);
+        public List<TeamMember> GetTeamMembersBySchemeID(Guid schemeID);
     }
 }

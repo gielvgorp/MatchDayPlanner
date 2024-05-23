@@ -75,5 +75,10 @@ namespace MatchDayPlanner.Core.Services
         {
             _teamRepository.AddTeamMember(teamID, playerName, playerEmail);
         }
+
+        public List<TeamMember> GetTeamMembersBySchemeID(Guid schemeID)
+        {
+            return _teamRepository.GetTeamMembersBySchemeID(schemeID);
+        }
     }
 }

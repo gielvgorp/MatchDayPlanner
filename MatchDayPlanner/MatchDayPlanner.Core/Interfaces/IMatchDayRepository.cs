@@ -13,8 +13,8 @@ namespace MatchDayPlanner.Core.Interfaces
         public void RemoveMatchday(Guid schemeID, string date);
         public void UpdateMatchday(SchemeMatchDay matchday);
         public List<SchemeMatchDay> GetAllMatchDays(Guid schemeID);
-        public List<SchemeMatchDay> GetAllPresents(Guid matchdayID);
-        public List<SchemeMatchDay> GetAllAbsents(Guid matchdayID);
-        public List<SchemeMatchDay> GetAllNoResponses(Guid matchdayID);
+        public List<ScheduleLayout> GetAllPresents(Guid matchdayID);
+        public List<ScheduleLayout> GetAllAbsents(Guid matchdayID);
+        public SchemeMatchDay GetMatchday(Guid schemeID, DateTime date);
     }
 }

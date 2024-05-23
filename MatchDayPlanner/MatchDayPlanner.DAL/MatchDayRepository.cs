@@ -16,16 +16,21 @@ namespace MatchDayPlanner.DAL
 
         public void AddMatchday(Guid schemeID, string date)
         {
-            _database.Insert(string.Format("INSERT INTO SchemeMatchDay (schemeID, matchDayDateTime) VALUES ('{0}', '{1}')", matchday.schemeID, matchday.matchDayDateTime));
+            _database.Insert(string.Format("INSERT INTO SchemeMatchDay (schemeID, matchDayDateTime) VALUES ('{0}', '{1}')", schemeID, date));
         }
         public void RemoveMatchday(Guid schemeID, string date) 
         {
             _database.Delete(string.Format("DELETE FROM SchemeMatchDay WHERE schemeID = '{0}' AND matchDayDateTime = '{1}'", schemeID, date));
         }
 
+        public SchemeMatchDay GetMatchday(Guid schemeID, DateTime date)
+        {
+            return _database.Query<SchemeMatchDay>(string.Format("SELECT * FROM SchemeMatchDay WHERE schemeID = '{0}' AND matchDayDateTime = '{1}'", schemeID, date)).FirstOrDefault();
+        }
+
         public void UpdateMatchday(SchemeMatchDay matchday)
         {
-
+            _database.Update(string.Format("UPDATE SchemeMatchDay SET matchDayDateTime = '{0}'", matchday.matchDayDateTime));
         }
 
         public List<SchemeMatchDay> GetAllMatchDays(Guid schemeID)
@@ -33,19 +38,14 @@ namespace MatchDayPlanner.DAL
            return _database.Query<SchemeMatchDay>(string.Format("SELECT * FROM SchemeMatchDay WHERE schemeID = '{0}'", schemeID));
         }
 
-        public List<SchemeMatchDay> GetAllPresents(Guid matchdayID)
+        public List<ScheduleLayout> GetAllPresents(Guid matchdayID)
         {
-
+            return _database.Query<ScheduleLayout>(string.Format("SELECT * FROM ScheduleLayout WHERE matchdayID = '{0}' AND isPresent = '1'", matchdayID));
         }
 
-        public List<SchemeMatchDay> GetAllAbsents(Guid matchdayID)
+        public List<ScheduleLayout> GetAllAbsents(Guid matchdayID)
         {
-
-        }
-
-        public List<SchemeMatchDay> GetAllNoResponses(Guid matchdayID)
-        {
-
+            return _database.Query<ScheduleLayout>(string.Format("SELECT * FROM ScheduleLayout WHERE matchdayID = '{0}' AND isPresent = '0'", matchdayID));
         }
     }
 }

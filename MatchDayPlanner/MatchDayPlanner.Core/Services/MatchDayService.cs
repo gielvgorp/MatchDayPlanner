@@ -12,9 +12,9 @@ namespace MatchDayPlanner.Core.Services
     {
         private readonly IMatchDayRepository _matchDayRepository;
 
-        public MatchDayService()
+        public MatchDayService(IMatchDayRepository c_matchDayRepository)
         {
-            
+            _matchDayRepository = c_matchDayRepository;
         }
         public void AddMatchday(Guid schemeID, string date)
         {

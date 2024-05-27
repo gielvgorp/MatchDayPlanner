@@ -14,9 +14,9 @@ namespace MatchDayPlanner.Core.Services
     {
         private readonly ITeamRepository _teamRepository;
 
-        public TeamService()
+        public TeamService(ITeamRepository c_teamRepository)
         {
-
+            _teamRepository = c_teamRepository;
         }
 
         public void CreateTeam(string teamName, Guid uid)

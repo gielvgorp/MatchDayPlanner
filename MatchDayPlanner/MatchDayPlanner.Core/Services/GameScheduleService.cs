@@ -12,6 +12,11 @@ namespace MatchDayPlanner.Core.Services
     {
         private readonly IGameScheduleRepository _gameScheduleRepository;
 
+        public GameScheduleService(IGameScheduleRepository c_gameScheduleRepository)
+        {
+            _gameScheduleRepository = c_gameScheduleRepository;
+        }
+
         public GameSchedules GetGameScheduleByID(Guid schemeID)
         {
             return _gameScheduleRepository.GetGameScheduleByID(schemeID);

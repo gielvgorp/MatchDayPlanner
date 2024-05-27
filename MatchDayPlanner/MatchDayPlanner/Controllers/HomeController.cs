@@ -11,6 +11,7 @@ using MatchDayPlanner.Core.Dto;
 using MatchDayPlanner.Models.ViewModels;
 using MatchDayPlanner.Core.Models.Entities;
 using MatchDayPlanner.Core.Services;
+using MatchDayPlanner.DAL;
 
 namespace MatchDayPlanner.Controllers
 {
@@ -24,9 +25,9 @@ namespace MatchDayPlanner.Controllers
 
         public HomeController(UserManager<ApplicationUser> userManager)
         {
-            _teamService = new TeamService();
-            _gameScheduleService = new GameScheduleService();
-            _matchdayService = new MatchDayService();
+            _teamService = new TeamService(new TeamRepository());
+            _gameScheduleService = new GameScheduleService(new GameScheduleRepository());
+            _matchdayService = new MatchDayService(new MatchDayRepository());
             _userManager = userManager;
         }
 

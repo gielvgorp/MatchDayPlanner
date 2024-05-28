@@ -1,4 +1,5 @@
-﻿using MatchDayPlanner.Core.Interfaces;
+﻿using MatchDayPlanner.Core.Entities;
+using MatchDayPlanner.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,14 +21,29 @@ namespace MatchDayPlanner.Core.Services
             _preventionRepository.DeletePrevention(matchDayID, memberID);
         }
 
-        public void UpdatePrevention()
-        {
-
-        }
-
         public void AddPrevention(Guid matchDayID, Guid memberID, Guid schemeID, string status)
         {
             _preventionRepository.AddPrevention(matchDayID, memberID, schemeID, Convert.ToInt16(status == "available"));
+        }
+
+        public SchedulePresentComment GetPresentComment(Guid schemeID, Guid memberID)
+        {
+            return _preventionRepository.GetPresentComment(schemeID, memberID);
+        }
+
+        public List<ScheduleLayout> GetPreventionsOfMember(Guid schemeID, Guid memberID)
+        {
+            return _preventionRepository.GetPreventionsOfMember(schemeID, memberID);
+        }
+
+        public void DeletePresentComment(Guid schemeID, Guid memberID)
+        {
+            _preventionRepository.DeletePresentComment(schemeID, memberID);
+        }
+
+        public void UpdatePresentComment(Guid schemeID, Guid memberID, string message)
+        {
+            _preventionRepository.UpdatePresentComment(schemeID, memberID, message);
         }
     }
 }

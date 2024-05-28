@@ -66,7 +66,7 @@ namespace MatchDayPlanner.DAL
 
         public void UpdateTeamMember(TeamMember member)
         {
-            database.Update(string.Format("UPDATE teamMembers SET memberName = '{0}', memberEmail = '{1}' WHERE memberID = '{2}'", member.memberName, member.memberEmail, member.teamMemberID));
+            database.Update(string.Format("UPDATE teamMembers SET memberName = '{0}', memberEmail = '{1}' WHERE memberID = '{2}'", member.memberName, member.memberEmail, member.memberID));
         }
 
         public void UpdateTeamCaptain(Guid memberID, Guid teamID)

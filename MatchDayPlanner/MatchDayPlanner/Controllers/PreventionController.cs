@@ -42,7 +42,7 @@ namespace MatchDayPlanner.Controllers
                 teamID = team.teamID,
                 members = team.teamMembers.Select(tm => new TeamMemberViewModel
                 {
-                    memberID = tm.teamMemberID,
+                    memberID = tm.memberID,
                     memberEmail = tm.memberEmail,
                     memberName = tm.memberName,
                     teamID = tm.teamID
@@ -107,24 +107,30 @@ namespace MatchDayPlanner.Controllers
         [HttpPost]
         public JsonResult GetPrevention(Guid playerID, Guid schemeID)
         {
-            var result = database.Query<ScheduleLayoutViewModel>(string.Format("SELECT * FROM ScheduleLayout WHERE schemeID = '{0}' and memberID = '{1}'", schemeID, playerID));
+            var result = _preventionService.GetPreventionsOfMember(schemeID, playerID);
             return new JsonResult(Ok(result));
         }
 
         [HttpPost]
         public JsonResult GetPreventionComment(Guid playerID, Guid schemeID)
         {
-            var result = database.Query<SchedulePresentCommentViewModel>(string.Format("SELECT * FROM schedulePresentComments WHERE schemeID = '{0}' AND memberID = '{1}'", schemeID, playerID));
+            var comment = _preventionService.GetPresentComment(schemeID, playerID);
+            var result = new SchedulePresentCommentViewModel
+            {
+                schemeID = comment.schemeID,
+                memberID = comment.memberID,
+                comment = comment.comment
+            };
             return new JsonResult(Ok(result));
         }
 
         [HttpPost]
         public IActionResult SubmitPrevention(string comment, Guid schemeID, Guid memberID)
         {
-            database.Delete(string.Format("DELETE FROM SchedulePresentComments WHERE schemeID = '{0}' AND memberID = '{1}'", schemeID, memberID));
+            _preventionService.DeletePresentComment(schemeID, memberID);
 
             if (!string.IsNullOrEmpty(comment))
-                database.Insert(string.Format("INSERT INTO SchedulePresentComments (schemeID, memberID, comment) VALUES ('{0}', '{1}', '{2}')", schemeID, memberID, comment));
+                _preventionService.UpdatePresentComment(schemeID, memberID, comment);
             
             return Redirect("Index");
         }

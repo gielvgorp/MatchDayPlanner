@@ -48,7 +48,7 @@ namespace MatchDayPlanner.Controllers
             model.ForEach(team => team.members = _teamService.GetTeamMembers(team.teamID).Select(t => new TeamMemberViewModel
             {
                 teamID = t.teamID,
-                memberID = t.teamMemberID,
+                memberID = t.memberID,
                 memberEmail = t.memberEmail,
                 memberName = t.memberName
             }).ToList());
@@ -81,7 +81,7 @@ namespace MatchDayPlanner.Controllers
             List<TeamMemberViewModel> members = _teamService.GetTeamMembers(teamID).Select(t => new TeamMemberViewModel
             {
                 teamID = t.teamID,
-                memberID = t.teamMemberID,
+                memberID = t.memberID,
                 memberEmail = t.memberEmail,
                 memberName = t.memberName
             }).ToList();
@@ -109,7 +109,7 @@ namespace MatchDayPlanner.Controllers
                 teamCaptainID = team.teamCaptainID,
                 members = team.teamMembers.Select(tm => new TeamMemberViewModel
                 {
-                    memberID = tm.teamMemberID,
+                    memberID = tm.memberID,
                     memberEmail = tm.memberEmail,
                     memberName = tm.memberName,
                     teamID = tm.teamID,
@@ -131,7 +131,7 @@ namespace MatchDayPlanner.Controllers
 
             TeamMemberViewModel model = new TeamMemberViewModel
             {
-                memberID = member.teamMemberID,
+                memberID = member.memberID,
                 memberEmail = member.memberEmail,
                 memberName = member.memberName,
                 teamID = teamID
@@ -152,7 +152,7 @@ namespace MatchDayPlanner.Controllers
             {
                 TeamMember member = new TeamMember
                 {
-                    teamMemberID = model.memberID,
+                    memberID = model.memberID,
                     memberEmail = model.memberEmail,
                     memberName = model.memberName,
                     teamID = model.teamID
@@ -260,7 +260,7 @@ namespace MatchDayPlanner.Controllers
 
                 foreach (var item in preventions)
                 {
-                    var member = teamMembers.FirstOrDefault(tm => tm.teamMemberID.Equals(item.memberID));
+                    var member = teamMembers.FirstOrDefault(tm => tm.memberID.Equals(item.memberID));
                     teamMembers.Remove(member);
                     model.PreventionList.Add(new MemberPrevention
                     {

@@ -11,8 +11,9 @@ namespace MatchDayPlanner.Core.Interfaces
     {
         public void DeletePrevention(Guid matchDayID, Guid memberID);
         public void AddPrevention(Guid matchDayID, Guid memberID, Guid schemeID, int preventionStatus);
-        public List<ScheduleLayout> GetPreventionsOfMember(Guid matchdayID, Guid memberID);
+        public List<ScheduleLayout> GetPreventionsOfMember(Guid schemeID, Guid memberID);
         public SchedulePresentComment GetPresentComment(Guid schemeID, Guid memberID);
-        public SchedulePresentComment UpdatePresentComment(Guid schemeID, Guid memberID, string message);
+        public void UpdatePresentComment(Guid schemeID, Guid memberID, string message);
+        public void DeletePresentComment(Guid schemeID, Guid memberID);
     }
 }

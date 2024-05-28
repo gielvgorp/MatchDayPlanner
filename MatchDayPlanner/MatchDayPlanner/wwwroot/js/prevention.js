@@ -138,7 +138,7 @@ function getPreventionComment(schemeID) {
             playerID: memberID
         },
         success: function (response) {
-            response = response.value[0];
+            response = response.value;
             if (response != undefined) {
                 $("#prevention-comment-input").val(response.comment.trim());
             } else {

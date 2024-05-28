@@ -4,11 +4,13 @@
     {
         public enum PreventionStatus
         {
+            Unavailable = 0,
             Available = 1,
-            Unavailable = 2,
-            NoResponse = 3
+            NoResponse = 2,
+            Playing = 3
         }
+
         public TeamMemberViewModel teamMemberViewModel { get; set; }
-        public PreventionStatus preventionStatus { get; set; } = PreventionStatus.Available;
+        public PreventionStatus preventionStatus { get; set; }
     }
 }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using static MatchDayPlanner.Core.Entities.ScheduleLayout;
 
 namespace MatchDayPlanner.DAL
 {
@@ -67,7 +68,7 @@ namespace MatchDayPlanner.DAL
                             ScheduleLayout layout = new ScheduleLayout();
                             layout.matchDayID = reader.GetGuid(reader.GetOrdinal("matchDayID"));
                             layout.memberID = reader.GetGuid(reader.GetOrdinal("memberID"));
-                            layout.isPresent = reader.GetByte(reader.GetOrdinal("isPresent"));
+                            layout.isPresent = (PreventionStatus)reader.GetInt32(reader.GetOrdinal("isPresent"));
                             layout.schemeID = reader.GetGuid(reader.GetOrdinal("schemeID"));
 
                             result.Add(layout);

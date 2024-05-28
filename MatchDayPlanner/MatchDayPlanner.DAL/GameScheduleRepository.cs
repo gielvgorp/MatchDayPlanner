@@ -5,35 +5,130 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data.SqlClient;
 
 namespace MatchDayPlanner.DAL
 {
     public class GameScheduleRepository : IGameScheduleRepository
     {
-        private readonly Database _database = new Database();
+        private readonly string _connectionString;
+
+        public GameScheduleRepository()
+        {
+            _connectionString = "Server=DESKTOP-SML637F;Database=MatchDayPlanner;Trusted_Connection=True;TrustServerCertificate=True;";
+        }
+
         public void Create(GameSchedules schedule)
         {
-            _database.Insert(string.Format("INSERT INTO GameSchedules (teamID, scheduleName, schemeDeadline, numberOfPresent, startDate, endDate) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}')", schedule.teamID, schedule.scheduleName, schedule.schemeDeadline, schedule.numberOfPresent, schedule.startDate, schedule.endDate));
+            string query = "INSERT INTO GameSchedules (teamID, scheduleName, schemeDeadline, numberOfPresent, startDate, endDate) VALUES (@teamID, @scheduleName, @schemeDeadline, @numberOfPresent, @startDate, @endDate)";
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@teamID", schedule.teamID);
+                    command.Parameters.AddWithValue("@scheduleName", schedule.scheduleName);
+                    command.Parameters.AddWithValue("@schemeDeadline", schedule.schemeDeadline);
+                    command.Parameters.AddWithValue("@numberOfPresent", schedule.numberOfPresent);
+                    command.Parameters.AddWithValue("@startDate", schedule.startDate);
+                    command.Parameters.AddWithValue("@endDate", schedule.endDate);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
         }
 
         public void Update(GameSchedules schedule)
         {
-            _database.Update(string.Format("UPDATE GameSchedules SET schemeDeadline = '{0}', numberOfPresent = '{1}', startDate = '{2}', endDate = '{3}', scheduleName = '{4}' WHERE schemeID = '{5}'", schedule.schemeDeadline, schedule.numberOfPresent, schedule.startDate, schedule.endDate, schedule.scheduleName, schedule.schemeID));
+            string query = "UPDATE GameSchedules SET schemeDeadline = @schemeDeadline, numberOfPresent = @numberOfPresent, startDate = @startDate, endDate = @endDate, scheduleName = @scheduleName WHERE schemeID = @schemeID";
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@schemeDeadline", schedule.schemeDeadline);
+                    command.Parameters.AddWithValue("@numberOfPresent", schedule.numberOfPresent);
+                    command.Parameters.AddWithValue("@startDate", schedule.startDate);
+                    command.Parameters.AddWithValue("@endDate", schedule.endDate);
+                    command.Parameters.AddWithValue("@scheduleName", schedule.scheduleName);
+                    command.Parameters.AddWithValue("@schemeID", schedule.schemeID);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
         }
 
         public void Delete(GameSchedules schedule)
         {
-            _database.Delete(string.Format("DELETE FROM GameSchedules WHERE schemeID = '{0}'", schedule.schemeID));
+            string query = "DELETE FROM GameSchedules WHERE schemeID = @schemeID";
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@schemeID", schedule.schemeID);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
         }
 
         public List<GameSchedules> GetGameSchedules(Guid teamID)
         {
-            return _database.Query<GameSchedules>(string.Format("SELECT * FROM GameSchedules WHERE teamID = '{0}'", teamID));
+            string query = "SELECT * FROM GameSchedules WHERE teamID = @teamID";
+            var result = new List<GameSchedules>();
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@teamID", teamID);
+                    connection.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            result.Add(new GameSchedules
+                            {
+                                schemeID = reader.GetGuid(reader.GetOrdinal("schemeID")),
+                                teamID = reader.GetGuid(reader.GetOrdinal("teamID")),
+                                scheduleName = reader.GetString(reader.GetOrdinal("scheduleName")),
+                                schemeDeadline = reader.GetDateTime(reader.GetOrdinal("schemeDeadline")),
+                                numberOfPresent = reader.GetInt32(reader.GetOrdinal("numberOfPresent")),
+                                startDate = reader.GetDateTime(reader.GetOrdinal("startDate")),
+                                endDate = reader.GetDateTime(reader.GetOrdinal("endDate"))
+                            });
+                        }
+                    }
+                }
+            }
+            return result;
         }
 
         public GameSchedules GetGameScheduleByID(Guid schemeID)
         {
-            return _database.Query<GameSchedules>(string.Format("SELECT * FROM GameSchedules WHERE schemeID = '{0}'", schemeID)).FirstOrDefault();
+            string query = "SELECT * FROM GameSchedules WHERE schemeID = @schemeID";
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@schemeID", schemeID);
+                    connection.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return new GameSchedules
+                            {
+                                schemeID = reader.GetGuid(reader.GetOrdinal("schemeID")),
+                                teamID = reader.GetGuid(reader.GetOrdinal("teamID")),
+                                scheduleName = reader.GetString(reader.GetOrdinal("scheduleName")),
+                                schemeDeadline = reader.GetDateTime(reader.GetOrdinal("schemeDeadline")),
+                                numberOfPresent = reader.GetInt32(reader.GetOrdinal("numberOfPresent")),
+                                startDate = reader.GetDateTime(reader.GetOrdinal("startDate")),
+                                endDate = reader.GetDateTime(reader.GetOrdinal("endDate"))
+                            };
+                        }
+                    }
+                }
+            }
+            return null;
         }
     }
 }

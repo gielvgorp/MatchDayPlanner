@@ -255,7 +255,7 @@ namespace MatchDayPlanner.Controllers
             
             if (model.MatchDay != null)
             {
-                var preventions = _matchdayService.GetPreventions(model.MatchDay.matchDayID); //database.Query<ScheduleLayoutViewModel>(string.Format("SELECT * FROM ScheduleLayout WHERE schemeID = '{0}' AND matchDayID = '{1}'", model.MatchDay.schemeID, model.MatchDay.matchDayID));
+                var preventions = _matchdayService.GetPreventions(model.MatchDay.matchDayID);
                 var teamMembers = _teamService.GetTeamMembersBySchemeID(model.MatchDay.schemeID);
 
                 foreach (var item in preventions)

@@ -35,6 +35,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MatchDayPlanner.Core\MatchDayPlanner.Core.csproj" />
+    <ProjectReference Include="..\MatchDayPlanner.DAL\MatchDayPlanner.DAL.csproj" />
   </ItemGroup>
 
 </Project>

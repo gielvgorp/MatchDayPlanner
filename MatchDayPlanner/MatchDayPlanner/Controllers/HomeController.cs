@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using MatchDayPlanner.Core.Interfaces;
 using MatchDayPlanner.Core.Dto;
 using MatchDayPlanner.Models.ViewModels;
-using MatchDayPlanner.Core.Models.Entities;
+using MatchDayPlanner.Core.Entities;
 using MatchDayPlanner.Core.Services;
 using MatchDayPlanner.DAL;
 
@@ -89,7 +89,16 @@ namespace MatchDayPlanner.Controllers
             ViewBag.CurrentView = "ManageTeam";
             ViewBag.AddPlayer = add;
             ViewBag.TeamID = teamID;
-            ViewBag.Schedules = _gameScheduleService.GetGameSchedules(teamID);
+            ViewBag.Schedules = _gameScheduleService.GetGameSchedules(teamID).Select(gs => new ScheduleViewModel
+            {
+                schemeID = gs.schemeID,
+                numberOfPresent = gs.numberOfPresent,
+                startDate = gs.startDate,
+                endDate = gs.endDate,
+                scheduleName = gs.scheduleName,
+                schemeDeadline = gs.schemeDeadline,
+                teamID = gs.teamID
+            }).ToList();
 
             Team team = _teamService.GetTeamByID(teamID);
 
@@ -212,7 +221,7 @@ namespace MatchDayPlanner.Controllers
             GameSchedules schedule = new GameSchedules
             {
                 teamID = model.TeamID,
-                ScheduleName = model.ScheduleName,
+                scheduleName = model.ScheduleName,
                 startDate = model.DateStart,
                 endDate = model.DateEnd,
                 schemeDeadline = model.Deadline,

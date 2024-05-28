@@ -1,6 +1,6 @@
 ﻿using MatchDayPlanner.Core;
 using MatchDayPlanner.Core.Interfaces;
-using MatchDayPlanner.Core.Models.Entities;
+using MatchDayPlanner.Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Data;

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MatchDayPlanner.Core;
 using MatchDayPlanner.Core.Interfaces;
-using MatchDayPlanner.Core.Models.Entities;
+using MatchDayPlanner.Core.Entities;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MatchDayPlanner.DAL

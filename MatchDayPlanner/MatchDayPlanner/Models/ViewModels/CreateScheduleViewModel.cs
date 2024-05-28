@@ -10,9 +10,9 @@ namespace MatchDayPlanner.Models.ViewModels
         [Display(Name = "Deadline")]
         public DateTime? Deadline { get; set; }
         [Display(Name = "Start periode"), Required]
-        public DateOnly DateStart { get; set; }
+        public DateTime DateStart { get; set; }
         [Display(Name = "Einde periode"), Required]
-        public DateOnly DateEnd { get; set; }
+        public DateTime DateEnd { get; set; }
         [Display(Name = "Aantal verplichte aanwezige"), Required]
         public int numberOfPresent { get; set; }
     }

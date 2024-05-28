@@ -1,4 +1,4 @@
-﻿namespace MatchDayPlanner.Core.Models.Entities
+﻿namespace MatchDayPlanner.Core.Entities
 {
     public class SchedulePreventStatuses
     {

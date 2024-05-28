@@ -3,12 +3,26 @@ using System.Collections.Generic;
 using System.Reflection;
 using MatchDayPlanner.DAL;
 using MatchDayPlanner.Models.ViewModels;
+using MatchDayPlanner.Core.Services;
+using MatchDayPlanner.Core.Entities;
 
 namespace MatchDayPlanner.Controllers
 {
     public class PreventionController : Controller
     {
         Database database = new Database();
+        private readonly TeamService _teamService;
+        private readonly GameScheduleService _gameScheduleService;
+        private readonly MatchDayService _matchdayService;
+        private readonly PreventionService _preventionService;
+
+        public PreventionController()
+        {
+            _teamService = new TeamService(new TeamRepository());
+            _gameScheduleService = new GameScheduleService(new GameScheduleRepository());
+            _matchdayService = new MatchDayService(new MatchDayRepository());
+            _preventionService = new PreventionService(new PreventionRepository());
+        }
 
         [HttpGet("/prevention/{teamID}/{schemeID}")]
         public IActionResult Index(Guid teamID, Guid schemeID)
@@ -17,12 +31,43 @@ namespace MatchDayPlanner.Controllers
             {
                 return RedirectToAction("Index", "Home");
             }
-            PreventionViewModel model = new PreventionViewModel();
 
-            model.Team = database.Query<TeamViewModel>(string.Format("SELECT * FROM Teams WHERE teamID = '{0}'", teamID)).FirstOrDefault();
-            model.Team.members = database.Query<TeamMemberViewModel>(string.Format("SELECT * FROM TeamMembers WHERE teamID = '{0}'", teamID));
-            model.Scheme = database.Query<SchemeViewModel>(string.Format("SELECT * FROM GameSchedules WHERE schemeID = '{0}'", schemeID)).FirstOrDefault();
-            model.SchemeMatchDay = database.Query<SchemeMatchDayViewModel>(string.Format("SELECT * FROM SchemeMatchDay WHERE schemeID = '{0}'", schemeID));
+            Team team = _teamService.GetTeamByID(teamID);
+            GameSchedules scheme = _gameScheduleService.GetGameScheduleByID(schemeID);
+            List<SchemeMatchDay> matchdays = _matchdayService.GetAllMatchDays(schemeID);
+
+            PreventionViewModel model = new PreventionViewModel();
+            model.Team = new TeamViewModel 
+            { 
+                teamID = team.teamID,
+                members = team.teamMembers.Select(tm => new TeamMemberViewModel
+                {
+                    memberID = tm.teamMemberID,
+                    memberEmail = tm.memberEmail,
+                    memberName = tm.memberName,
+                    teamID = tm.teamID
+                }).ToList(),
+                teamName = team.teamName,
+                teamCaptainID = team.teamCaptainID,
+            };
+            
+            model.Scheme = new SchemeViewModel
+            {
+                schemeID = scheme.schemeID,
+                teamID = scheme.teamID,
+                startDate = scheme.startDate,
+                endDate = scheme.endDate,
+                numberOfPresent = scheme.numberOfPresent,
+                scheduleName = scheme.scheduleName,
+                schemeDeadline = scheme.schemeDeadline
+            };
+
+            model.SchemeMatchDay = matchdays.Select(md => new SchemeMatchDayViewModel
+            {
+                matchDayID = md.matchDayID,
+                matchDayDateTime = md.matchDayDateTime,
+                schemeID = md.schemeID
+            }).ToList();
 
             if (model.Scheme.teamID != teamID)
             {
@@ -34,23 +79,29 @@ namespace MatchDayPlanner.Controllers
 
         [HttpPost]
         public JsonResult SetPrevention(bool add, DateTime date, Guid schemeID, Guid playerID, string status)
-        {
-
+        { 
             var matchday = GetSchemeMatchDayByDate(date, schemeID);
 
             if (matchday != null)
             {
-                database.Delete(string.Format("DELETE FROM ScheduleLayout WHERE schemeID = '{0}' AND memberID = '{1}' AND matchDayID = '{2}'", schemeID, playerID, matchday.matchDayID));
+                _preventionService.DeletePrevention(matchday.matchDayID, playerID);
 
                 if (add && status != "no-response")
-                    database.Insert(string.Format("INSERT INTO ScheduleLayout (matchDayID, memberID, isPresent, schemeID) VALUES ('{0}', '{1}', '{2}', '{3}')", matchday.matchDayID, playerID, Convert.ToInt16(status == "available"), schemeID));
+                    _preventionService.AddPrevention(matchday.matchDayID, playerID, schemeID, status);
             }
             return new JsonResult(Ok("success"));
         }
 
         public SchemeMatchDayViewModel GetSchemeMatchDayByDate(DateTime date, Guid schemeID)
         {
-            return database.Query<SchemeMatchDayViewModel>(string.Format("SELECT * FROM SchemeMatchday WHERE matchDayDateTime = '{0}' AND schemeID = '{1}'", date, schemeID)).FirstOrDefault();
+            SchemeMatchDay schemeMatchDay = _matchdayService.GetMatchday(schemeID, date);
+
+            return new SchemeMatchDayViewModel
+            {
+                matchDayID = schemeMatchDay.matchDayID,
+                schemeID = schemeID,
+                matchDayDateTime = date
+            };
         }
 
         [HttpPost]

@@ -1,5 +1,5 @@
 ﻿using MatchDayPlanner.Core.Interfaces;
-using MatchDayPlanner.Core.Models.Entities;
+using MatchDayPlanner.Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,9 +31,9 @@ namespace MatchDayPlanner.Core.Services
             _matchDayRepository.UpdateMatchday(matchday);
         }
 
-        public List<SchemeMatchDay> GetAllMatchDays(Guid teamID)
+        public List<SchemeMatchDay> GetAllMatchDays(Guid schemeID)
         {
-            return _matchDayRepository.GetAllMatchDays(teamID);
+            return _matchDayRepository.GetAllMatchDays(schemeID);
         }
 
         public List<ScheduleLayout> GetAllPresents(Guid matchdayID)

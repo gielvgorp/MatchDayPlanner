@@ -1,5 +1,5 @@
 ﻿using MatchDayPlanner.Core.Dto;
-using MatchDayPlanner.Core.Models.Entities;
+using MatchDayPlanner.Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

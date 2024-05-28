@@ -1,5 +1,5 @@
 ﻿using MatchDayPlanner.Core.Entities;
-using MatchDayPlanner.Core.Models.Entities;
+using MatchDayPlanner.Core.Entities;
 
 namespace MatchDayPlanner.Models.ViewModels
 {

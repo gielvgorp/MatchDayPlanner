@@ -115,13 +115,18 @@ namespace MatchDayPlanner.Controllers
         public JsonResult GetPreventionComment(Guid playerID, Guid schemeID)
         {
             var comment = _preventionService.GetPresentComment(schemeID, playerID);
-            var result = new SchedulePresentCommentViewModel
+            if(comment != null) 
             {
-                schemeID = comment.schemeID,
-                memberID = comment.memberID,
-                comment = comment.comment
-            };
-            return new JsonResult(Ok(result));
+                var result = new SchedulePresentCommentViewModel
+                {
+                    schemeID = comment.schemeID,
+                    memberID = comment.memberID,
+                    comment = comment?.comment
+                };
+                return new JsonResult(Ok(result));
+            }
+
+            return new JsonResult(Ok(null));
         }
 
         [HttpPost]

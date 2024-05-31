@@ -16,5 +16,7 @@ namespace MatchDayPlanner.Core.Interfaces
         public List<ScheduleLayout> GetAllPresents(Guid matchdayID);
         public List<ScheduleLayout> GetAllAbsents(Guid matchdayID);
         public SchemeMatchDay GetMatchday(Guid schemeID, DateTime date);
+        public List<ScheduleLayout> GetPreventionOfMember(Guid memberID, Guid schemeID);
+        public List<ScheduleLayout> GetPreventedOfMember(Guid memberID, Guid schemeID);
     }
 }

@@ -1,0 +1,109 @@
+﻿@using MatchDayPlanner.Models.ViewModels
+@using System.Globalization
+@model GeneratedSchemeViewModel
+
+@{
+    ViewData["Title"] = "Gemaakte schema";
+}
+
+<link rel="stylesheet" href="~/css/matchDayOverview.css" asp-append-version="true" />
+<div class="main-content" style="flex: 1; overflow: hidden">
+    <div class="prevention-main-container mt-0" style="max-height: 100%">
+        <div class="prevention-list-container overflow-auto col-10">
+            @if (Model.matchDays.Count > 0)
+            {
+                <form asp-action="SaveScheme" asp-controller="Home" method="post">
+                    @for (int i = 0; i < Model.matchDays.Count; i++)
+                    {
+                        var matchday = Model.matchDays[i];
+
+                        <div>
+                            <h4 style="color: white; font-family: var(--font)" class="fw-bold mt-3">
+                                @(new DateOnly(matchday.matchDayDateTime.Year, matchday.matchDayDateTime.Month, matchday.matchDayDateTime.Day).ToString("dd MMMM yyyy", CultureInfo.CreateSpecificCulture("nl")))
+                            </h4>
+
+                            @for (int j = 0; j < matchday.scheduledMembers.Count; j++)
+                            {
+                                <div class="prevention-list-item matchday">
+                                    <i class="fa-solid fa-user"></i>
+                                    <input type="text" name="matchDays[@i].scheduledMembers[@j].memberName" value="@matchday.scheduledMembers[j].memberName" class="form-control" />
+                                    <input type="hidden" name="matchDays[@i].scheduledMembers[@j].memberID" value="@matchday.scheduledMembers[j].memberName" />
+                                    <p> | Ingepland</p>
+                                </div>
+                            }
+
+                            @for (int k = 0; k < matchday.reserveMembers.Count; k++)
+                            {
+                                <div class="prevention-list-item available">
+                                    <i class="fa-solid fa-user"></i>
+                                    <input type="text" name="matchDays[@i].reserveMembers[@k].memberName" value="@matchday.reserveMembers[k].memberName" class="form-control" />
+                                    <input type="hidden" name="matchDays[@i].reserveMembers[@k].memberID" value="@matchday.reserveMembers[k].memberName" />
+                                    <p> | Reserve</p>
+                                </div>
+                            }
+
+                            @for (int l = 0; l < matchday.notAvailableMembers.Count; l++)
+                            {
+                                <div class="prevention-list-item unavailable">
+                                    <i class="fa-solid fa-user"></i>
+                                    <input type="text" name="matchDays[@i].notAvailableMembers[@l].memberName" value="@matchday.notAvailableMembers[l].memberName" class="form-control" />
+                                    <input type="hidden" name="matchDays[@i].notAvailableMembers[@l].memberID" value="@matchday.notAvailableMembers[l].memberName" />
+                                    <p> | Niet beschikbaar</p>
+                                </div>
+                            }
+
+                            @* Uncomment and adjust if you need to handle notResponseMembers as well
+                            @for (int m = 0; m < matchday.notResponseMembers.Count; m++)
+                            {
+                            <div class="prevention-list-item unknown">
+                            <i class="fa-solid fa-user"></i>
+                            <input type="text" name="matchDays[@i].notResponseMembers[@m].memberName" value="@matchday.notResponseMembers[m].memberName" class="form-control" />
+                            <input type="hidden" name="matchDays[@i].notResponseMembers[@m].Id" value="@matchday.notResponseMembers[m].Id" />
+                            <p> | Niet gereageerd</p>
+                            </div>
+                            } *@
+                        </div>
+                    }
+
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </form>
+            }
+            else
+            {
+                <h4 style="color: white; font-family: var(--font)">Geen resultaat!</h4>
+            }
+        </div>
+        <div class="col-2 d-flex flex-column justify-content-between">
+            <div class="legenda-container" style="height: auto !important;">
+                <h5 class="title">Legenda</h5>
+                <div class="legenda-item">
+                    <div class="legenda-color matchday"></div>
+                    <span>Ingepland</span>
+                </div>
+                <div class="legenda-item">
+                    <div class="legenda-color legenda-available"></div>
+                    <span>Reserve</span>
+                </div>
+                <div class="legenda-item">
+                    <div class="legenda-color legenda-unavailable"></div>
+                    <span>Niet beschikbaar</span>
+                </div>
+                <div class="legenda-item">
+                    <div class="legenda-color unknown"></div>
+                    <span>Onbekend</span>
+                </div>
+            </div>
+            <div class="legenda-container" style="height: auto !important;">
+                <h5 class="title">Schema info</h5>
+                @foreach (var item in Model.team.members)
+                {
+                    <div class="legenda-item">
+                        <span>@item.memberName:</span>
+                        <span class="ms-2">@Model.matchDays.SelectMany(m => m.scheduledMembers).Where(m => m.memberID.Equals(item.memberID)).ToList().Count</span>
+                    </div>
+                }
+            </div>
+        </div>
+       
+    </div>
+</div>

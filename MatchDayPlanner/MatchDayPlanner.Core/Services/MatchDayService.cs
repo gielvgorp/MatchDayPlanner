@@ -71,5 +71,15 @@ namespace MatchDayPlanner.Core.Services
 
             return result;
         }
+
+        public List<ScheduleLayout> GetAvailabilityOfMember(Guid memberID, Guid schemeID)
+        {
+            return _matchDayRepository.GetPreventionOfMember(memberID, schemeID);
+        }
+
+        public List<ScheduleLayout> GetPreventedOfMember(Guid memberID, Guid schemeID)
+        {
+            return _matchDayRepository.GetPreventedOfMember(memberID, schemeID);
+        }
     }
 }

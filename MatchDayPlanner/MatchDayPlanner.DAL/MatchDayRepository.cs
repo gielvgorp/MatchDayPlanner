@@ -47,5 +47,15 @@ namespace MatchDayPlanner.DAL
         {
             return _database.Query<ScheduleLayout>(string.Format("SELECT * FROM ScheduleLayout WHERE matchdayID = '{0}' AND isPresent = '0'", matchdayID));
         }
+
+        public List<ScheduleLayout> GetPreventionOfMember(Guid memberID, Guid schemeID)
+        {
+            return _database.Query<ScheduleLayout>(string.Format("SELECT * FROM ScheduleLayout WHERE memberID = '{0}' AND schemeID = '{1}' AND isPresent = '1'", memberID, schemeID));
+        }
+
+        public List<ScheduleLayout> GetPreventedOfMember(Guid memberID, Guid schemeID)
+        {
+            return _database.Query<ScheduleLayout>(string.Format("SELECT * FROM ScheduleLayout WHERE memberID = '{0}' AND schemeID = '{1}' AND isPresent = '0'", memberID, schemeID));
+        }
     }
 }

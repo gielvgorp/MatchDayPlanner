@@ -80,5 +80,10 @@ namespace MatchDayPlanner.Core.Services
         {
             return _teamRepository.GetTeamMembersBySchemeID(schemeID);
         }
+
+        public Team GetTeamBySchemeID(Guid schemeID)
+        {
+            return _teamRepository.GetTeamBySchemeID(schemeID);
+        }
     }
 }

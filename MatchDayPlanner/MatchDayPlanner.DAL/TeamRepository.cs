@@ -88,5 +88,10 @@ namespace MatchDayPlanner.DAL
         {
             return database.Query<TeamMember>(string.Format("SELECT * FROM TeamMembers as tm INNER JOIN GameSchedules as gm on gm.schemeID = '{0}' and gm.teamID = tm.teamID", schemeID));
         }
+
+        public Team GetTeamBySchemeID(Guid schemeID)
+        {
+            return database.Query<Team>(string.Format("SELECT * FROM Teams as t INNER JOIN GameSchedules as gm on gm.schemeID = '{0}' and gm.teamID = t.teamID", schemeID)).FirstOrDefault();
+        }
     }
 }

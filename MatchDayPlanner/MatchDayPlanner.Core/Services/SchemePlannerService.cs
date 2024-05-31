@@ -1,0 +1,188 @@
+﻿using MatchDayPlanner.Core.Interfaces;
+using MatchDayPlanner.Core.SchemePlanner;
+
+namespace MatchDayPlanner.Core.Services
+{
+    public class SchemePlannerService
+    {
+        private Guid schemeID { get; set; }
+        public Team team { get; set; }
+        public List<MatchDay> matchDays { set; get; }
+        public int numberOfPlayers = 3;
+        public int error = 0;
+        private List<MatchDay> schemeLayout { get; set; } = new List<MatchDay>();
+
+        private readonly TeamService _teamService;
+        private readonly GameScheduleService _gameScheduleService;
+        private readonly MatchDayService _matchDayService;
+        public SchemePlannerService(TeamService c_teamService, GameScheduleService c_gameScheduleService, MatchDayService c_matchDayService)
+        {
+            _teamService = c_teamService;
+            _gameScheduleService = c_gameScheduleService;
+            _matchDayService = c_matchDayService;
+        }
+
+        public Scheme NewScheme(Guid schemeID)
+        {
+            var result = _teamService.GetTeamBySchemeID(schemeID);
+            var captain = _teamService.GetTeamCaptain(result.teamID);
+            var matchdays = _matchDayService.GetAllMatchDays(schemeID);
+            var teamMembers = _teamService.GetTeamMembers(result.teamID);
+
+            this.matchDays = matchdays.Select(m => new MatchDay(m.matchDayID, m.matchDayDateTime)).ToList();
+            this.schemeID = schemeID;
+            this.team = new Team
+            {
+                teamID = result.teamID,
+                teamName = result.teamName,
+                teamCreatedBy = result.teamCreatedBy,
+                teamCaptain = new TeamMember(captain.memberID, captain.teamID, captain.memberName, GetPreventionOfMember(captain.memberID, schemeID), true),
+                members = teamMembers.Select(t => new TeamMember(t.memberID, t.teamID, t.memberName, GetPreventionOfMember(t.memberID, schemeID), false)).ToList()
+            };
+
+            return GenerateScheme();
+        }
+
+        private List<MatchDay> GetPreventionOfMember(Guid memberID, Guid schemeID)
+        {
+            List<MatchDay> matchdays = new List<MatchDay>();
+            var preventions = _matchDayService.GetPreventedOfMember(memberID, schemeID);
+
+            preventions.ForEach(m =>
+            {
+                matchdays.Add(new MatchDay(m.matchDayID, matchDays.Where(md => md.matchDayID == m.matchDayID).FirstOrDefault().matchDayDateTime));
+            });
+
+            return matchdays;
+        }
+
+        private Scheme GenerateScheme()
+        {
+            CalculateAmountOfMatchesPerPlayer();
+
+            // get dates of matchdays
+            List<DateTime> matchDaysDateTime = matchDays.Select(md => md.matchDayDateTime).ToList();
+
+            List<MatchDay> preventedMatchDays = team.members
+           .SelectMany(m => m.preventions)
+           .Select(p => new MatchDay(p.matchDayID, p.matchDayDateTime)).DistinctBy(r => r.matchDayDateTime)
+           .ToList();
+
+            List<PreventedInfo> orderedList = preventedMatchDays
+                .Select(pmd => new PreventedInfo(GetMembersArePreventedOnDate(pmd.matchDayDateTime, null).Count, pmd))
+                .ToList();
+
+            // first plan all matchdays where 1 or more members are prevented
+            Console.WriteLine("Date that players are prevented:");
+            foreach (PreventedInfo item in orderedList.OrderByDescending(r => r.amountOfPrevented))
+            {
+                MatchDay layout = new MatchDay(item.matchDay.matchDayID, item.matchDay.matchDayDateTime);
+                Console.WriteLine("==============");
+                Console.WriteLine(item.matchDay.matchDayDateTime);
+                GetMembersArePreventedOnDate(item.matchDay.matchDayDateTime, layout);
+                MakeSchemeLayout(item.matchDay, layout);
+                Console.WriteLine("==============");
+
+                List<TeamMember> noResponse = _teamService.GetTeamMembers(team.teamID).Select(t => new TeamMember(t.memberID, t.teamID, t.memberName, null, false)).Where(m => layout.notAvailableMembers.Contains(m) == false && layout.scheduledMembers.Contains(m) == false && layout.reserveMembers.Contains(m) == false).ToList();
+                layout.noResponseMembers = noResponse;
+                schemeLayout.Add(layout);
+            }
+            Console.WriteLine("");
+
+
+            List<MatchDay> noPreventedMatchDays = matchDays
+             .Where(md => !preventedMatchDays.Any(pmd => pmd.matchDayDateTime == md.matchDayDateTime))
+             .Select(md => new MatchDay(md.matchDayID, md.matchDayDateTime))
+             .ToList();
+
+            // plan all matchdays where all members are available
+            foreach (MatchDay item in noPreventedMatchDays)
+            {
+                MatchDay layout = new MatchDay(item.matchDayID, item.matchDayDateTime);
+                Console.WriteLine("==============");
+                Console.WriteLine(item.matchDayDateTime);
+                GetMembersArePreventedOnDate(item.matchDayDateTime, layout);
+                MakeSchemeLayout(item, layout);
+                Console.WriteLine("==============");
+
+                schemeLayout.Add(layout);
+            }
+
+            Console.WriteLine("Number of errors: " + error);
+
+            return new Scheme(schemeLayout, schemeID);
+        }
+
+        void MakeSchemeLayout(MatchDay matchDay, MatchDay layout)
+        {
+            List<TeamMember> membersAvailable = GetMembersAreAvailableOnDate(matchDay.matchDayDateTime).Where(m => m.amountOfMatches > 0).OrderByDescending(m => m.numberOfPreventions).OrderByDescending(m => m.amountOfMatches).ToList();
+
+            Console.WriteLine("Planned in for: " + matchDay.matchDayDateTime);
+            for (int i = 0; i < membersAvailable.Count; i++)
+            {
+                if(i < numberOfPlayers)
+                {
+                    Console.WriteLine(membersAvailable[i].memberName);
+                    membersAvailable[i].amountOfMatches--;
+                    layout.scheduledMembers.Add(membersAvailable[i]);
+                }
+                else
+                {
+                    layout.reserveMembers.Add(membersAvailable[i]);
+                }
+            }
+
+            if (membersAvailable.Count < numberOfPlayers)
+            {
+                error++;
+            }
+        }
+
+        List<TeamMember> GetMembersArePreventedOnDate(DateTime date, MatchDay layout)
+        {
+            List<TeamMember> result = team.members.Where(m => m.preventions.Select(p => p.matchDayDateTime).Contains(date)).ToList();
+
+            if (layout != null)
+            {
+                result.ForEach(r =>
+                {
+                    layout.notAvailableMembers.Add(r);
+                });
+            }
+
+            //result.ForEach(r => Console.WriteLine(r.memberName));
+            Console.WriteLine("Amount of prevented: " + result.Count);
+            return result;
+        }
+
+        List<TeamMember> GetMembersAreAvailableOnDate(DateTime date)
+        {
+            List<TeamMember> result = team.members.Where(m => m.preventions.Select(p => p.matchDayDateTime).Contains(date) == false).ToList();
+
+            //result.ForEach(r => Console.WriteLine(r.memberName));
+            Console.WriteLine("Amount of available: " + result.Count);
+            return result;
+        }
+
+        void CalculateAmountOfMatchesPerPlayer()
+        {
+            decimal totalPlayersNeeded = matchDays.Count * numberOfPlayers;
+            decimal matchesPerPlayer = Math.Ceiling(totalPlayersNeeded / team.members.Count);
+            team.members.ForEach(m => m.amountOfMatches = (int)matchesPerPlayer);
+
+            Console.WriteLine("Matches per player: " + matchesPerPlayer);
+        }
+
+        partial class PreventedInfo
+        {
+            public int amountOfPrevented { get; set; }
+            public MatchDay matchDay { get; set; }
+
+            public PreventedInfo(int c_amountOfPrevented, MatchDay c_matchDay)
+            {
+                this.amountOfPrevented = c_amountOfPrevented;
+                this.matchDay = c_matchDay;
+            }
+        }
+    }
+}

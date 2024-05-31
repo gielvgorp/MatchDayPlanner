@@ -31,6 +31,7 @@ namespace MatchDayPlanner.DAL
                     command.Parameters.AddWithValue("@numberOfPresent", schedule.numberOfPresent);
                     command.Parameters.AddWithValue("@startDate", schedule.startDate);
                     command.Parameters.AddWithValue("@endDate", schedule.endDate);
+                    command.Parameters.AddWithValue("@scheduleStatus", 0);
                     connection.Open();
                     command.ExecuteNonQuery();
                 }
@@ -50,6 +51,21 @@ namespace MatchDayPlanner.DAL
                     command.Parameters.AddWithValue("@endDate", schedule.endDate);
                     command.Parameters.AddWithValue("@scheduleName", schedule.scheduleName);
                     command.Parameters.AddWithValue("@schemeID", schedule.schemeID);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void UpdateScheduleStatus(Guid schemeID, int statusCode)
+        {
+            string query = "UPDATE GameSchedules SET scheduleStatus = @statusCode WHERE schemeID = @schemeID";
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@schemeID", schemeID);
+                    command.Parameters.AddWithValue("@statusCode", statusCode);
                     connection.Open();
                     command.ExecuteNonQuery();
                 }

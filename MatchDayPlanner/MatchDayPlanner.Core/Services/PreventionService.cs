@@ -21,9 +21,9 @@ namespace MatchDayPlanner.Core.Services
             _preventionRepository.DeletePrevention(matchDayID, memberID);
         }
 
-        public void AddPrevention(Guid matchDayID, Guid memberID, Guid schemeID, string status)
+        public void AddPrevention(Guid matchDayID, Guid memberID, Guid schemeID, int status)
         {
-            _preventionRepository.AddPrevention(matchDayID, memberID, schemeID, Convert.ToInt16(status == "available"));
+            _preventionRepository.AddPrevention(matchDayID, memberID, schemeID, status);
         }
 
         public SchedulePresentComment GetPresentComment(Guid schemeID, Guid memberID)

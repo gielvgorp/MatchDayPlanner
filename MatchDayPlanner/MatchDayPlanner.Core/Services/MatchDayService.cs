@@ -81,5 +81,10 @@ namespace MatchDayPlanner.Core.Services
         {
             return _matchDayRepository.GetPreventedOfMember(memberID, schemeID);
         }
+
+        public Matchday GetMatchdayByID(Guid matchdayID)
+        {
+            return _matchDayRepository.GetMatchdayByID(matchdayID);
+        }
     }
 }

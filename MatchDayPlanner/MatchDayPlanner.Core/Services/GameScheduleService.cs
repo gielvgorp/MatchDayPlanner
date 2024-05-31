@@ -39,5 +39,9 @@ namespace MatchDayPlanner.Core.Services
         {
             _gameScheduleRepository.Delete(schedule);
         }
+        public void UpdateScheduleStatus(Guid schemeID, int statusCode)
+        {
+            _gameScheduleRepository.UpdateScheduleStatus(schemeID, statusCode);
+        }
     }
 }

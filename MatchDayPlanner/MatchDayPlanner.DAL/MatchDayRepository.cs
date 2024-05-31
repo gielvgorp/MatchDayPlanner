@@ -57,5 +57,10 @@ namespace MatchDayPlanner.DAL
         {
             return _database.Query<ScheduleLayout>(string.Format("SELECT * FROM ScheduleLayout WHERE memberID = '{0}' AND schemeID = '{1}' AND isPresent = '0'", memberID, schemeID));
         }
+
+        public Matchday GetMatchdayByID(Guid matchdayID)
+        {
+            return _database.Query<Matchday>(string.Format("SELECT * FROM SchemeMatchDay WHERE matchDayID = '{0}'", matchdayID)).FirstOrDefault();
+        }
     }
 }

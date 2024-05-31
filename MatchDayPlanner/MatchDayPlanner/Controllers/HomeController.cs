@@ -12,6 +12,7 @@ using MatchDayPlanner.Models.ViewModels;
 using MatchDayPlanner.Core.Entities;
 using MatchDayPlanner.Core.Services;
 using MatchDayPlanner.DAL;
+using Newtonsoft.Json;
 
 namespace MatchDayPlanner.Controllers
 {
@@ -29,12 +30,13 @@ namespace MatchDayPlanner.Controllers
             _teamService = new TeamService(new TeamRepository());
             _gameScheduleService = new GameScheduleService(new GameScheduleRepository());
             _matchdayService = new MatchDayService(new MatchDayRepository());
-            _schemePlannerService = new SchemePlannerService(_teamService, _gameScheduleService, _matchdayService);
+            _schemePlannerService = new SchemePlannerService(_teamService, _gameScheduleService, _matchdayService, new PreventionService(new PreventionRepository()));
             _userManager = userManager;
         }
 
         public IActionResult Index()
         {
+            TempData["ErrorMessage"] = null;
             ViewBag.CurrentView = "Index";
             ViewData["SubTitle"] = "Welkom terug, " + _userManager.GetUserName(this.User) + "!";
 
@@ -290,9 +292,37 @@ namespace MatchDayPlanner.Controllers
 
         public IActionResult GeneratedScheme(Guid scheduleID)
         {
+            if (TempData["ErrorMessage"] != null)
+            {
+                // Retrieve the model from TempData
+                var modelJson = TempData["GeneratedSchemeViewModel"] as string;
+                var viewModel = modelJson != null ? JsonConvert.DeserializeObject<GeneratedSchemeViewModel>(modelJson) : new GeneratedSchemeViewModel();
+                Team result = _teamService.GetTeamBySchemeID(scheduleID);
+                viewModel.team = new TeamViewModel
+                {
+                    teamID = result.teamID,
+                    teamName = result.teamName,
+                    members = _teamService.GetTeamMembers(result.teamID).Select(tm => new TeamMemberViewModel
+                    {
+                        memberID = tm.memberID,
+                        teamID = tm.teamID,
+                        memberEmail = tm.memberEmail,
+                        memberName = tm.memberName
+                    }).ToList(),
+                    teamCaptainID = result.teamCaptainID
+                };
+
+                // Pass the error message to the view
+                ViewBag.ErrorMessage = TempData["ErrorMessage"].ToString();
+
+                return View(viewModel);
+            }
+
+            GeneratedSchemeViewModel model = new GeneratedSchemeViewModel();
+            model = new GeneratedSchemeViewModel();
             MatchDayPlanner.Core.SchemePlanner.Scheme scheme = _schemePlannerService.NewScheme(scheduleID);
             Team team = _teamService.GetTeamBySchemeID(scheduleID);
-            GeneratedSchemeViewModel model = new GeneratedSchemeViewModel();
+
             model.SchemeID = scheme.GetSchemeID();
             model.team = new TeamViewModel
             {
@@ -314,43 +344,72 @@ namespace MatchDayPlanner.Controllers
                 layout.matchDayID = item.matchDayID;
                 layout.matchDayDateTime = item.matchDayDateTime;
 
-                layout.reserveMembers = scheme.GetAllReserveMembersForMatchDay(item.matchDayID).Select(m => new TeamMemberViewModel
+                layout.schemeLayout.AddRange(scheme.GetAllReserveMembersForMatchDay(item.matchDayID).Select(m => new SchemeTeamMember
                 {
                     memberID = m.memberID,
                     memberName = m.memberName,
                     teamID = m.teamID,
-                }).ToList();
+                    memberPrevention = SchemeTeamMember.PreventionStatus.Reserve
+                }).ToList());
 
-                layout.notAvailableMembers = scheme.GetAllPreventedMembersForMatchDay(item.matchDayID).Select(m => new TeamMemberViewModel
+                layout.schemeLayout.AddRange(scheme.GetAllPreventedMembersForMatchDay(item.matchDayID).Select(m => new SchemeTeamMember
                 {
                     memberID = m.memberID,
                     memberName = m.memberName,
                     teamID = m.teamID,
-                }).ToList();
+                    memberPrevention = SchemeTeamMember.PreventionStatus.NotAvailable
+                }).ToList());
 
-                layout.scheduledMembers = scheme.GetAllAvailableMembersForMatchDay(item.matchDayID).Select(m => new TeamMemberViewModel
+                layout.schemeLayout.AddRange(scheme.GetAllAvailableMembersForMatchDay(item.matchDayID).Select(m => new SchemeTeamMember
                 {
                     memberID = m.memberID,
                     memberName = m.memberName,
                     teamID = m.teamID,
-                }).ToList();
+                    memberPrevention = SchemeTeamMember.PreventionStatus.Scheduled
+                }).ToList());
 
-                layout.notResponseMembers = scheme.GetAllNoResponseMembersForMatchDay(item.matchDayID).Select(m => new TeamMemberViewModel
-                {
-                    memberID = m.memberID,
-                    memberName = m.memberName,
-                    teamID = m.teamID,
-                }).ToList();
+                /*                layout.schemeLayout.AddRange(scheme.GetAllNoResponseMembersForMatchDay(item.matchDayID).Select(m => new SchemeTeamMember
+                                {
+                                    memberID = m.memberID,
+                                    memberName = m.memberName,
+                                    teamID = m.teamID,
+                                    memberPrevention = SchemeTeamMember.PreventionStatus.NoResponse
+                                }).ToList());*/
 
                 model.matchDays.Add(layout);
             }
-
+            
+            
             return View(model);
         }
 
         [HttpPost]
-        public IActionResult SaveScheme(GeneratedSchemeViewModel model)
+        public IActionResult SaveScheme(GeneratedSchemeViewModel model, Guid schemeID)
         {
+            try
+            {
+                List<MatchDayPlanner.Core.SchemePlanner.MatchDay> matchDays = new List<MatchDayPlanner.Core.SchemePlanner.MatchDay>();
+                matchDays.AddRange(model.matchDays.Select(m => new MatchDayPlanner.Core.SchemePlanner.MatchDay
+                {
+                    matchDayID = m.matchDayID,
+                    schemeLayout = m.schemeLayout.Select(s => new Core.SchemePlanner.TeamMember(
+                        s.memberID,
+                        s.teamID,
+                        s.memberName,
+                        null,
+                        false,
+                        (Core.SchemePlanner.TeamMember.PreventionStatus)s.memberPrevention)).ToList(),
+                    matchDayDateTime = m.matchDayDateTime
+                }));
+
+                _schemePlannerService.SaveScheme(matchDays, schemeID);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                TempData["GeneratedSchemeViewModel"] = JsonConvert.SerializeObject(model);
+                return RedirectToAction("GeneratedScheme", "Home", new { scheduleID = schemeID });
+            }
             return View();
         }
 

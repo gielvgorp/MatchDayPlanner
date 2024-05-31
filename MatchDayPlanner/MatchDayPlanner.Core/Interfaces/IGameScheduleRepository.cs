@@ -14,5 +14,6 @@ namespace MatchDayPlanner.Core.Interfaces
         public void Delete(GameSchedules schedule);
         public List<GameSchedules> GetGameSchedules(Guid teamID);
         public GameSchedules GetGameScheduleByID(Guid scheduleID);
+        public void UpdateScheduleStatus(Guid schemeID, int statusCode);
     }
 }

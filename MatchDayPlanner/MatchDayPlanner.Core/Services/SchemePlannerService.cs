@@ -1,5 +1,6 @@
 ﻿using MatchDayPlanner.Core.Interfaces;
 using MatchDayPlanner.Core.SchemePlanner;
+using System.Globalization;
 
 namespace MatchDayPlanner.Core.Services
 {
@@ -15,11 +16,13 @@ namespace MatchDayPlanner.Core.Services
         private readonly TeamService _teamService;
         private readonly GameScheduleService _gameScheduleService;
         private readonly MatchDayService _matchDayService;
-        public SchemePlannerService(TeamService c_teamService, GameScheduleService c_gameScheduleService, MatchDayService c_matchDayService)
+        private readonly PreventionService _preventionService;
+        public SchemePlannerService(TeamService c_teamService, GameScheduleService c_gameScheduleService, MatchDayService c_matchDayService, PreventionService c_preventionSerice)
         {
             _teamService = c_teamService;
             _gameScheduleService = c_gameScheduleService;
             _matchDayService = c_matchDayService;
+            _preventionService = c_preventionSerice;
         }
 
         public Scheme NewScheme(Guid schemeID)
@@ -36,8 +39,8 @@ namespace MatchDayPlanner.Core.Services
                 teamID = result.teamID,
                 teamName = result.teamName,
                 teamCreatedBy = result.teamCreatedBy,
-                teamCaptain = new TeamMember(captain.memberID, captain.teamID, captain.memberName, GetPreventionOfMember(captain.memberID, schemeID), true),
-                members = teamMembers.Select(t => new TeamMember(t.memberID, t.teamID, t.memberName, GetPreventionOfMember(t.memberID, schemeID), false)).ToList()
+                teamCaptain = new TeamMember(captain.memberID, captain.teamID, captain.memberName, GetPreventionOfMember(captain.memberID, schemeID), true, 0),
+                members = teamMembers.Select(t => new TeamMember(t.memberID, t.teamID, t.memberName, GetPreventionOfMember(t.memberID, schemeID), false, 0)).ToList()
             };
 
             return GenerateScheme();
@@ -83,7 +86,7 @@ namespace MatchDayPlanner.Core.Services
                 MakeSchemeLayout(item.matchDay, layout);
                 Console.WriteLine("==============");
 
-                List<TeamMember> noResponse = _teamService.GetTeamMembers(team.teamID).Select(t => new TeamMember(t.memberID, t.teamID, t.memberName, null, false)).Where(m => layout.notAvailableMembers.Contains(m) == false && layout.scheduledMembers.Contains(m) == false && layout.reserveMembers.Contains(m) == false).ToList();
+                List<TeamMember> noResponse = _teamService.GetTeamMembers(team.teamID).Select(t => new TeamMember(t.memberID, t.teamID, t.memberName, null, false, 0)).Where(m => layout.notAvailableMembers.Contains(m) == false && layout.scheduledMembers.Contains(m) == false && layout.reserveMembers.Contains(m) == false).ToList();
                 layout.noResponseMembers = noResponse;
                 schemeLayout.Add(layout);
             }
@@ -171,6 +174,40 @@ namespace MatchDayPlanner.Core.Services
             team.members.ForEach(m => m.amountOfMatches = (int)matchesPerPlayer);
 
             Console.WriteLine("Matches per player: " + matchesPerPlayer);
+        }
+
+        public void SaveScheme(List<MatchDay> schemeLayout, Guid schemeID)
+        {
+            ValidateSchemeData(schemeLayout, schemeID);
+
+            foreach (MatchDay matchDay in schemeLayout)
+            {
+                foreach (TeamMember member in matchDay.schemeLayout.Where(m => m.memberPrevention == TeamMember.PreventionStatus.Scheduled))
+                {
+                    _preventionService.DeletePrevention(matchDay.matchDayID, member.memberID);
+                    _preventionService.AddPrevention(matchDay.matchDayID, member.memberID, schemeID, (int)TeamMember.PreventionStatus.Scheduled);
+                }
+            }
+
+            _gameScheduleService.UpdateScheduleStatus(schemeID, 1);
+        }
+
+        private void ValidateSchemeData(List<MatchDay> layout, Guid schemeID)
+        {
+            var scheme = _gameScheduleService.GetGameScheduleByID(schemeID);
+            int numberOfScheduled = scheme.numberOfPresent;
+
+            foreach (var matchday in layout)
+            {
+                if (matchday.schemeLayout.Where(m => m.memberPrevention == TeamMember.PreventionStatus.Scheduled).Count() > numberOfPlayers)
+                {
+                    throw new Exception(string.Format("Op {0} zijn er meer spelers ingepland dan de toegestaande aantal spelers", new DateOnly(matchday.matchDayDateTime.Year, matchday.matchDayDateTime.Month, matchday.matchDayDateTime.Day).ToString("dd MMMM", CultureInfo.CreateSpecificCulture("nl"))));
+                }
+                else if (matchday.schemeLayout.Where(m => m.memberPrevention == TeamMember.PreventionStatus.Scheduled).Count() < numberOfPlayers)
+                {
+                    throw new Exception(string.Format("Op {0} zijn er minder spelers ingepland dan de toegestaande aantal spelers", new DateOnly(matchday.matchDayDateTime.Year, matchday.matchDayDateTime.Month, matchday.matchDayDateTime.Day).ToString("dd MMMM", CultureInfo.CreateSpecificCulture("nl"))));
+                }
+            }
         }
 
         partial class PreventedInfo

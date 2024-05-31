@@ -1,0 +1,19 @@
+﻿.prevention-list-item:has(input[value='NoResponse']) {
+    background: var(--no-response-bg);
+}
+
+.prevention-list-item:has(input[value='Available']) {
+    background: var(--available-bg);
+}
+
+.prevention-list-item:has(input[value='Reserve']) {
+    background: var(--available-bg);
+}
+
+.prevention-list-item:has(input[value='Scheduled']) {
+    background: var(--matchday-bg);
+}
+
+.prevention-list-item:has(input[value='NotAvailable']) {
+    background: var(--unavailable-bg);
+}

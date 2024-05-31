@@ -87,7 +87,7 @@ namespace MatchDayPlanner.Controllers
                 _preventionService.DeletePrevention(matchday.matchDayID, playerID);
 
                 if (add && status != "no-response")
-                    _preventionService.AddPrevention(matchday.matchDayID, playerID, schemeID, status);
+                    _preventionService.AddPrevention(matchday.matchDayID, playerID, schemeID, Convert.ToInt16(status == "available"));
             }
             return new JsonResult(Ok("success"));
         }

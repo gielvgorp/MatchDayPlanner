@@ -9,5 +9,6 @@
         public DateTime startDate { get; set; }
         public DateTime endDate { get; set; }
         public string scheduleName { get; set; }
+        public int scheduleStatus { get; set; }
     }
 }

@@ -7,48 +7,40 @@
 }
 
 <link rel="stylesheet" href="~/css/matchDayOverview.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/GeneratedScheme.css" asp-append-version="true" />
+<script src="~/js/ScheduleOverview.js" defer></script>
+<script src="~/js/GeneratedScheme.js" defer></script>
 <div class="main-content" style="flex: 1; overflow: hidden">
     <div class="prevention-main-container mt-0" style="max-height: 100%">
-        <div class="prevention-list-container overflow-auto col-10">
+        <div class="prevention-list-container overflow-auto col-10 custom-scrollbar">
             @if (Model.matchDays.Count > 0)
             {
-                <form asp-action="SaveScheme" asp-controller="Home" method="post">
+                <form asp-action="SaveScheme" asp-controller="Home" method="post" id="scheme-form">
+                    <input type="hidden" name="schemeID" value="@Model.SchemeID" />
+                    <input type="hidden" name="team.teamID" value="@Model.team.teamID" />
                     @for (int i = 0; i < Model.matchDays.Count; i++)
                     {
                         var matchday = Model.matchDays[i];
+                        <input type="hidden" name="matchDays[@i].matchDayID" value="@matchday.matchDayID" />
+                        <input type="hidden" name="matchDays[@i].matchDayDateTime" value="@matchday.matchDayDateTime" />
 
                         <div>
                             <h4 style="color: white; font-family: var(--font)" class="fw-bold mt-3">
                                 @(new DateOnly(matchday.matchDayDateTime.Year, matchday.matchDayDateTime.Month, matchday.matchDayDateTime.Day).ToString("dd MMMM yyyy", CultureInfo.CreateSpecificCulture("nl")))
                             </h4>
-
-                            @for (int j = 0; j < matchday.scheduledMembers.Count; j++)
-                            {
-                                <div class="prevention-list-item matchday">
-                                    <i class="fa-solid fa-user"></i>
-                                    <input type="text" name="matchDays[@i].scheduledMembers[@j].memberName" value="@matchday.scheduledMembers[j].memberName" class="form-control" />
-                                    <input type="hidden" name="matchDays[@i].scheduledMembers[@j].memberID" value="@matchday.scheduledMembers[j].memberName" />
-                                    <p> | Ingepland</p>
-                                </div>
+                            @{
+                                var sortedSchemeLayout = matchday.schemeLayout.OrderByDescending(x => x.memberPrevention).ToList();
                             }
 
-                            @for (int k = 0; k < matchday.reserveMembers.Count; k++)
+                            @for (int j = 0; j < sortedSchemeLayout.Count; j++)
                             {
-                                <div class="prevention-list-item available">
+                                <div class="prevention-list-item mt-3 matchday" onclick="changeMemberPrevention(this)">
                                     <i class="fa-solid fa-user"></i>
-                                    <input type="text" name="matchDays[@i].reserveMembers[@k].memberName" value="@matchday.reserveMembers[k].memberName" class="form-control" />
-                                    <input type="hidden" name="matchDays[@i].reserveMembers[@k].memberID" value="@matchday.reserveMembers[k].memberName" />
-                                    <p> | Reserve</p>
-                                </div>
-                            }
-
-                            @for (int l = 0; l < matchday.notAvailableMembers.Count; l++)
-                            {
-                                <div class="prevention-list-item unavailable">
-                                    <i class="fa-solid fa-user"></i>
-                                    <input type="text" name="matchDays[@i].notAvailableMembers[@l].memberName" value="@matchday.notAvailableMembers[l].memberName" class="form-control" />
-                                    <input type="hidden" name="matchDays[@i].notAvailableMembers[@l].memberID" value="@matchday.notAvailableMembers[l].memberName" />
-                                    <p> | Niet beschikbaar</p>
+                                    <p>@sortedSchemeLayout[j].memberName</p>
+                                    <p> | @sortedSchemeLayout[j].memberPrevention</p>
+                                    <input type="hidden" name="matchDays[@i].schemeLayout[@j].memberPrevention" value="@sortedSchemeLayout[j].memberPrevention" />
+                                    <input type="hidden" name="matchDays[@i].schemeLayout[@j].memberName" value="@sortedSchemeLayout[j].memberName" />
+                                    <input type="hidden" name="matchDays[@i].schemeLayout[@j].memberID" value="@sortedSchemeLayout[j].memberID" />
                                 </div>
                             }
 
@@ -64,8 +56,6 @@
                             } *@
                         </div>
                     }
-
-                    <button type="submit" class="btn btn-primary">Save</button>
                 </form>
             }
             else
@@ -76,34 +66,54 @@
         <div class="col-2 d-flex flex-column justify-content-between">
             <div class="legenda-container" style="height: auto !important;">
                 <h5 class="title">Legenda</h5>
-                <div class="legenda-item">
+                <div class="legenda-item" data-status="Scheduled">
                     <div class="legenda-color matchday"></div>
                     <span>Ingepland</span>
                 </div>
-                <div class="legenda-item">
+                <div class="legenda-item" data-status="Reserve">
                     <div class="legenda-color legenda-available"></div>
                     <span>Reserve</span>
                 </div>
-                <div class="legenda-item">
+                <div class="legenda-item" data-status="NotAvailable">
                     <div class="legenda-color legenda-unavailable"></div>
                     <span>Niet beschikbaar</span>
                 </div>
-                <div class="legenda-item">
+                <div class="legenda-item" data-status="NoResponse">
                     <div class="legenda-color unknown"></div>
                     <span>Onbekend</span>
                 </div>
             </div>
-            <div class="legenda-container" style="height: auto !important;">
-                <h5 class="title">Schema info</h5>
-                @foreach (var item in Model.team.members)
-                {
-                    <div class="legenda-item">
-                        <span>@item.memberName:</span>
-                        <span class="ms-2">@Model.matchDays.SelectMany(m => m.scheduledMembers).Where(m => m.memberID.Equals(item.memberID)).ToList().Count</span>
-                    </div>
-                }
+            <div>
+                <div class="legenda-container" style="height: auto !important;">
+                    <h5 class="title">Schema info</h5>
+                    @foreach (var item in Model.team.members)
+                    {
+                        <div class="legenda-item">
+                            <span>@item.memberName:</span>
+                            <span class="ms-2">@Model.matchDays.SelectMany(m => m.schemeLayout).Where(m => m.memberID.Equals(item.memberID) && m.memberPrevention == SchemeTeamMember.PreventionStatus.Scheduled).ToList().Count</span>
+                        </div>
+                    }
+                </div>
+                <button type="button" onclick="$('#scheme-form').submit()" class="btn btn-primary w-100 mt-3">Opslaan & publiceren</button>
             </div>
         </div>
        
     </div>
 </div>
+
+<!-- SweetAlert2 JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+
+<script>
+    // Check if ViewBag contains an error message
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <text>
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: '@ViewBag.ErrorMessage'
+            });
+        </text>
+    }
+</script>

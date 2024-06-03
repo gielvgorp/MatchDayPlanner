@@ -31,13 +31,14 @@ else if (ViewBag.CurrentView == "ScheduleOverview")
     </div>
     <div class="stats-item">
         <p class="name">Schema status:</p>
-        <p class="value">Niet gepubliceerd</p>
+        <p class="value">@if (ViewBag.SchemeStatus == 1) @("Gepubliceerd") else @("Niet gepubliceerd")</p>
+
     </div>
 }
 else if (ViewBag.CurrentView == "SchemePrevention")
 {
     <div class="stats-item">
         <p class="name">Deadline:</p>
-        <p class="value">11-05-2024</p>
+        <p class="value">@ViewBag.SchemeDeadline</p>
     </div>
 }

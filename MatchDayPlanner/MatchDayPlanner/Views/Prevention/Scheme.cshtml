@@ -13,8 +13,8 @@
 <link rel="stylesheet" href="~/css/prevention.css" asp-append-version="true" />
 <script defer src="~/js/SchemeView.js"></script>
 
-<div class="main-content d-flex justify-content-center align-items-center position-relative" style="flex: 1; overflow: hidden">
-    <div class="prevention-main-container w-50 h-50" id="wizard">
+<div class="main-content d-flex justify-content-center align-items-center position-relative m-auto overflow-auto" style="flex: 1; overflow: hidden">
+    <div class="prevention-main-container w-50 h-50 mt-0" id="wizard">
         <div class="prevention-main-content d-flex flex-column">
             <div class="step-wizard f-center" data-step="1" style="flex-direction: column">
                 <div class="form-group w-75 m-auto">
@@ -33,7 +33,7 @@
         </div>
     </div>
 
-    <div class="cal-grid position-absolute start-0 top-0" id="cal-grid" style="display: none">
+    <div class="cal-grid position-absolute start-0 top-0 py-3" id="cal-grid" style="display: none; grid-template-columns: repeat(2, 600px);">
         @for (int i = Model.Scheme.startDate.Month; i < Model.Scheme.endDate.Month + 1; i++)
         {
             <div class="call-month">

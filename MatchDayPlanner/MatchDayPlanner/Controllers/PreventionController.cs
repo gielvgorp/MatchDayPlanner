@@ -27,6 +27,7 @@ namespace MatchDayPlanner.Controllers
         [HttpGet("/prevention/{teamID}/{schemeID}")]
         public IActionResult Index(Guid teamID, Guid schemeID)
         {
+            ViewBag.CurrentView = "SchemePrevention";
             GameSchedules scheme = _gameScheduleService.GetGameScheduleByID(schemeID);
 
             if (teamID == Guid.Empty || schemeID == Guid.Empty || scheme == null)
@@ -67,6 +68,8 @@ namespace MatchDayPlanner.Controllers
                 scheduleName = scheme.scheduleName,
                 schemeDeadline = scheme.schemeDeadline
             };
+
+            ViewBag.SchemeDeadline = model.Scheme.schemeDeadline;
 
             model.SchemeMatchDay = matchdays.Select(md => new SchemeMatchDayViewModel
             {
@@ -220,11 +223,13 @@ namespace MatchDayPlanner.Controllers
         public IActionResult SubmitPrevention(string comment, Guid schemeID, Guid memberID)
         {
             _preventionService.DeletePresentComment(schemeID, memberID);
+            Team team = _teamService.GetTeamBySchemeID(schemeID);
 
             if (!string.IsNullOrEmpty(comment))
                 _preventionService.UpdatePresentComment(schemeID, memberID, comment);
-            
-            return Redirect("Index");
+
+            TempData["SuccessMessage"] = "Verhinderingen opgeslagen!";
+            return RedirectToAction("Index", "prevention", new { teamID = team.teamID, schemeID = schemeID});
         }
     }
 }

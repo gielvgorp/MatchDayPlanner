@@ -76,7 +76,8 @@ namespace MatchDayPlanner.Controllers
                 _teamService.CreateTeam(model.TeamName, Guid.Parse(_userManager.GetUserId(this.User)));
             }
 
-            return View(model);
+            TempData["SuccessMessage"] = "Team succesvol aangemaakt!";
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpGet("/manage-team/{teamID}/{add}")]
@@ -122,6 +123,7 @@ namespace MatchDayPlanner.Controllers
                     teamID = tm.teamID,
                 }).ToList()
             };
+
 
             return View(model);
         }
@@ -184,6 +186,7 @@ namespace MatchDayPlanner.Controllers
                 _teamService.DeleteTeamMember(model.memberID);
             }
 
+            TempData["SuccessMessage"] = "Veranderingen opgeslagen!";
             return RedirectToAction("ManageTeam", "Home", new { add = false, teamID = teamID });
         }
 
@@ -252,6 +255,7 @@ namespace MatchDayPlanner.Controllers
             model.SchemeMatchDay = _matchdayService.GetAllMatchDays(scheduleID);
             ViewBag.SharedURL = string.Format("https://localhost:7294/prevention/{0}/{1}", model.Scheme.teamID, model.Scheme.schemeID);
             ViewBag.SchemeID = scheduleID;
+            ViewBag.SchemeStatus = _gameScheduleService.GetGameScheduleByID(scheduleID).scheduleStatus;
             return View(model);
         }
 

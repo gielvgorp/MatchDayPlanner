@@ -79,6 +79,32 @@ namespace MatchDayPlanner.DAL
             return result;
         }
 
+        public ScheduleLayout GetPreventionOfMemberByMatchdayID(Guid memberID, Guid matchdayID)
+        {
+            string query = "SELECT * FROM ScheduleLayout WHERE matchdayID = @matchdayID AND memberID = @memberID";
+            var result = new ScheduleLayout();
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@matchdayID", matchdayID);
+                    command.Parameters.AddWithValue("@memberID", memberID);
+                    connection.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            result.matchDayID = reader.GetGuid(reader.GetOrdinal("matchDayID"));
+                            result.memberID = reader.GetGuid(reader.GetOrdinal("memberID"));
+                            result.isPresent = (PreventionStatus)reader.GetInt32(reader.GetOrdinal("isPresent"));
+                            result.schemeID = reader.GetGuid(reader.GetOrdinal("schemeID"));
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
         public SchedulePresentComment GetPresentComment(Guid schemeID, Guid memberID)
         {
             string query = "SELECT * FROM SchedulePresentComments WHERE schemeID = @schemeID AND memberID = @memberID";

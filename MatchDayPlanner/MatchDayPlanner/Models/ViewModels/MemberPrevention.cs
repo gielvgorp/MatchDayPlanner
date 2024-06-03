@@ -6,10 +6,11 @@ namespace MatchDayPlanner.Models.ViewModels
     {
         public enum PreventionStatus
         {
-            Unavailable = 0,
+            NotAvailable = 0,
             Available = 1,
-            NoResponse = 2,
-            Playing = 3
+            Reserve = 1,
+            NoResponse = 3,
+            Scheduled = 4
         }
         public TeamMember TeamMember { get; set; }
         public PreventionStatus IsPresent { get; set; }

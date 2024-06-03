@@ -41,6 +41,16 @@ namespace MatchDayPlanner.Core.Services
             return _matchDayRepository.GetAllPresents(matchdayID);
         }
 
+        public List<ScheduleLayout> GetGameScheduleOfMachday(Guid matchdayID)
+        {
+            return _matchDayRepository.GetGameScheduleOfMachday(matchdayID);
+        }
+
+        public List<ScheduleLayout> GetMembersOfScheduleByStatus(int status, Guid matchdayID)
+        {
+            return _matchDayRepository.GetMembersOfScheduleByStatus(status, matchdayID);
+        }
+
         public List<ScheduleLayout> GetAllAbsents(Guid matchdayID)
         {
             return _matchDayRepository.GetAllAbsents(matchdayID);

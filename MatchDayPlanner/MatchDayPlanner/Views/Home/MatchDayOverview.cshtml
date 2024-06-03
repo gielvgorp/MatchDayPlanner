@@ -12,7 +12,7 @@
         </div>
          <div class="status-item">
             <span class="name">Afwezig: </span>
-            <span>@(Model.PreventionList.Where(p => p.IsPresent == MemberPrevention.PreventionStatus.Unavailable).Count() == null ? "0" : Model.PreventionList.Where(p => p.IsPresent == MemberPrevention.PreventionStatus.Unavailable).Count().ToString())</span>
+            <span>@(Model.PreventionList.Where(p => p.IsPresent == MemberPrevention.PreventionStatus.NotAvailable).Count() == null ? "0" : Model.PreventionList.Where(p => p.IsPresent == MemberPrevention.PreventionStatus.NotAvailable).Count().ToString())</span>
         </div>
         <div class="status-item">
             <span class="name">Niet gereageerd: </span>
@@ -23,11 +23,26 @@
         <div class="prevention-list-container">
             @if (Model.PreventionList.Count > 0)
             {
-                @foreach (var item in Model.PreventionList)
+                var sortedSchemeLayout = Model.PreventionList.OrderByDescending(x => x.IsPresent).ToList();
+
+                @foreach (var item in sortedSchemeLayout)
                 {
-                    <div class="prevention-list-item @if (item.IsPresent == MemberPrevention.PreventionStatus.Available) @("available") else if(item.IsPresent == MemberPrevention.PreventionStatus.Unavailable) @("unavailable")">
+                    <div class="prevention-list-item @if (item.IsPresent == MemberPrevention.PreventionStatus.Available)
+                                @("available")
+                     else if(item.IsPresent == MemberPrevention.PreventionStatus.NotAvailable)
+                                @("unavailable")
+                     else if(item.IsPresent == MemberPrevention.PreventionStatus.Scheduled)
+                                @("matchday") ">
                         <i class="fa-solid fa-user"></i>
-                        <p>@item.TeamMember.memberName | @if (item.IsPresent == MemberPrevention.PreventionStatus.Available) @("Aanwezig") else if(item.IsPresent == MemberPrevention.PreventionStatus.Unavailable) @("Afwezig") else @("Niet gereageerd")</p>
+                        <p>@item.TeamMember.memberName | @if (item.IsPresent == MemberPrevention.PreventionStatus.Available)
+                                @("Aanwezig")
+                            else if (item.IsPresent == MemberPrevention.PreventionStatus.NotAvailable)
+                                @("Afwezig")
+                            else if (item.IsPresent == MemberPrevention.PreventionStatus.Scheduled)
+                                @("Ingepland")
+                            else
+                                @("Niet gereageerd")
+        </p>
                     </div>
                 }
             }
@@ -39,6 +54,10 @@
         <div class="legenda-container">
             <h5 class="title">Legenda</h5>
             <div class="legenda-item">
+                <div class="legenda-color matchday"></div>
+                <span>Ingepland</span>
+            </div>
+            <div class="legenda-item">
                 <div class="legenda-color legenda-available"></div>
                 <span>Beschikbaar</span>
             </div>
@@ -46,8 +65,8 @@
                 <div class="legenda-color legenda-unavailable"></div>
                 <span>Niet beschikbaar</span>
             </div>
-            <div class="legenda-item unknown">
-                <div class="legenda-color"></div>
+            <div class="legenda-item">
+                <div class="legenda-color unknown"></div>
                 <span>Onbekend</span>
             </div>
         </div>

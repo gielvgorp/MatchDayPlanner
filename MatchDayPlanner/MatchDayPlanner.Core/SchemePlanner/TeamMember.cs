@@ -7,7 +7,7 @@ namespace MatchDayPlanner.Core.SchemePlanner
         {
             NotAvailable = 0,
             Available = 1,
-            Reserve = 2,
+            Reserve = 1,
             NoResponse = 3,
             Scheduled = 4
         }
@@ -25,7 +25,7 @@ namespace MatchDayPlanner.Core.SchemePlanner
         }
         public bool isCaptain { get; set; }
         public int amountOfMatches { get; set; }
-        public PreventionStatus memberPrevention {  get; set; }
+        public PreventionStatus memberPrevention { get; set; }
 
         public TeamMember(Guid c_memberID, Guid c_teamid, string c_memberName, List<MatchDay> c_preventions, bool c_isCaptain, PreventionStatus c_status)
         {

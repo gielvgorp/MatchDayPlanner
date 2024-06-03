@@ -1,5 +1,6 @@
 ﻿using MatchDayPlanner.Core.Entities;
 using MatchDayPlanner.Core.Interfaces;
+using MatchDayPlanner.Core.SchemePlanner;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,6 +35,11 @@ namespace MatchDayPlanner.Core.Services
         public List<ScheduleLayout> GetPreventionsOfMember(Guid schemeID, Guid memberID)
         {
             return _preventionRepository.GetPreventionsOfMember(schemeID, memberID);
+        }
+
+        public ScheduleLayout GetPreventionOfMemberByMatchdayID(Guid memberID, Guid matchdayID)
+        {
+            return _preventionRepository.GetPreventionOfMemberByMatchdayID(memberID, matchdayID);
         }
 
         public void DeletePresentComment(Guid schemeID, Guid memberID)

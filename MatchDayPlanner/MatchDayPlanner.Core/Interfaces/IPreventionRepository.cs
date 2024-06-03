@@ -15,5 +15,6 @@ namespace MatchDayPlanner.Core.Interfaces
         public SchedulePresentComment GetPresentComment(Guid schemeID, Guid memberID);
         public void UpdatePresentComment(Guid schemeID, Guid memberID, string message);
         public void DeletePresentComment(Guid schemeID, Guid memberID);
+        public ScheduleLayout GetPreventionOfMemberByMatchdayID(Guid memberID, Guid matchdayID);
     }
 }

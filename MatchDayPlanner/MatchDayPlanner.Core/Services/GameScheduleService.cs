@@ -5,16 +5,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MatchDayPlanner.Core.SchemePlanner;
 
 namespace MatchDayPlanner.Core.Services
 {
     public class GameScheduleService 
     {
         private readonly IGameScheduleRepository _gameScheduleRepository;
+        private readonly MatchDayService _matchdayService;
+        private readonly TeamService _teamService;
 
-        public GameScheduleService(IGameScheduleRepository c_gameScheduleRepository)
+        public GameScheduleService(IGameScheduleRepository c_gameScheduleRepository, MatchDayService c_matchdayService, TeamService c_teamService)
         {
             _gameScheduleRepository = c_gameScheduleRepository;
+            _teamService = c_teamService;
+            this._matchdayService = c_matchdayService;
         }
 
         public GameSchedules GetGameScheduleByID(Guid schemeID)
@@ -42,6 +47,58 @@ namespace MatchDayPlanner.Core.Services
         public void UpdateScheduleStatus(Guid schemeID, int statusCode)
         {
             _gameScheduleRepository.UpdateScheduleStatus(schemeID, statusCode);
+        }
+
+        public Scheme GetFullScheme(Guid schemeID)
+        {
+            GameSchedules schedule = _gameScheduleRepository.GetGameScheduleByID(schemeID);
+            
+            if(schedule == null || schedule.scheduleStatus != 1)
+            {
+                throw new Exception("Schema is nog niet gepubliceerd!");
+            }
+
+            var matchDays = _matchdayService.GetAllMatchDays(schemeID);
+
+            List<MatchDay> layout = new List<MatchDay>();
+
+            foreach (var matchday in matchDays)
+            {
+                MatchDay md = new MatchDay(matchday.matchDayID, matchday.matchDayDateTime);
+                foreach (var teamMember in _matchdayService.GetMembersOfScheduleByStatus(0, md.matchDayID))
+                {
+                    Entities.TeamMember member = _teamService.GetTeamMemberByID(teamMember.memberID);
+                    md.schemeLayout.Add(new SchemePlanner.TeamMember(teamMember.memberID, member.teamID, member.memberName, null, false, (SchemePlanner.TeamMember.PreventionStatus)0));
+                }
+
+                foreach (var teamMember in _matchdayService.GetMembersOfScheduleByStatus(1, md.matchDayID))
+                {
+                    Entities.TeamMember member = _teamService.GetTeamMemberByID(teamMember.memberID);
+                    md.schemeLayout.Add(new SchemePlanner.TeamMember(teamMember.memberID, member.teamID, member.memberName, null, false, (SchemePlanner.TeamMember.PreventionStatus)1));
+                }
+
+                foreach (var teamMember in _matchdayService.GetMembersOfScheduleByStatus(2, md.matchDayID))
+                {
+                    Entities.TeamMember member = _teamService.GetTeamMemberByID(teamMember.memberID);
+                    md.schemeLayout.Add(new SchemePlanner.TeamMember(teamMember.memberID, member.teamID, member.memberName, null, false, (SchemePlanner.TeamMember.PreventionStatus)2));
+                }
+
+                foreach (var teamMember in _matchdayService.GetMembersOfScheduleByStatus(3, md.matchDayID))
+                {
+                    Entities.TeamMember member = _teamService.GetTeamMemberByID(teamMember.memberID);
+                    md.schemeLayout.Add(new SchemePlanner.TeamMember(teamMember.memberID, member.teamID, member.memberName, null, false, (SchemePlanner.TeamMember.PreventionStatus)3));
+                }
+
+                foreach (var teamMember in _matchdayService.GetMembersOfScheduleByStatus(4, md.matchDayID))
+                {
+                    Entities.TeamMember member = _teamService.GetTeamMemberByID(teamMember.memberID);
+                    md.schemeLayout.Add(new SchemePlanner.TeamMember(teamMember.memberID, member.teamID, member.memberName, null, false, (SchemePlanner.TeamMember.PreventionStatus)4));
+                }
+
+                layout.Add(md);
+            }
+
+            return new Scheme(layout, schemeID);
         }
     }
 }

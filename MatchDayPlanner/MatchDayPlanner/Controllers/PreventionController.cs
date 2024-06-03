@@ -19,21 +19,27 @@ namespace MatchDayPlanner.Controllers
         public PreventionController()
         {
             _teamService = new TeamService(new TeamRepository());
-            _gameScheduleService = new GameScheduleService(new GameScheduleRepository());
             _matchdayService = new MatchDayService(new MatchDayRepository());
             _preventionService = new PreventionService(new PreventionRepository());
+            _gameScheduleService = new GameScheduleService(new GameScheduleRepository(), _matchdayService, _teamService);
         }
 
         [HttpGet("/prevention/{teamID}/{schemeID}")]
         public IActionResult Index(Guid teamID, Guid schemeID)
         {
-            if(teamID == Guid.Empty || schemeID == Guid.Empty)
+            GameSchedules scheme = _gameScheduleService.GetGameScheduleByID(schemeID);
+
+            if (teamID == Guid.Empty || schemeID == Guid.Empty || scheme == null)
             {
                 return RedirectToAction("Index", "Home");
             }
 
+            if (scheme.scheduleStatus == 1)
+            {
+                return RedirectToAction("Scheme", "Prevention", new { schemeID = schemeID });
+            }
+
             Team team = _teamService.GetTeamByID(teamID);
-            GameSchedules scheme = _gameScheduleService.GetGameScheduleByID(schemeID);
             List<SchemeMatchDay> matchdays = _matchdayService.GetAllMatchDays(schemeID);
 
             PreventionViewModel model = new PreventionViewModel();
@@ -77,24 +83,105 @@ namespace MatchDayPlanner.Controllers
             return View(model);
         }
 
+        public IActionResult Scheme(Guid schemeID)
+        {
+            ViewBag.CurrentView = "PreventionFullScheme";
+
+            PreventionSchemeViewModel model = new PreventionSchemeViewModel();
+            model.schemeID = schemeID;
+            model.Scheme = _gameScheduleService.GetGameScheduleByID(schemeID);
+
+            Team result = _teamService.GetTeamBySchemeID(schemeID);
+            model.Team = new TeamViewModel
+            {
+                teamID = result.teamID,
+                members = result.teamMembers.Select(tm => new TeamMemberViewModel
+                {
+                    memberID = tm.memberID,
+                    memberEmail = tm.memberEmail,
+                    memberName = tm.memberName,
+                    teamID = tm.teamID
+                }).ToList(),
+                teamName = result.teamName,
+                teamCaptainID = result.teamCaptainID,
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public JsonResult GetSchemeOfMember(Guid schemeID, Guid playerID)
+        {
+            try
+            {
+                PreventionSchemeViewModel model = new PreventionSchemeViewModel();
+                model.schemeID = schemeID;
+
+                TeamMember member = _teamService.GetTeamMemberByID(playerID);
+                List<SchemeMatchDay> matchdays = _matchdayService.GetAllMatchDays(schemeID);
+
+                foreach (var matchday in matchdays)
+                {
+                    MemberScheme memberScheme = new MemberScheme
+                    {
+                        member = new SchemeTeamMember
+                        {
+                            memberID = member.memberID,
+                            memberEmail = member.memberEmail,
+                            memberName = member.memberName,
+                            teamID = member.teamID,
+                            memberPrevention = (SchemeTeamMember.PreventionStatus)_preventionService.GetPreventionOfMemberByMatchdayID(member.memberID, matchday.matchDayID).isPresent
+                        },
+                        matchday = matchday
+                    };
+                    model.memberScheme.Add(memberScheme);
+                }
+
+                if (member == null) throw new Exception("Speler niet gevonden!");
+
+                return new JsonResult(Ok(model));
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(Ok(ex.Message));
+            }
+        }
+
         [HttpPost]
         public JsonResult SetPrevention(bool add, DateTime date, Guid schemeID, Guid playerID, string status)
-        { 
-            var matchday = GetSchemeMatchDayByDate(date, schemeID);
-
-            if (matchday != null)
+        {
+            try
             {
-                _preventionService.DeletePrevention(matchday.matchDayID, playerID);
+                var matchday = GetSchemeMatchDayByDate(date, schemeID);
 
-                if (add && status != "no-response")
-                    _preventionService.AddPrevention(matchday.matchDayID, playerID, schemeID, Convert.ToInt16(status == "available"));
+                if (matchday != null)
+                {
+                    _preventionService.DeletePrevention(matchday.matchDayID, playerID);
+
+                    if (add && status != "no-response")
+                        _preventionService.AddPrevention(matchday.matchDayID, playerID, schemeID, Convert.ToInt16(status == "available"));
+
+                    return new JsonResult(Ok("success"));
+                }
+
+                throw new Exception("Kan geen verhindering registreren voor deze datum!");
+                
             }
-            return new JsonResult(Ok("success"));
+            catch (Exception ex)
+            {
+                return new JsonResult(new { error = ex.Message })
+                {
+                    StatusCode = 400 // Status code for Bad Request
+                };
+            }
+
         }
 
         public SchemeMatchDayViewModel GetSchemeMatchDayByDate(DateTime date, Guid schemeID)
         {
             SchemeMatchDay schemeMatchDay = _matchdayService.GetMatchday(schemeID, date);
+
+            if(schemeMatchDay == null) throw new Exception("Kan geen verhindering registreren voor deze datum!");
 
             return new SchemeMatchDayViewModel
             {

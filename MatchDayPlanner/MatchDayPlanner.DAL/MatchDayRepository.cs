@@ -7,6 +7,7 @@ using MatchDayPlanner.Core;
 using MatchDayPlanner.Core.Interfaces;
 using MatchDayPlanner.Core.Entities;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using MatchDayPlanner.Core.SchemePlanner;
 
 namespace MatchDayPlanner.DAL
 {
@@ -43,9 +44,19 @@ namespace MatchDayPlanner.DAL
             return _database.Query<ScheduleLayout>(string.Format("SELECT * FROM ScheduleLayout WHERE matchdayID = '{0}' AND isPresent = '1'", matchdayID));
         }
 
+        public List<ScheduleLayout> GetMembersOfScheduleByStatus(int status, Guid matchdayID)
+        {
+            return _database.Query<ScheduleLayout>(string.Format("SELECT * FROM ScheduleLayout WHERE matchdayID = '{0}' AND isPresent = {1}", matchdayID, status));
+        }
+
         public List<ScheduleLayout> GetAllAbsents(Guid matchdayID)
         {
             return _database.Query<ScheduleLayout>(string.Format("SELECT * FROM ScheduleLayout WHERE matchdayID = '{0}' AND isPresent = '0'", matchdayID));
+        }
+
+        public List<ScheduleLayout> GetGameScheduleOfMachday(Guid matchdayID)
+        {
+            return _database.Query<ScheduleLayout>(string.Format("SELECT * FROM ScheduleLayout WHERE matchdayID = '{0}'", matchdayID));
         }
 
         public List<ScheduleLayout> GetPreventionOfMember(Guid memberID, Guid schemeID)

@@ -44,9 +44,9 @@
     background: var(--unavailable-bg) !important;
 }
 
-.cal-day-cell[data-status=matchday] {
-    background: var(--matchday-bg) !important;
-}
+    .cal-day-cell[data-status=matchday], .cal-day-cell[data-status=scheduled] {
+        background: var(--matchday-bg) !important;
+    }
 
 .legenda-match-day {
     background: #2271b1 !important;

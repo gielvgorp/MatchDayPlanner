@@ -1,0 +1,61 @@
+﻿@using MatchDayPlanner.Models.ViewModels
+@using System.Globalization
+@model PreventionSchemeViewModel
+
+@{
+    ViewData["Title"] = "Schema";
+}
+
+<link rel="stylesheet" href="~/css/scheduleOverview.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/matchDayOverview.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/GeneratedScheme.css" asp-append-version="true" />
+
+<link rel="stylesheet" href="~/css/prevention.css" asp-append-version="true" />
+<script defer src="~/js/SchemeView.js"></script>
+
+<div class="main-content d-flex justify-content-center align-items-center position-relative" style="flex: 1; overflow: hidden">
+    <div class="prevention-main-container w-50 h-50" id="wizard">
+        <div class="prevention-main-content d-flex flex-column">
+            <div class="step-wizard f-center" data-step="1" style="flex-direction: column">
+                <div class="form-group w-75 m-auto">
+                    <h6 class="text">Wat is je naam?</h6>
+                    <select id="player-select" class="form-select mt-2">
+                        @foreach (TeamMemberViewModel player in Model.Team.members)
+                        {
+                            <option value="@player.memberID">@player.memberName</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="prevention-bottom">
+                <button id="prevention-next-btn" onclick="nextStep('@Model.schemeID')">Volgende</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="cal-grid position-absolute start-0 top-0" id="cal-grid" style="display: none">
+        @for (int i = Model.Scheme.startDate.Month; i < Model.Scheme.endDate.Month + 1; i++)
+        {
+            <div class="call-month">
+                <h3 class="text cal-month-name">@(new DateOnly(Model.Scheme.startDate.Year, i, 1).ToString("MMMM yyyy", CultureInfo.CreateSpecificCulture("nl"))) </h3>
+                <div class="cal-days">
+                    @for (int y = 0; y < (int)new DateTime(Model.Scheme.startDate.Year, i, 1).DayOfWeek - 2; y++)
+                    {
+                        <div class="day-cell-disabled cal-day-cell"></div>
+                    }
+
+                    @for (int x = 0; x < DateTime.DaysInMonth(Model.Scheme.startDate.Year, i); x++)
+                    {
+                        <div class="cal-day-cell" data-date="@i/@(x + 1)/@(Model.Scheme.startDate.Year)">
+                            <h5 class="text">@(x + 1)</h5>
+                        </div>
+                    }
+
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- SweetAlert2 JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>

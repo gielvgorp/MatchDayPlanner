@@ -20,7 +20,7 @@ namespace MatchDayPlanner.DAL
 
         public void Create(GameSchedules schedule)
         {
-            string query = "INSERT INTO GameSchedules (teamID, scheduleName, schemeDeadline, numberOfPresent, startDate, endDate) VALUES (@teamID, @scheduleName, @schemeDeadline, @numberOfPresent, @startDate, @endDate)";
+            string query = "INSERT INTO GameSchedules (teamID, scheduleName, schemeDeadline, numberOfPresent, startDate, endDate, scheduleStatus) VALUES (@teamID, @scheduleName, @schemeDeadline, @numberOfPresent, @startDate, @endDate, @scheduleStatus)";
             using (var connection = new SqlConnection(_connectionString))
             {
                 using (var command = new SqlCommand(query, connection))
@@ -138,7 +138,8 @@ namespace MatchDayPlanner.DAL
                                 schemeDeadline = reader.GetDateTime(reader.GetOrdinal("schemeDeadline")),
                                 numberOfPresent = reader.GetInt32(reader.GetOrdinal("numberOfPresent")),
                                 startDate = reader.GetDateTime(reader.GetOrdinal("startDate")),
-                                endDate = reader.GetDateTime(reader.GetOrdinal("endDate"))
+                                endDate = reader.GetDateTime(reader.GetOrdinal("endDate")),
+                                scheduleStatus = reader.GetInt32(reader.GetOrdinal("scheduleStatus"))
                             };
                         }
                     }

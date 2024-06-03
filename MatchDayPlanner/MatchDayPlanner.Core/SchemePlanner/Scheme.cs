@@ -23,7 +23,7 @@ namespace MatchDayPlanner.Core.SchemePlanner
         {
             return layout
                 .Where(m => m.matchDayID.Equals(matchdayID))
-                .SelectMany(m => m.scheduledMembers) 
+                .SelectMany(m => m.schemeLayout).Where(l => l.memberPrevention == TeamMember.PreventionStatus.Scheduled)
                 .ToList();
         }
 
@@ -31,7 +31,7 @@ namespace MatchDayPlanner.Core.SchemePlanner
         {
             return layout
                 .Where(m => m.matchDayID.Equals(matchdayID))
-                .SelectMany(m => m.noResponseMembers)
+                .SelectMany(m => m.schemeLayout).Where(l => l.memberPrevention == TeamMember.PreventionStatus.NoResponse)
                 .ToList();
         }
 
@@ -39,7 +39,7 @@ namespace MatchDayPlanner.Core.SchemePlanner
         {
             return layout
                .Where(m => m.matchDayID.Equals(matchdayID))
-               .SelectMany(m => m.notAvailableMembers)
+              .SelectMany(m => m.schemeLayout).Where(l => l.memberPrevention == TeamMember.PreventionStatus.NotAvailable)
                .ToList();
         }
 
@@ -47,7 +47,7 @@ namespace MatchDayPlanner.Core.SchemePlanner
         {
             return layout
                  .Where(m => m.matchDayID.Equals(matchdayID))
-                 .SelectMany(m => m.reserveMembers)
+                 .SelectMany(m => m.schemeLayout).Where(l => l.memberPrevention == TeamMember.PreventionStatus.Reserve)
                  .ToList();
         }
 

@@ -28,8 +28,8 @@ namespace MatchDayPlanner.Controllers
         public HomeController(UserManager<ApplicationUser> userManager)
         {
             _teamService = new TeamService(new TeamRepository());
-            _gameScheduleService = new GameScheduleService(new GameScheduleRepository());
             _matchdayService = new MatchDayService(new MatchDayRepository());
+            _gameScheduleService = new GameScheduleService(new GameScheduleRepository(), _matchdayService, _teamService);
             _schemePlannerService = new SchemePlannerService(_teamService, _gameScheduleService, _matchdayService, new PreventionService(new PreventionRepository()));
             _userManager = userManager;
         }
@@ -263,7 +263,7 @@ namespace MatchDayPlanner.Controllers
             
             if (model.MatchDay != null)
             {
-                var preventions = _matchdayService.GetPreventions(model.MatchDay.matchDayID);
+                var preventions = _matchdayService.GetGameScheduleOfMachday(model.MatchDay.matchDayID);
                 var teamMembers = _teamService.GetTeamMembersBySchemeID(model.MatchDay.schemeID);
 
                 foreach (var item in preventions)
@@ -285,6 +285,8 @@ namespace MatchDayPlanner.Controllers
                         IsPresent = MemberPrevention.PreventionStatus.NoResponse
                     });
                 }
+
+
             }
 
             return View(model);

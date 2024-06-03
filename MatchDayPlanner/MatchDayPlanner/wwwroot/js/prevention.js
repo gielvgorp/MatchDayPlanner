@@ -99,16 +99,14 @@ function setAvailability(elem, schemeID) {
 
     }
     else if (status == available_status) {
-        $(elem).removeAttr("data-status");
-        setPrevention(false, $(elem).attr("data-date"), schemeID, playerID)
+        setPrevention(false, $(elem).attr("data-date"), schemeID, playerID, elem, status);
     }
     else {
-        $(elem).attr("data-status", available_status);
-        setPrevention(true, $(elem).attr("data-date"), schemeID, playerID)
+        setPrevention(true, $(elem).attr("data-date"), schemeID, playerID, elem, status);
     }
 }
 
-function setPrevention(add, date, schemeID, playerID) {
+function setPrevention(add, date, schemeID, playerID, elem, status) {
     $.ajax({
         url: "/prevention/SetPrevention",
         type: "post",
@@ -120,10 +118,16 @@ function setPrevention(add, date, schemeID, playerID) {
             status: available_status
         },
         success: function (response) {
+            $(elem).removeAttr("data-status");
+
+            if (status != available_status) {
+                $(elem).attr("data-status", available_status);
+            }
+
             console.log('test success');
         },
         error: function (jqXHR, textStatus, errorThrown) {
-            console.error('FAILED: something went wrong while update prevention!');
+            showFailurePopup(jqXHR.responseJSON.error);
         }
     });
 }

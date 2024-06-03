@@ -85,9 +85,9 @@ namespace MatchDayPlanner.Core.Services
                 GetMembersArePreventedOnDate(item.matchDay.matchDayDateTime, layout);
                 MakeSchemeLayout(item.matchDay, layout);
                 Console.WriteLine("==============");
-
+/*
                 List<TeamMember> noResponse = _teamService.GetTeamMembers(team.teamID).Select(t => new TeamMember(t.memberID, t.teamID, t.memberName, null, false, 0)).Where(m => layout.notAvailableMembers.Contains(m) == false && layout.scheduledMembers.Contains(m) == false && layout.reserveMembers.Contains(m) == false).ToList();
-                layout.noResponseMembers = noResponse;
+                layout.noResponseMembers = noResponse;*/
                 schemeLayout.Add(layout);
             }
             Console.WriteLine("");
@@ -127,11 +127,11 @@ namespace MatchDayPlanner.Core.Services
                 {
                     Console.WriteLine(membersAvailable[i].memberName);
                     membersAvailable[i].amountOfMatches--;
-                    layout.scheduledMembers.Add(membersAvailable[i]);
+                    layout.schemeLayout.Add(new TeamMember(membersAvailable[i].memberID, membersAvailable[i].teamID, membersAvailable[i].memberName, null, false, TeamMember.PreventionStatus.Scheduled));
                 }
                 else
                 {
-                    layout.reserveMembers.Add(membersAvailable[i]);
+                    layout.schemeLayout.Add(new TeamMember(membersAvailable[i].memberID, membersAvailable[i].teamID, membersAvailable[i].memberName, null, false, TeamMember.PreventionStatus.Reserve));
                 }
             }
 
@@ -149,7 +149,7 @@ namespace MatchDayPlanner.Core.Services
             {
                 result.ForEach(r =>
                 {
-                    layout.notAvailableMembers.Add(r);
+                    layout.schemeLayout.Add(r);
                 });
             }
 

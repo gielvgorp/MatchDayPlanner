@@ -36,8 +36,7 @@
                             {
                                 <div class="prevention-list-item mt-3 matchday" onclick="changeMemberPrevention(this)">
                                     <i class="fa-solid fa-user"></i>
-                                    <p>@sortedSchemeLayout[j].memberName</p>
-                                    <p> | @sortedSchemeLayout[j].memberPrevention</p>
+                                    <p>@sortedSchemeLayout[j].memberName | @sortedSchemeLayout[j].memberPrevention</p>
                                     <input type="hidden" name="matchDays[@i].schemeLayout[@j].memberPrevention" value="@sortedSchemeLayout[j].memberPrevention" />
                                     <input type="hidden" name="matchDays[@i].schemeLayout[@j].memberName" value="@sortedSchemeLayout[j].memberName" />
                                     <input type="hidden" name="matchDays[@i].schemeLayout[@j].memberID" value="@sortedSchemeLayout[j].memberID" />

@@ -14,6 +14,12 @@
     justify-content: space-between;
     align-items: center;
     padding: 0 40px;
+    position: relative;
+}
+
+.player-container > * {
+    flex: 0 0 auto;
+    text-align: center;
 }
 
 .manage-player i {
@@ -47,4 +53,14 @@
     border-radius: 10px;
     outline: none;
     border: none;
+}
+
+.player-container > .player-email {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.player-role{
+    text-align: start;
 }

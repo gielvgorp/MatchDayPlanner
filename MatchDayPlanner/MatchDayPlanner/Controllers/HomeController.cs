@@ -240,7 +240,8 @@ namespace MatchDayPlanner.Controllers
 
             _gameScheduleService.Create(schedule);
 
-            return View();
+            TempData["SuccessMessage"] = "Schema aangemaakt!";
+            return Redirect(string.Format("/manage-team/{0}/false", model.TeamID));
         }
 
         public IActionResult AddPlayer()

@@ -43,7 +43,7 @@ namespace MatchDayPlanner.Core.Services
 
         public List<ScheduleLayout> GetGameScheduleOfMachday(Guid matchdayID)
         {
-            return _matchDayRepository.GetGameScheduleOfMachday(matchdayID);
+            return _matchDayRepository.GetGameScheduleOfMatchday(matchdayID);
         }
 
         public List<ScheduleLayout> GetMembersOfScheduleByStatus(int status, Guid matchdayID)
@@ -92,7 +92,7 @@ namespace MatchDayPlanner.Core.Services
             return _matchDayRepository.GetPreventedOfMember(memberID, schemeID);
         }
 
-        public Matchday GetMatchdayByID(Guid matchdayID)
+        public SchemeMatchDay GetMatchdayByID(Guid matchdayID)
         {
             return _matchDayRepository.GetMatchdayByID(matchdayID);
         }

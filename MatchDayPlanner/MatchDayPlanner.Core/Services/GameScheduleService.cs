@@ -34,6 +34,18 @@ namespace MatchDayPlanner.Core.Services
 
         public void Create(GameSchedules schedule)
         {
+            if (schedule.startDate > schedule.endDate)
+            {
+                throw new Exception("De eind datum kan niet eerder zijn dan de start datum!");
+            }
+            else if ((schedule.endDate.Year - schedule.startDate.Year) > 1)
+            {
+                throw new Exception("Je kan een schema maken voor maximaal 1 jaar!");
+            }else if (schedule.schemeDeadline > schedule.startDate)
+            {
+                throw new Exception("De deadline is na de start datum!");
+            }
+
             _gameScheduleRepository.Create(schedule);
         }
         public void Update(GameSchedules schedule)

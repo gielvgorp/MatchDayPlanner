@@ -18,8 +18,8 @@ namespace MatchDayPlanner.Core.Interfaces
         public SchemeMatchDay GetMatchday(Guid schemeID, DateTime date);
         public List<ScheduleLayout> GetPreventionOfMember(Guid memberID, Guid schemeID);
         public List<ScheduleLayout> GetPreventedOfMember(Guid memberID, Guid schemeID);
-        public Matchday GetMatchdayByID(Guid matchdayID);
+        public SchemeMatchDay GetMatchdayByID(Guid matchdayID);
         public List<ScheduleLayout> GetMembersOfScheduleByStatus(int status, Guid matchdayID);
-        public List<ScheduleLayout> GetGameScheduleOfMachday(Guid matchdayID);
+        public List<ScheduleLayout> GetGameScheduleOfMatchday(Guid matchdayID);
     }
 }

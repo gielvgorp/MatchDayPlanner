@@ -65,6 +65,11 @@
             if (successMessage) {
                 showSuccessPopup(successMessage);
             }
+
+            var errorMessage = '@TempData["ErrorMessage"]';
+            if (errorMessage) {
+                showFailurePopup(errorMessage);
+            }
         });
     </script>
     @await RenderSectionAsync("Scripts", required: false)

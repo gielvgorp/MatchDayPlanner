@@ -8,70 +8,320 @@ using MatchDayPlanner.Core.Interfaces;
 using MatchDayPlanner.Core.Entities;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using MatchDayPlanner.Core.SchemePlanner;
+using System.Data.SqlClient;
 
 namespace MatchDayPlanner.DAL
 {
     public class MatchDayRepository : IMatchDayRepository
     {
-        private readonly Database _database = new Database();
+        private readonly string _connectionString;
+
+        public MatchDayRepository()
+        {
+            _connectionString = "Server=DESKTOP-SML637F;Database=MatchDayPlanner;Trusted_Connection=True;TrustServerCertificate=True;";
+        }
 
         public void AddMatchday(Guid schemeID, string date)
         {
-            _database.Insert(string.Format("INSERT INTO SchemeMatchDay (schemeID, matchDayDateTime) VALUES ('{0}', '{1}')", schemeID, date));
+            try
+            {
+                string query = "INSERT INTO SchemeMatchDay (schemeID, matchDayDateTime) VALUES (@schemeID, @date)";
+                using (var connection = new SqlConnection(_connectionString))
+                {
+                    using (var command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@schemeID", schemeID);
+                        command.Parameters.AddWithValue("@date", date);
+                        connection.Open();
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Er is een fout opgetreden bij het opslaan van de gegevens!");
+            }
         }
-        public void RemoveMatchday(Guid schemeID, string date) 
+
+        public void RemoveMatchday(Guid schemeID, string date)
         {
-            _database.Delete(string.Format("DELETE FROM SchemeMatchDay WHERE schemeID = '{0}' AND matchDayDateTime = '{1}'", schemeID, date));
+            string query = "DELETE FROM SchemeMatchDay WHERE schemeID = @schemeID AND matchDayDateTime = @date";
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@schemeID", schemeID);
+                    command.Parameters.AddWithValue("@date", date);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
         }
 
         public SchemeMatchDay GetMatchday(Guid schemeID, DateTime date)
         {
-            return _database.Query<SchemeMatchDay>(string.Format("SELECT * FROM SchemeMatchDay WHERE schemeID = '{0}' AND matchDayDateTime = '{1}'", schemeID, date)).FirstOrDefault();
+            string query = "SELECT * FROM SchemeMatchDay WHERE schemeID = @schemeID AND matchDayDateTime = @date";
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@schemeID", schemeID);
+                    command.Parameters.AddWithValue("@date", date);
+                    connection.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return new SchemeMatchDay
+                            {
+                                matchDayID = reader.GetGuid(reader.GetOrdinal("matchDayID")),
+                                schemeID = reader.GetGuid(reader.GetOrdinal("schemeID")),
+                                matchDayDateTime = reader.GetDateTime(reader.GetOrdinal("matchDayDateTime"))
+                            };
+                        }
+                    }
+                }
+            }
+            return null;
         }
 
         public void UpdateMatchday(SchemeMatchDay matchday)
         {
-            _database.Update(string.Format("UPDATE SchemeMatchDay SET matchDayDateTime = '{0}'", matchday.matchDayDateTime));
+            string query = "UPDATE SchemeMatchDay SET matchDayDateTime = @date WHERE matchDayID = @matchDayID";
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@date", matchday.matchDayDateTime);
+                    command.Parameters.AddWithValue("@matchDayID", matchday.matchDayID);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
         }
 
         public List<SchemeMatchDay> GetAllMatchDays(Guid schemeID)
         {
-           return _database.Query<SchemeMatchDay>(string.Format("SELECT * FROM SchemeMatchDay WHERE schemeID = '{0}'", schemeID));
+            string query = "SELECT * FROM SchemeMatchDay WHERE schemeID = @schemeID";
+            var result = new List<SchemeMatchDay>();
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@schemeID", schemeID);
+                    connection.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            result.Add(new SchemeMatchDay
+                            {
+                                matchDayID = reader.GetGuid(reader.GetOrdinal("matchDayID")),
+                                schemeID = reader.GetGuid(reader.GetOrdinal("schemeID")),
+                                matchDayDateTime = reader.GetDateTime(reader.GetOrdinal("matchDayDateTime"))
+                            });
+                        }
+                    }
+                }
+            }
+            return result;
         }
 
         public List<ScheduleLayout> GetAllPresents(Guid matchdayID)
         {
-            return _database.Query<ScheduleLayout>(string.Format("SELECT * FROM ScheduleLayout WHERE matchdayID = '{0}' AND isPresent = '1'", matchdayID));
+            string query = "SELECT * FROM ScheduleLayout WHERE matchdayID = @matchdayID AND isPresent = 1";
+            var result = new List<ScheduleLayout>();
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@matchdayID", matchdayID);
+                    connection.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            result.Add(new ScheduleLayout
+                            {
+                                matchDayID = reader.GetGuid(reader.GetOrdinal("matchDayID")),
+                                memberID = reader.GetGuid(reader.GetOrdinal("memberID")),
+                                isPresent = (ScheduleLayout.PreventionStatus)reader.GetInt32(reader.GetOrdinal("isPresent")),
+                                schemeID = reader.GetGuid(reader.GetOrdinal("schemeID"))
+                            });
+                        }
+                    }
+                }
+            }
+            return result;
         }
 
         public List<ScheduleLayout> GetMembersOfScheduleByStatus(int status, Guid matchdayID)
         {
-            return _database.Query<ScheduleLayout>(string.Format("SELECT * FROM ScheduleLayout WHERE matchdayID = '{0}' AND isPresent = {1}", matchdayID, status));
+            string query = "SELECT * FROM ScheduleLayout WHERE matchdayID = @matchdayID AND isPresent = @status";
+            var result = new List<ScheduleLayout>();
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@matchdayID", matchdayID);
+                    command.Parameters.AddWithValue("@status", status);
+                    connection.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            result.Add(new ScheduleLayout
+                            {
+                                matchDayID = reader.GetGuid(reader.GetOrdinal("matchDayID")),
+                                memberID = reader.GetGuid(reader.GetOrdinal("memberID")),
+                                isPresent = (ScheduleLayout.PreventionStatus)reader.GetInt32(reader.GetOrdinal("isPresent")),
+                                schemeID = reader.GetGuid(reader.GetOrdinal("schemeID"))
+                            });
+                        }
+                    }
+                }
+            }
+            return result;
         }
 
         public List<ScheduleLayout> GetAllAbsents(Guid matchdayID)
         {
-            return _database.Query<ScheduleLayout>(string.Format("SELECT * FROM ScheduleLayout WHERE matchdayID = '{0}' AND isPresent = '0'", matchdayID));
+            string query = "SELECT * FROM ScheduleLayout WHERE matchdayID = @matchdayID AND isPresent = 0";
+            var result = new List<ScheduleLayout>();
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@matchdayID", matchdayID);
+                    connection.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            result.Add(new ScheduleLayout
+                            {
+                                matchDayID = reader.GetGuid(reader.GetOrdinal("matchDayID")),
+                                memberID = reader.GetGuid(reader.GetOrdinal("memberID")),
+                                isPresent = (ScheduleLayout.PreventionStatus)reader.GetInt32(reader.GetOrdinal("isPresent")),
+                                schemeID = reader.GetGuid(reader.GetOrdinal("schemeID"))
+                            });
+                        }
+                    }
+                }
+            }
+            return result;
         }
 
-        public List<ScheduleLayout> GetGameScheduleOfMachday(Guid matchdayID)
+        public List<ScheduleLayout> GetGameScheduleOfMatchday(Guid matchdayID)
         {
-            return _database.Query<ScheduleLayout>(string.Format("SELECT * FROM ScheduleLayout WHERE matchdayID = '{0}'", matchdayID));
+            string query = "SELECT * FROM ScheduleLayout WHERE matchdayID = @matchdayID";
+            var result = new List<ScheduleLayout>();
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@matchdayID", matchdayID);
+                    connection.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            result.Add(new ScheduleLayout
+                            {
+                                matchDayID = reader.GetGuid(reader.GetOrdinal("matchDayID")),
+                                memberID = reader.GetGuid(reader.GetOrdinal("memberID")),
+                                isPresent = (ScheduleLayout.PreventionStatus)reader.GetInt32(reader.GetOrdinal("isPresent")),
+                                schemeID = reader.GetGuid(reader.GetOrdinal("schemeID"))
+                            });
+                        }
+                    }
+                }
+            }
+            return result;
         }
 
         public List<ScheduleLayout> GetPreventionOfMember(Guid memberID, Guid schemeID)
         {
-            return _database.Query<ScheduleLayout>(string.Format("SELECT * FROM ScheduleLayout WHERE memberID = '{0}' AND schemeID = '{1}' AND isPresent = '1'", memberID, schemeID));
+            string query = "SELECT * FROM ScheduleLayout WHERE memberID = @memberID AND schemeID = @schemeID AND isPresent = 1";
+            var result = new List<ScheduleLayout>();
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@memberID", memberID);
+                    command.Parameters.AddWithValue("@schemeID", schemeID);
+                    connection.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            result.Add(new ScheduleLayout
+                            {
+                                matchDayID = reader.GetGuid(reader.GetOrdinal("matchDayID")),
+                                memberID = reader.GetGuid(reader.GetOrdinal("memberID")),
+                                isPresent = (ScheduleLayout.PreventionStatus)reader.GetInt32(reader.GetOrdinal("isPresent")),
+                                schemeID = reader.GetGuid(reader.GetOrdinal("schemeID"))
+                            });
+                        }
+                    }
+                }
+            }
+            return result;
         }
 
         public List<ScheduleLayout> GetPreventedOfMember(Guid memberID, Guid schemeID)
         {
-            return _database.Query<ScheduleLayout>(string.Format("SELECT * FROM ScheduleLayout WHERE memberID = '{0}' AND schemeID = '{1}' AND isPresent = '0'", memberID, schemeID));
+            string query = "SELECT * FROM ScheduleLayout WHERE memberID = @memberID AND schemeID = @schemeID AND isPresent = 0";
+            var result = new List<ScheduleLayout>();
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@memberID", memberID);
+                    command.Parameters.AddWithValue("@schemeID", schemeID);
+                    connection.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            result.Add(new ScheduleLayout
+                            {
+                                matchDayID = reader.GetGuid(reader.GetOrdinal("matchDayID")),
+                                memberID = reader.GetGuid(reader.GetOrdinal("memberID")),
+                                isPresent = (ScheduleLayout.PreventionStatus)reader.GetInt32(reader.GetOrdinal("isPresent")),
+                                schemeID = reader.GetGuid(reader.GetOrdinal("schemeID"))
+                            });
+                        }
+                    }
+                }
+            }
+            return result;
         }
 
-        public Matchday GetMatchdayByID(Guid matchdayID)
+        public SchemeMatchDay GetMatchdayByID(Guid matchdayID)
         {
-            return _database.Query<Matchday>(string.Format("SELECT * FROM SchemeMatchDay WHERE matchDayID = '{0}'", matchdayID)).FirstOrDefault();
+            string query = "SELECT * FROM SchemeMatchDay WHERE matchDayID = @matchdayID";
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@matchdayID", matchdayID);
+                    connection.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return new SchemeMatchDay
+                            {
+                                matchDayID = reader.GetGuid(reader.GetOrdinal("matchDayID")),
+                                schemeID  = reader.GetGuid(reader.GetOrdinal("schemeID")),
+                                matchDayDateTime = reader.GetDateTime(reader.GetOrdinal("matchDayDateTime"))
+                            };
+                        }
+                    }
+                }
+            }
+            return null;
         }
     }
 }

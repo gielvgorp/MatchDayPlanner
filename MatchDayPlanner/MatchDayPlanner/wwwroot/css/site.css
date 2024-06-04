@@ -131,10 +131,11 @@ header .sub-title {
     align-content: center;
 }
 
-.item.dropdown-container{
+.item.dropdown-container {
     position: relative;
     height: 24px;
     width: 120px;
+    z-index: 101;
 }
 
 .dropdown-content {

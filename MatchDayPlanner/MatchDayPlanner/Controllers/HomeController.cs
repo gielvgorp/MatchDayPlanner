@@ -24,6 +24,7 @@ namespace MatchDayPlanner.Controllers
         private readonly GameScheduleService _gameScheduleService;
         private readonly MatchDayService _matchdayService;
         private readonly SchemePlannerService _schemePlannerService;
+        private readonly FileExportService _fileExportService;
 
         public HomeController(UserManager<ApplicationUser> userManager)
         {
@@ -32,6 +33,7 @@ namespace MatchDayPlanner.Controllers
             _gameScheduleService = new GameScheduleService(new GameScheduleRepository(), _matchdayService, _teamService);
             _schemePlannerService = new SchemePlannerService(_teamService, _gameScheduleService, _matchdayService, new PreventionService(new PreventionRepository()));
             _userManager = userManager;
+            _fileExportService = new FileExportService();
         }
 
         public IActionResult Index()
@@ -426,6 +428,13 @@ namespace MatchDayPlanner.Controllers
                 return RedirectToAction("GeneratedScheme", "Home", new { scheduleID = schemeID });
             }
             return View();
+        }
+
+        [HttpGet("/export/{schemeID}")]
+        public IActionResult Export(Guid schemeID)
+        {
+            var scheme = _gameScheduleService.GetFullScheme(schemeID);
+            return _fileExportService.ExportToExcel(scheme);
         }
 
         public IActionResult Privacy()

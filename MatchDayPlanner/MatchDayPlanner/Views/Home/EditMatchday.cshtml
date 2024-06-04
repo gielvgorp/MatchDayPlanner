@@ -1,0 +1,29 @@
+﻿@using MatchDayPlanner.Models.ViewModels
+@model SchemeMatchDayViewModel
+
+@{
+    ViewData["Title"] = "Speler bewerken";
+}
+<link rel="stylesheet" href="~/css/editPlayer.css" asp-append-version="true" />
+
+<div class="page-content">
+    @using (Html.BeginForm("EditMatchday", "Home", FormMethod.Post))
+    {
+        @Html.HiddenFor(m => m.schemeID)
+        @Html.HiddenFor(m => m.matchDayID)
+        <div class="form-container p-4">
+            <div class="form-group">
+                @Html.DisplayNameFor(m => m.matchDayDateTime)
+                <input type="time" class="form-control" asp-asp-for="matchDayDateTime" />
+            </div>
+            <div class="form-group mt-3">
+                @Html.DisplayNameFor(m => m.location)
+                @Html.TextBoxFor(m => m.location, new { @class = "form-control", aria_describedby = "emailHelp", placeholder = "Locatie van wedstrijd" })
+            </div>
+            <div class="form-group mt-3">
+                <button class="btn btn-primary" name="submitButton" value="save" type="submit">Opslaan</button>
+                <button class="btn btn-danger" name="submitButton" value="delete" type="submit">Verwijder</button>
+            </div>
+        </div>
+    }
+</div>

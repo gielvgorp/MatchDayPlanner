@@ -71,6 +71,8 @@ namespace MatchDayPlanner.Core.Services
                     }
 
                     worksheet.Cells[i + 3, 5].Value = reserve;
+
+                    worksheet.Cells[i + 3, 7].Value = matchdays[i].matchDayDateTime.Hour + ":" + matchdays[i].matchDayDateTime.Minute;
                 }
 
                 worksheet.Column(1).Width = 16;

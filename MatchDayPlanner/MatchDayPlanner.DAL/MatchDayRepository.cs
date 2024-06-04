@@ -76,7 +76,8 @@ namespace MatchDayPlanner.DAL
                             {
                                 matchDayID = reader.GetGuid(reader.GetOrdinal("matchDayID")),
                                 schemeID = reader.GetGuid(reader.GetOrdinal("schemeID")),
-                                matchDayDateTime = reader.GetDateTime(reader.GetOrdinal("matchDayDateTime"))
+                                matchDayDateTime = reader.GetDateTime(reader.GetOrdinal("matchDayDateTime")),
+                                location = reader.GetString(reader.GetOrdinal("location"))
                             };
                         }
                     }
@@ -87,13 +88,14 @@ namespace MatchDayPlanner.DAL
 
         public void UpdateMatchday(SchemeMatchDay matchday)
         {
-            string query = "UPDATE SchemeMatchDay SET matchDayDateTime = @date WHERE matchDayID = @matchDayID";
+            string query = "UPDATE SchemeMatchDay SET matchDayDateTime = @date, location = @location WHERE matchDayID = @matchDayID";
             using (var connection = new SqlConnection(_connectionString))
             {
                 using (var command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@date", matchday.matchDayDateTime);
                     command.Parameters.AddWithValue("@matchDayID", matchday.matchDayID);
+                    command.Parameters.AddWithValue("@location", matchday.location);
                     connection.Open();
                     command.ExecuteNonQuery();
                 }
@@ -118,7 +120,8 @@ namespace MatchDayPlanner.DAL
                             {
                                 matchDayID = reader.GetGuid(reader.GetOrdinal("matchDayID")),
                                 schemeID = reader.GetGuid(reader.GetOrdinal("schemeID")),
-                                matchDayDateTime = reader.GetDateTime(reader.GetOrdinal("matchDayDateTime"))
+                                matchDayDateTime = reader.GetDateTime(reader.GetOrdinal("matchDayDateTime")),
+                                location = reader.GetString(reader.GetOrdinal("location"))
                             });
                         }
                     }
@@ -315,7 +318,8 @@ namespace MatchDayPlanner.DAL
                             {
                                 matchDayID = reader.GetGuid(reader.GetOrdinal("matchDayID")),
                                 schemeID  = reader.GetGuid(reader.GetOrdinal("schemeID")),
-                                matchDayDateTime = reader.GetDateTime(reader.GetOrdinal("matchDayDateTime"))
+                                matchDayDateTime = reader.GetDateTime(reader.GetOrdinal("matchDayDateTime")),
+                                location = reader.GetString(reader.GetOrdinal("location"))
                             };
                         }
                     }

@@ -275,7 +275,9 @@ namespace MatchDayPlanner.Controllers
         {
             MatchDayOverviewModel model = new MatchDayOverviewModel();
             model.MatchDay = _matchdayService.GetMatchday(schemeID, date);
-            
+            ViewBag.matchdayID = model.MatchDay.matchDayID;
+            ViewBag.location = model.MatchDay.location != "" ? model.MatchDay.location : "Onbekend";
+
             if (model.MatchDay != null)
             {
                 var preventions = _matchdayService.GetGameScheduleOfMachday(model.MatchDay.matchDayID);
@@ -428,6 +430,41 @@ namespace MatchDayPlanner.Controllers
                 return RedirectToAction("GeneratedScheme", "Home", new { scheduleID = schemeID });
             }
             return View();
+        }
+
+        [HttpGet("/edit-matchday/{matchdayID}")]
+        public IActionResult EditMatchday(Guid matchdayID)
+        {
+            var scheme = _matchdayService.GetMatchdayByID(matchdayID);
+
+            SchemeMatchDayViewModel model = new SchemeMatchDayViewModel
+            {
+                matchDayID = scheme.matchDayID,
+                schemeID = scheme.schemeID,
+                matchDayDateTime = scheme.matchDayDateTime,
+                location = scheme.location
+            };
+            return View(model);
+        }
+
+        [HttpPost("/edit-matchday/{matchdayID}")]
+        public IActionResult EditMatchday(SchemeMatchDayViewModel model)
+        {
+            DateTime matchdayDateTime = _matchdayService.GetMatchdayByID(model.matchDayID).matchDayDateTime;
+            TimeSpan ts = model.matchDayDateTime.TimeOfDay;
+            matchdayDateTime = matchdayDateTime.Date + ts;
+
+
+            SchemeMatchDay matchday = new SchemeMatchDay
+            {
+                matchDayID = model.matchDayID,
+                location = model.location,
+                matchDayDateTime = matchdayDateTime,
+                schemeID = model.schemeID
+            };
+            _matchdayService.UpdateMatchday(matchday);
+            TempData["SuccessMessage"] = "Veranderingen opgeslagen!";
+            return RedirectToAction("MatchDayOverview", "Home", new { schemeID = matchday.schemeID, date = matchday.matchDayDateTime.Date.ToString().Replace("/", "-") });
         }
 
         [HttpGet("/export/{schemeID}")]

@@ -39,3 +39,7 @@ else if (ViewBag.CurrentView == "PreventionFullScheme")
     <a class="item" href="#" onclick="">Exporteren naar Excel</a>
     <a class="item" href="">Exporteren naar PDF</a>
 }
+else if (ViewBag.CurrentView == "MatchdayOverview")
+{
+    <a class="item" href="@Url.Action("EditMatchday", "Home", new { matchdayID = ViewBag.matchdayID })">Bewerken</a>
+}

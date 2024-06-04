@@ -265,6 +265,7 @@ namespace MatchDayPlanner.Controllers
             ViewBag.SharedURL = string.Format("https://localhost:7294/prevention/{0}/{1}", model.Scheme.teamID, model.Scheme.schemeID);
             ViewBag.SchemeID = scheduleID;
             ViewBag.SchemeStatus = _gameScheduleService.GetGameScheduleByID(scheduleID).scheduleStatus;
+            ViewBag.SchemeDeadline = model.Scheme.schemeDeadline.ToString() ?? "Geen deadline";
             return View(model);
         }
 

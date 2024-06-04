@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="~/css/manageTeam.css" asp-append-version="true" />
 
 <div class="page-content players">
-    @foreach (TeamMemberViewModel member in Model.members)
+    @foreach (TeamMemberViewModel member in Model.members.OrderByDescending(m => m.memberID == Model.teamCaptainID))
     {
         <div class="player-container">
             <h6 class="player-name text">

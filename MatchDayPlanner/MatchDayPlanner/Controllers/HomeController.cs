@@ -24,6 +24,7 @@ namespace MatchDayPlanner.Controllers
         private readonly GameScheduleService _gameScheduleService;
         private readonly MatchDayService _matchdayService;
         private readonly SchemePlannerService _schemePlannerService;
+        private readonly FileExportService _fileExportService;
 
         public HomeController(UserManager<ApplicationUser> userManager)
         {
@@ -32,6 +33,7 @@ namespace MatchDayPlanner.Controllers
             _gameScheduleService = new GameScheduleService(new GameScheduleRepository(), _matchdayService, _teamService);
             _schemePlannerService = new SchemePlannerService(_teamService, _gameScheduleService, _matchdayService, new PreventionService(new PreventionRepository()));
             _userManager = userManager;
+            _fileExportService = new FileExportService();
         }
 
         public IActionResult Index()
@@ -274,7 +276,10 @@ namespace MatchDayPlanner.Controllers
         {
             MatchDayOverviewModel model = new MatchDayOverviewModel();
             model.MatchDay = _matchdayService.GetMatchday(schemeID, date);
-            
+            ViewBag.matchdayID = model.MatchDay.matchDayID;
+            ViewBag.location = model.MatchDay.location != "" ? model.MatchDay.location : "Onbekend";
+            ViewBag.DateTime = model.MatchDay.matchDayDateTime;
+
             if (model.MatchDay != null)
             {
                 var preventions = _matchdayService.GetGameScheduleOfMachday(model.MatchDay.matchDayID);
@@ -427,6 +432,78 @@ namespace MatchDayPlanner.Controllers
                 return RedirectToAction("GeneratedScheme", "Home", new { scheduleID = schemeID });
             }
             return View();
+        }
+
+        [HttpGet("/edit-matchday/{matchdayID}")]
+        public IActionResult EditMatchday(Guid matchdayID)
+        {
+            var scheme = _matchdayService.GetMatchdayByID(matchdayID);
+
+            SchemeMatchDayViewModel model = new SchemeMatchDayViewModel
+            {
+                matchDayID = scheme.matchDayID,
+                schemeID = scheme.schemeID,
+                matchDayDateTime = scheme.matchDayDateTime,
+                location = scheme.location
+            };
+            return View(model);
+        }
+
+        [HttpPost("/edit-matchday/{matchdayID}")]
+        public IActionResult EditMatchday(SchemeMatchDayViewModel model, TimeSpan matchdayTime)
+        {
+            DateTime matchdayDateTime = _matchdayService.GetMatchdayByID(model.matchDayID).matchDayDateTime;
+            TimeSpan ts = matchdayTime;
+            matchdayDateTime = matchdayDateTime.Date + ts;
+
+
+            SchemeMatchDay matchday = new SchemeMatchDay
+            {
+                matchDayID = model.matchDayID,
+                location = model.location,
+                matchDayDateTime = matchdayDateTime,
+                schemeID = model.schemeID
+            };
+            _matchdayService.UpdateMatchday(matchday);
+            TempData["SuccessMessage"] = "Veranderingen opgeslagen!";
+            return RedirectToAction("MatchDayOverview", "Home", new { schemeID = matchday.schemeID, date = matchday.matchDayDateTime.Date.ToString().Replace("/", "-") });
+        }
+
+        [HttpGet("/export/{format}/{schemeID}")]
+        public IActionResult Export(string format, Guid schemeID)
+        {
+            try
+            {
+                var scheme = _gameScheduleService.GetFullScheme(schemeID);
+                if (scheme == null)
+                {
+                    throw new Exception("Schema exporteren mislukt. Schema niet gevonden!");
+                }
+
+                switch (format.ToLower())
+                {
+                    case "excel":
+                        return _fileExportService.ExportToExcel(scheme);
+                    case "pdf":
+                        return _fileExportService.ExportToPdf(scheme);
+                        //throw new Exception("Ongeldig exportformaat! Kan niet exporteren naar " + format.ToLower());
+                    default:
+                        throw new Exception("Ongeldig exportformaat! Kan niet exporteren naar " + format.ToLower());
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                string refererUrl = Request.Headers["Referer"].ToString();
+                if (!string.IsNullOrEmpty(refererUrl))
+                {
+                    return Redirect(refererUrl);
+                }
+                else
+                {
+                    return RedirectToAction("Index");
+                }
+            }
         }
 
         public IActionResult Privacy()

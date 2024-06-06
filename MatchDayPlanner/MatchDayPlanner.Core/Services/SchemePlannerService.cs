@@ -32,7 +32,7 @@ namespace MatchDayPlanner.Core.Services
             var matchdays = _matchDayService.GetAllMatchDays(schemeID);
             var teamMembers = _teamService.GetTeamMembers(result.teamID);
 
-            this.matchDays = matchdays.Select(m => new MatchDay(m.matchDayID, m.matchDayDateTime)).ToList();
+            this.matchDays = matchdays.Select(m => new MatchDay(m.matchDayID, m.matchDayDateTime, m.location)).ToList();
             this.schemeID = schemeID;
             this.team = new Team
             {
@@ -53,7 +53,7 @@ namespace MatchDayPlanner.Core.Services
 
             preventions.ForEach(m =>
             {
-                matchdays.Add(new MatchDay(m.matchDayID, matchDays.Where(md => md.matchDayID == m.matchDayID).FirstOrDefault().matchDayDateTime));
+                matchdays.Add(new MatchDay(m.matchDayID, matchDays.Where(md => md.matchDayID == m.matchDayID).FirstOrDefault().matchDayDateTime, matchDays.Where(md => md.matchDayID == m.matchDayID).FirstOrDefault().location));
             });
 
             return matchdays;
@@ -68,7 +68,7 @@ namespace MatchDayPlanner.Core.Services
 
             List<MatchDay> preventedMatchDays = team.members
            .SelectMany(m => m.preventions)
-           .Select(p => new MatchDay(p.matchDayID, p.matchDayDateTime)).DistinctBy(r => r.matchDayDateTime)
+           .Select(p => new MatchDay(p.matchDayID, p.matchDayDateTime, p.location)).DistinctBy(r => r.matchDayDateTime)
            .ToList();
 
             List<PreventedInfo> orderedList = preventedMatchDays
@@ -79,7 +79,7 @@ namespace MatchDayPlanner.Core.Services
             Console.WriteLine("Date that players are prevented:");
             foreach (PreventedInfo item in orderedList.OrderByDescending(r => r.amountOfPrevented))
             {
-                MatchDay layout = new MatchDay(item.matchDay.matchDayID, item.matchDay.matchDayDateTime);
+                MatchDay layout = new MatchDay(item.matchDay.matchDayID, item.matchDay.matchDayDateTime, item.matchDay.location);
                 Console.WriteLine("==============");
                 Console.WriteLine(item.matchDay.matchDayDateTime);
                 GetMembersArePreventedOnDate(item.matchDay.matchDayDateTime, layout);
@@ -95,13 +95,13 @@ namespace MatchDayPlanner.Core.Services
 
             List<MatchDay> noPreventedMatchDays = matchDays
              .Where(md => !preventedMatchDays.Any(pmd => pmd.matchDayDateTime == md.matchDayDateTime))
-             .Select(md => new MatchDay(md.matchDayID, md.matchDayDateTime))
+             .Select(md => new MatchDay(md.matchDayID, md.matchDayDateTime, md.location))
              .ToList();
 
             // plan all matchdays where all members are available
             foreach (MatchDay item in noPreventedMatchDays)
             {
-                MatchDay layout = new MatchDay(item.matchDayID, item.matchDayDateTime);
+                MatchDay layout = new MatchDay(item.matchDayID, item.matchDayDateTime, item.location);
                 Console.WriteLine("==============");
                 Console.WriteLine(item.matchDayDateTime);
                 GetMembersArePreventedOnDate(item.matchDayDateTime, layout);

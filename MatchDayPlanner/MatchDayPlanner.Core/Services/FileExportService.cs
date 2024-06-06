@@ -4,6 +4,11 @@ using System.IO;
 using Microsoft.AspNetCore.Mvc;
 using MatchDayPlanner.Core.SchemePlanner;
 using System.Runtime.InteropServices.JavaScript;
+using System.Reflection.Metadata;
+using iTextSharp.text.pdf;
+using iTextSharp.text;
+using System.Drawing;
+using Font = iTextSharp.text.Font;
 
 namespace MatchDayPlanner.Core.Services
 {
@@ -67,12 +72,13 @@ namespace MatchDayPlanner.Core.Services
                     string reserve = "";
                     for (int k = 0; k < matchdays[i].schemeLayout.Where(s => s.memberPrevention == TeamMember.PreventionStatus.Reserve).ToList().Count; k++)
                     {
-                        reserve.CompareTo(matchdays[i].schemeLayout.Where(s => s.memberPrevention == TeamMember.PreventionStatus.Reserve).ToList()[k].memberName + ", ");
+                        reserve += matchdays[i].schemeLayout.Where(s => s.memberPrevention == TeamMember.PreventionStatus.Reserve).ToList()[k].memberName + ", ";
                     }
 
                     worksheet.Cells[i + 3, 5].Value = reserve;
 
-                    worksheet.Cells[i + 3, 7].Value = matchdays[i].matchDayDateTime.Hour + ":" + matchdays[i].matchDayDateTime.Minute;
+                    worksheet.Cells[i + 3, 6].Value = matchdays[i].location;
+                    worksheet.Cells[i + 3, 7].Value = matchdays[i].matchDayDateTime.ToString("HH:mm");
                 }
 
                 worksheet.Column(1).Width = 16;
@@ -92,6 +98,81 @@ namespace MatchDayPlanner.Core.Services
             {
                 FileDownloadName = "Schedule.xlsx"
             };
+        }
+
+        public IActionResult ExportToPdf(Scheme scheme)
+        {
+            using (var ms = new MemoryStream())
+            {
+                var document = new iTextSharp.text.Document();
+                var writer = PdfWriter.GetInstance(document, ms);
+                // Attach the custom page event helper for background
+
+                document.Open();
+
+                // Adding title
+                var titleFont = FontFactory.GetFont("Arial", 16, Font.BOLD);
+                var titleParagraph = new Paragraph("Scheme", titleFont);
+                titleParagraph.Alignment = Element.ALIGN_CENTER;
+                document.Add(titleParagraph);
+
+                // Adding space after the title
+                document.Add(new Paragraph("\n"));
+
+                // Adding a table
+                var table = new PdfPTable(5)
+                {
+                    WidthPercentage = 100
+                };
+
+                // Adding headers
+                var headerFont = FontFactory.GetFont("Arial", 12, Font.BOLD);
+                table.AddCell(new PdfPCell(new Phrase("Datum", headerFont)));
+                table.AddCell(new PdfPCell(new Phrase("Tijd", headerFont)));
+                table.AddCell(new PdfPCell(new Phrase("Location", headerFont)));
+                table.AddCell(new PdfPCell(new Phrase("Ingepland", headerFont)));
+                table.AddCell(new PdfPCell(new Phrase("Reserve", headerFont)));
+
+                // Adding data
+                foreach (var matchDay in scheme.GetSchemeLayout())
+                {
+                    string scheduled = string.Empty;
+                    for (int k = 0; k < matchDay.schemeLayout.Where(s => s.memberPrevention == TeamMember.PreventionStatus.Scheduled).ToList().Count; k++)
+                    {
+                        scheduled += matchDay.schemeLayout.Where(s => s.memberPrevention == TeamMember.PreventionStatus.Scheduled).ToList()[k].memberName + ", ";
+                    }
+
+                    string reserve = string.Empty;
+                    for (int k = 0; k < matchDay.schemeLayout.Where(s => s.memberPrevention == TeamMember.PreventionStatus.Reserve).ToList().Count; k++)
+                    {
+                        reserve += matchDay.schemeLayout.Where(s => s.memberPrevention == TeamMember.PreventionStatus.Reserve).ToList()[k].memberName + ", ";
+                    }
+
+                    table.AddCell(matchDay.matchDayDateTime.ToString("yyyy-MM-dd"));
+                    table.AddCell(matchDay.matchDayDateTime.ToString("HH:mm"));
+                    table.AddCell(matchDay.location);
+                    table.AddCell(scheduled);
+                    table.AddCell(reserve);
+                }
+
+                document.Add(table);
+
+                // Add footer to each page
+                var footerFont = FontFactory.GetFont("Arial", 10, Font.ITALIC);
+                var footerPhrase = new Phrase("Made by Matchday Planner", footerFont);
+                for (int i = 1; i <= writer.PageNumber; i++)
+                {
+                    ColumnText.ShowTextAligned(writer.DirectContentUnder, Element.ALIGN_CENTER, footerPhrase, 297.5f, 30f, 0);
+                }
+
+                document.Close();
+
+                var file = new FileContentResult(ms.ToArray(), "application/pdf")
+                {
+                    FileDownloadName = "Scheme.pdf"
+                };
+                return file;
+            }
         }
     }
 }

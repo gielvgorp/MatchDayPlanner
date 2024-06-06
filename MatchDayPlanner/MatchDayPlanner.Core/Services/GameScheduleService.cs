@@ -76,7 +76,7 @@ namespace MatchDayPlanner.Core.Services
 
             foreach (var matchday in matchDays)
             {
-                MatchDay md = new MatchDay(matchday.matchDayID, matchday.matchDayDateTime);
+                MatchDay md = new MatchDay(matchday.matchDayID, matchday.matchDayDateTime, matchday.location);
                 foreach (var teamMember in _matchdayService.GetMembersOfScheduleByStatus(0, md.matchDayID))
                 {
                     Entities.TeamMember member = _teamService.GetTeamMemberByID(teamMember.memberID);

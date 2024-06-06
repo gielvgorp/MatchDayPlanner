@@ -36,8 +36,14 @@ else if (ViewBag.CurrentView == "ReportAvailability")
 }
 else if (ViewBag.CurrentView == "PreventionFullScheme")
 {
-    <a class="item" href="#" onclick="">Exporteren naar Excel</a>
-    <a class="item" href="">Exporteren naar PDF</a>
+    <div class="export-buttons">
+        <button type="button" class="btn btn-success" onclick="location.href='@Url.Action("Export", "Home", new { schemeID = ViewBag.SchemeID, format = "excel" })'">
+            <i class="fas fa-file-excel"></i> Exporteren naar Excel
+        </button>
+        <button type="button" class="btn btn-danger" onclick="location.href='@Url.Action("Export", "Home", new { schemeID = ViewBag.SchemeID, format = "pdf" })'">
+            <i class="fas fa-file-pdf"></i> Exporteren naar PDF
+        </button>
+    </div>
 }
 else if (ViewBag.CurrentView == "MatchdayOverview")
 {

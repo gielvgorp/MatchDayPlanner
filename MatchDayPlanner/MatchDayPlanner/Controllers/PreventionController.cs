@@ -89,6 +89,7 @@ namespace MatchDayPlanner.Controllers
         public IActionResult Scheme(Guid schemeID)
         {
             ViewBag.CurrentView = "PreventionFullScheme";
+            ViewBag.schemeID = schemeID;
 
             PreventionSchemeViewModel model = new PreventionSchemeViewModel();
             model.schemeID = schemeID;

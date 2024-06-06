@@ -277,6 +277,7 @@ namespace MatchDayPlanner.Controllers
             model.MatchDay = _matchdayService.GetMatchday(schemeID, date);
             ViewBag.matchdayID = model.MatchDay.matchDayID;
             ViewBag.location = model.MatchDay.location != "" ? model.MatchDay.location : "Onbekend";
+            ViewBag.DateTime = model.MatchDay.matchDayDateTime;
 
             if (model.MatchDay != null)
             {
@@ -448,10 +449,10 @@ namespace MatchDayPlanner.Controllers
         }
 
         [HttpPost("/edit-matchday/{matchdayID}")]
-        public IActionResult EditMatchday(SchemeMatchDayViewModel model)
+        public IActionResult EditMatchday(SchemeMatchDayViewModel model, TimeSpan matchdayTime)
         {
             DateTime matchdayDateTime = _matchdayService.GetMatchdayByID(model.matchDayID).matchDayDateTime;
-            TimeSpan ts = model.matchDayDateTime.TimeOfDay;
+            TimeSpan ts = matchdayTime;
             matchdayDateTime = matchdayDateTime.Date + ts;
 
 
@@ -467,11 +468,41 @@ namespace MatchDayPlanner.Controllers
             return RedirectToAction("MatchDayOverview", "Home", new { schemeID = matchday.schemeID, date = matchday.matchDayDateTime.Date.ToString().Replace("/", "-") });
         }
 
-        [HttpGet("/export/{schemeID}")]
-        public IActionResult Export(Guid schemeID)
+        [HttpGet("/export/{format}/{schemeID}")]
+        public IActionResult Export(string format, Guid schemeID)
         {
-            var scheme = _gameScheduleService.GetFullScheme(schemeID);
-            return _fileExportService.ExportToExcel(scheme);
+            try
+            {
+                var scheme = _gameScheduleService.GetFullScheme(schemeID);
+                if (scheme == null)
+                {
+                    throw new Exception("Schema exporteren mislukt. Schema niet gevonden!");
+                }
+
+                switch (format.ToLower())
+                {
+                    case "excel":
+                        return _fileExportService.ExportToExcel(scheme);
+                    case "pdf":
+                        return _fileExportService.ExportToPdf(scheme);
+                        //throw new Exception("Ongeldig exportformaat! Kan niet exporteren naar " + format.ToLower());
+                    default:
+                        throw new Exception("Ongeldig exportformaat! Kan niet exporteren naar " + format.ToLower());
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                string refererUrl = Request.Headers["Referer"].ToString();
+                if (!string.IsNullOrEmpty(refererUrl))
+                {
+                    return Redirect(refererUrl);
+                }
+                else
+                {
+                    return RedirectToAction("Index");
+                }
+            }
         }
 
         public IActionResult Privacy()

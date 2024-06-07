@@ -13,9 +13,9 @@ namespace MatchDayPlanner.DAL
     {
         private readonly string _connectionString;
 
-        public PreventionRepository()
+        public PreventionRepository(string c_connectionString)
         {
-            _connectionString = "Server=DESKTOP-SML637F;Database=MatchDayPlanner;Trusted_Connection=True;TrustServerCertificate=True;";
+            this._connectionString = c_connectionString;
         }
 
         public void DeletePrevention(Guid matchDayID, Guid memberID)

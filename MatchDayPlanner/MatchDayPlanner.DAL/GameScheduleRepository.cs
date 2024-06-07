@@ -13,9 +13,9 @@ namespace MatchDayPlanner.DAL
     {
         private readonly string _connectionString;
 
-        public GameScheduleRepository()
+        public GameScheduleRepository(string c_connectionString)
         {
-            _connectionString = "Server=DESKTOP-SML637F;Database=MatchDayPlanner;Trusted_Connection=True;TrustServerCertificate=True;";
+            this._connectionString = c_connectionString;
         }
 
         public void Create(GameSchedules schedule)

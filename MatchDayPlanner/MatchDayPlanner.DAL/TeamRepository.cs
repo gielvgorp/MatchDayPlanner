@@ -12,7 +12,13 @@ namespace MatchDayPlanner.DAL
 {
     public class TeamRepository : ITeamRepository
     {
+        private readonly string _connectionString;
         private Database database = new Database();
+
+        public TeamRepository(string c_connectionString) 
+        {
+            this._connectionString = c_connectionString;
+        }
         public bool CreateTeam(string teamName, Guid uid)
         {
             return database.Insert(string.Format("INSERT INTO Teams (teamName, teamCreatedBy) VALUES ('{0}', '{1}')", teamName, uid));

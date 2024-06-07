@@ -25,13 +25,15 @@ namespace MatchDayPlanner.Controllers
         private readonly MatchDayService _matchdayService;
         private readonly SchemePlannerService _schemePlannerService;
         private readonly FileExportService _fileExportService;
+        private readonly string _dbConnectionString;
 
-        public HomeController(UserManager<ApplicationUser> userManager)
+        public HomeController(IConfiguration iConfig, UserManager<ApplicationUser> userManager)
         {
-            _teamService = new TeamService(new TeamRepository());
-            _matchdayService = new MatchDayService(new MatchDayRepository());
-            _gameScheduleService = new GameScheduleService(new GameScheduleRepository(), _matchdayService, _teamService);
-            _schemePlannerService = new SchemePlannerService(_teamService, _gameScheduleService, _matchdayService, new PreventionService(new PreventionRepository()));
+            _dbConnectionString = iConfig.GetSection("ConnectionStrings").GetConnectionString("DbConnection");
+            _teamService = new TeamService(new TeamRepository(_dbConnectionString));
+            _matchdayService = new MatchDayService(new MatchDayRepository(_dbConnectionString));
+            _gameScheduleService = new GameScheduleService(new GameScheduleRepository(_dbConnectionString), _matchdayService, _teamService);
+            _schemePlannerService = new SchemePlannerService(_teamService, _gameScheduleService, _matchdayService, new PreventionService(new PreventionRepository(_dbConnectionString)));
             _userManager = userManager;
             _fileExportService = new FileExportService();
         }

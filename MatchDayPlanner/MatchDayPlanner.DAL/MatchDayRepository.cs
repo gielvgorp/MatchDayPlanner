@@ -17,9 +17,9 @@ namespace MatchDayPlanner.DAL
     {
         private readonly string _connectionString;
 
-        public MatchDayRepository()
+        public MatchDayRepository(string c_connectionString)
         {
-            _connectionString = "Server=DESKTOP-SML637F;Database=MatchDayPlanner;Trusted_Connection=True;TrustServerCertificate=True;";
+            this._connectionString = c_connectionString;
         }
 
         public void AddMatchday(Guid schemeID, string date)

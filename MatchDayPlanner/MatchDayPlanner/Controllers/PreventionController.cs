@@ -86,6 +86,7 @@ namespace MatchDayPlanner.Controllers
             return View(model);
         }
 
+        [HttpGet("/scheme/{schemeID}")]
         public IActionResult Scheme(Guid schemeID)
         {
             ViewBag.CurrentView = "PreventionFullScheme";
@@ -231,6 +232,28 @@ namespace MatchDayPlanner.Controllers
 
             TempData["SuccessMessage"] = "Verhinderingen opgeslagen!";
             return RedirectToAction("Index", "prevention", new { teamID = team.teamID, schemeID = schemeID});
+        }
+
+        [HttpPost]
+        public IActionResult SaveFeedback(PreventionSchemeViewModel model)
+        {
+            try
+            {
+                SchemeFeedbackViewModel schemeModel = model.schemeFeedback;
+
+                if (string.IsNullOrEmpty(schemeModel.feedbackMessage))
+                {
+                    throw new Exception("Vul uw feedback in!");
+                }
+
+                TempData["SuccessMessage"] = "Feedback opgeslagen!";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+
+            return RedirectToAction("scheme", new { schemeID = model.schemeID });
         }
     }
 }

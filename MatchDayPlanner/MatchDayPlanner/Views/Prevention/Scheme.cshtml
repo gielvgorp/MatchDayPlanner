@@ -33,27 +33,43 @@
         </div>
     </div>
 
-    <div class="cal-grid position-absolute start-0 top-0 py-3" id="cal-grid" style="display: none; grid-template-columns: repeat(2, 600px);">
-        @for (int i = Model.Scheme.startDate.Month; i < Model.Scheme.endDate.Month + 1; i++)
-        {
-            <div class="call-month">
-                <h3 class="text cal-month-name">@(new DateOnly(Model.Scheme.startDate.Year, i, 1).ToString("MMMM yyyy", CultureInfo.CreateSpecificCulture("nl"))) </h3>
-                <div class="cal-days">
-                    @for (int y = 0; y < (int)new DateTime(Model.Scheme.startDate.Year, i, 1).DayOfWeek - 2; y++)
-                    {
-                        <div class="day-cell-disabled cal-day-cell"></div>
-                    }
+    <div class="position-absolute start-0 top-0" id="cal-grid" style="display: none">
+        <div class="cal-grid py-3" style="grid-template-columns: repeat(2, 600px);">
+            @for (int i = Model.Scheme.startDate.Month; i < Model.Scheme.endDate.Month + 1; i++)
+            {
+                <div class="call-month">
+                    <h3 class="text cal-month-name">@(new DateOnly(Model.Scheme.startDate.Year, i, 1).ToString("MMMM yyyy", CultureInfo.CreateSpecificCulture("nl"))) </h3>
+                    <div class="cal-days">
+                        @for (int y = 0; y < (int)new DateTime(Model.Scheme.startDate.Year, i, 1).DayOfWeek - 2; y++)
+                        {
+                            <div class="day-cell-disabled cal-day-cell"></div>
+                        }
 
-                    @for (int x = 0; x < DateTime.DaysInMonth(Model.Scheme.startDate.Year, i); x++)
-                    {
-                        <div class="cal-day-cell" data-date="@i/@(x + 1)/@(Model.Scheme.startDate.Year)">
-                            <h5 class="text">@(x + 1)</h5>
-                        </div>
-                    }
+                        @for (int x = 0; x < DateTime.DaysInMonth(Model.Scheme.startDate.Year, i); x++)
+                        {
+                            <div class="cal-day-cell" data-date="@i/@(x + 1)/@(Model.Scheme.startDate.Year)">
+                                <h5 class="text">@(x + 1)</h5>
+                            </div>
+                        }
 
+                    </div>
                 </div>
-            </div>
-        }
+            }
+        </div>
+        <div class="w-100 position-relative">
+            <h3 class="text">Feedback</h3>
+            @using (Html.BeginForm("SaveFeedback", "prevention", FormMethod.Post))
+            {
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.schemeID)
+                    @Html.LabelFor(m => m.schemeFeedback.feedbackMessage, new { @class = "form-label text pt-2" })
+                    @Html.TextAreaFor(m => m.schemeFeedback.feedbackMessage, new { @class = "form-control w-50", @name = "feedback" })
+                </div>
+                <div class="form-group pt-3">
+                    <button class="btn btn-primary">Feedback plaatsen</button>
+                </div>
+            }
+        </div>
     </div>
 </div>
 

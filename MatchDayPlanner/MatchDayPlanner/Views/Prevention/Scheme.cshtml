@@ -57,11 +57,26 @@
             }
         </div>
         <div class="w-100 position-relative">
-            <h3 class="text">Feedback</h3>
+            <h3 class="text" style="padding-bottom: 20px !important;">Feedback</h3>
+            @foreach (var feedback in Model.SchemeFeedbacks)
+            {
+                <div class="feedback-container ps-2 pb-3">
+                    <div class="d-flex gap-2 align-items-center">
+                        <h6 class="text">@feedback.teamMember.memberName</h6>
+                        <span class="text text-secondary"> - @(new DateOnly(feedback.feedbackDateTime.Year, feedback.feedbackDateTime.Month, feedback.feedbackDateTime.Day).ToString("dd MMMM yyyy", CultureInfo.CreateSpecificCulture("nl"))) @feedback.feedbackDateTime.ToString("HH:mm")</span>
+                    </div>
+                    <p class="w-50 text-white fw-light">
+                        @feedback.feedbackMessage
+                    </p>
+                    <hr class="text-white w-50" />
+                </div>
+            }
+            
             @using (Html.BeginForm("SaveFeedback", "prevention", FormMethod.Post))
             {
                 <div class="form-group">
                     @Html.HiddenFor(m => m.schemeID)
+                    <input name="memberID" value="" id="feedback-memberid" type="hidden" />
                     @Html.LabelFor(m => m.schemeFeedback.feedbackMessage, new { @class = "form-label text pt-2" })
                     @Html.TextAreaFor(m => m.schemeFeedback.feedbackMessage, new { @class = "form-control w-50", @name = "feedback" })
                 </div>

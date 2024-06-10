@@ -112,5 +112,21 @@ namespace MatchDayPlanner.Core.Services
 
             return new Scheme(layout, schemeID);
         }
+
+        public void SaveSchemeFeedback(Guid memberID, Guid schemeID, string message)
+        {
+            _gameScheduleRepository.SaveSchemeFeedback(memberID, schemeID, message);
+        }
+
+        public List<ScheduleFeedback> GetScheduleFeedbacks(Guid schemeID)
+        {
+            List<ScheduleFeedback> feedback = _gameScheduleRepository.GetSchemeFeedback(schemeID);
+            feedback.ForEach(e =>
+            {
+                e.member = _teamService.GetTeamMemberByID(e.memberID);
+            });
+
+            return feedback;
+        }
     }
 }

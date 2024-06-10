@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data.SqlClient;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MatchDayPlanner.DAL
 {
@@ -146,6 +147,53 @@ namespace MatchDayPlanner.DAL
                 }
             }
             return null;
+        }
+
+        public void SaveSchemeFeedback(Guid memberID, Guid schemeID, string message)
+        {
+            string query = "INSERT INTO SchedulesFeedback (SchemeID, MemberID, FeedbackMessage, FeedbackDateTime) VALUES (@schemeID, @memberID, @feedbackMessage, @feedbackDateTime)";
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@schemeID", schemeID);
+                    command.Parameters.AddWithValue("@memberID", memberID);
+                    command.Parameters.AddWithValue("@feedbackMessage", message);
+                    command.Parameters.AddWithValue("@feedbackDateTime", DateTime.Now);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public List<ScheduleFeedback> GetSchemeFeedback(Guid schemeID)
+        {
+            string query = "SELECT * FROM SchedulesFeedback WHERE SchemeID = @schemeID";
+            List<ScheduleFeedback> result = new List<ScheduleFeedback>();
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@schemeID", schemeID);
+                    connection.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            result.Add(new ScheduleFeedback
+                            {
+                                feedbackID = reader.GetGuid(reader.GetOrdinal("FeedbackID")),
+                                schemeID = reader.GetGuid(reader.GetOrdinal("SchemeID")),
+                                memberID = reader.GetGuid(reader.GetOrdinal("MemberID")),
+                                feedbackMessage = reader.GetString(reader.GetOrdinal("FeedbackMessage")),
+                                feedbackDateTime = reader.GetDateTime(reader.GetOrdinal("FeedbackDateTime")),
+                            });
+                        }
+                    }
+                }
+            }
+
+            return result;
         }
     }
 }

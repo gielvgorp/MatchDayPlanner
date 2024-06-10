@@ -15,5 +15,7 @@ namespace MatchDayPlanner.Core.Interfaces
         public List<GameSchedules> GetGameSchedules(Guid teamID);
         public GameSchedules GetGameScheduleByID(Guid scheduleID);
         public void UpdateScheduleStatus(Guid schemeID, int statusCode);
+        public void SaveSchemeFeedback(Guid memberID, Guid schemeID, string message);
+        public List<ScheduleFeedback> GetSchemeFeedback(Guid schemeID);
     }
 }

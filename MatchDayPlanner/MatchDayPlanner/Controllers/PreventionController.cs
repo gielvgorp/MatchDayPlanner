@@ -91,10 +91,26 @@ namespace MatchDayPlanner.Controllers
         {
             ViewBag.CurrentView = "PreventionFullScheme";
             ViewBag.schemeID = schemeID;
+            var feedback = _gameScheduleService.GetScheduleFeedbacks(schemeID);
 
             PreventionSchemeViewModel model = new PreventionSchemeViewModel();
             model.schemeID = schemeID;
             model.Scheme = _gameScheduleService.GetGameScheduleByID(schemeID);
+            model.SchemeFeedbacks = feedback.Select(f => new SchemeFeedbackViewModel
+            {
+                schemeID = f.schemeID,
+                feedbackID = f.feedbackID,
+                memberID = f.memberID,
+                feedbackDateTime = f.feedbackDateTime,
+                feedbackMessage = f.feedbackMessage,
+                teamMember = new TeamMemberViewModel
+                {
+                    memberID = f.memberID,
+                    memberEmail = f.member.memberEmail,
+                    memberName = f.member.memberName,
+                    teamID = f.member.teamID
+                }
+            }).ToList();
 
             Team result = _teamService.GetTeamBySchemeID(schemeID);
             model.Team = new TeamViewModel
@@ -235,17 +251,18 @@ namespace MatchDayPlanner.Controllers
         }
 
         [HttpPost]
-        public IActionResult SaveFeedback(PreventionSchemeViewModel model)
+        public IActionResult SaveFeedback(PreventionSchemeViewModel model, Guid memberID)
         {
             try
             {
                 SchemeFeedbackViewModel schemeModel = model.schemeFeedback;
 
-                if (string.IsNullOrEmpty(schemeModel.feedbackMessage))
+                if (string.IsNullOrEmpty(schemeModel.feedbackMessage) || memberID == Guid.Empty)
                 {
                     throw new Exception("Vul uw feedback in!");
                 }
 
+                _gameScheduleService.SaveSchemeFeedback(memberID, model.schemeID, model.schemeFeedback.feedbackMessage);
                 TempData["SuccessMessage"] = "Feedback opgeslagen!";
             }
             catch (Exception ex)

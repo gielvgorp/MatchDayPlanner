@@ -1,5 +1,6 @@
 ﻿function nextStep(schemeID) {
     const uid = $("#player-select").val();
+    $("#feedback-memberid").val(uid);
 
     $.ajax({
         url: "/prevention/GetSchemeOfMember",
@@ -54,4 +55,6 @@
             //console.error('FAILED: Something went wrong while fetching player availablity!');
         }
     });
+
+
 }

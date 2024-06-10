@@ -33,12 +33,16 @@
     @if (SignInManager.IsSignedIn(User))
     {
         <header>
-            <div class="header-top">
+            <div class="header-top positition-relative">
                 <h3 class="title">@ViewData["Title"]</h3>
                 @if (ViewData["SubTitle"] != null)
                 {
                     <p class="sub-title">@ViewData["SubTitle"]</p>
                 }
+
+                <form asp-controller="Account" asp-action="Logout" method="post" class="position-absolute top-0 end-0 p-3">
+                    <button type="submit" class="text text-white btn btn-link" style="font-size: 1.4rem"><i class="fa-solid fa-right-from-bracket"></i></button>
+                </form>
             </div>
             <div class="header-bottom">
                 <div class="header-stats-container">

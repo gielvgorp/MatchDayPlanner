@@ -26,13 +26,14 @@ namespace MatchDayPlanner.DAL
         {
             try
             {
-                string query = "INSERT INTO SchemeMatchDay (schemeID, matchDayDateTime) VALUES (@schemeID, @date)";
+                string query = "INSERT INTO SchemeMatchDay (schemeID, matchDayDateTime, location) VALUES (@schemeID, @date, @location)";
                 using (var connection = new SqlConnection(_connectionString))
                 {
                     using (var command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@schemeID", schemeID);
                         command.Parameters.AddWithValue("@date", date);
+                        command.Parameters.AddWithValue("@location", "");
                         connection.Open();
                         command.ExecuteNonQuery();
                     }

@@ -10,7 +10,6 @@ namespace MatchDayPlanner.Controllers
 {
     public class PreventionController : Controller
     {
-        Database database = new Database();
         private readonly string _dbConnectionString;
         private readonly TeamService _teamService;
         private readonly GameScheduleService _gameScheduleService;
@@ -19,7 +18,7 @@ namespace MatchDayPlanner.Controllers
 
         public PreventionController(IConfiguration iConfig)
         {
-            _dbConnectionString = iConfig.GetSection("ConnectionStrings").GetConnectionString("DbConnection");
+            _dbConnectionString = iConfig.GetConnectionString("DbConnection");
             _teamService = new TeamService(new TeamRepository(_dbConnectionString));
             _matchdayService = new MatchDayService(new MatchDayRepository(_dbConnectionString));
             _preventionService = new PreventionService(new PreventionRepository(_dbConnectionString));

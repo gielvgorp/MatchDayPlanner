@@ -24,7 +24,7 @@
         <div class="prevention-list-container">
             @if (Model.PreventionList.Count > 0)
             {
-                var sortedSchemeLayout = Model.PreventionList.OrderByDescending(x => x.IsPresent).ToList();
+                var sortedSchemeLayout = Model.PreventionList.OrderBy(x => x.IsPresent).ToList();
 
                 @foreach (var item in sortedSchemeLayout)
                 {

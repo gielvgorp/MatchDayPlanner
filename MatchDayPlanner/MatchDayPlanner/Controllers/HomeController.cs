@@ -25,11 +25,11 @@ namespace MatchDayPlanner.Controllers
         private readonly MatchDayService _matchdayService;
         private readonly SchemePlannerService _schemePlannerService;
         private readonly FileExportService _fileExportService;
-        private readonly string _dbConnectionString;
+        private readonly string _dbConnectionString = "";
 
         public HomeController(IConfiguration iConfig, UserManager<ApplicationUser> userManager)
         {
-            _dbConnectionString = iConfig.GetSection("ConnectionStrings").GetConnectionString("DbConnection");
+            _dbConnectionString = iConfig.GetConnectionString("DbConnection");
             _teamService = new TeamService(new TeamRepository(_dbConnectionString));
             _matchdayService = new MatchDayService(new MatchDayRepository(_dbConnectionString));
             _gameScheduleService = new GameScheduleService(new GameScheduleRepository(_dbConnectionString), _matchdayService, _teamService);
@@ -37,13 +37,12 @@ namespace MatchDayPlanner.Controllers
             _userManager = userManager;
             _fileExportService = new FileExportService();
         }
-
+ 
         public IActionResult Index()
         {
             TempData["ErrorMessage"] = null;
             ViewBag.CurrentView = "Index";
             ViewData["SubTitle"] = "Welkom terug, " + _userManager.GetUserName(this.User) + "!";
-
 
             List<Team> teams = _teamService.GetAllTeams(Guid.Parse(_userManager.GetUserId(this.User)));
             List<TeamViewModel> model = teams.Select(t => new TeamViewModel
@@ -87,49 +86,56 @@ namespace MatchDayPlanner.Controllers
         [HttpGet("/manage-team/{teamID}/{add}")]
         public IActionResult ManageTeam(bool add, Guid teamID)
         {
-            List<TeamMemberViewModel> members = _teamService.GetTeamMembers(teamID).Select(t => new TeamMemberViewModel
+            try
             {
-                teamID = t.teamID,
-                memberID = t.memberID,
-                memberEmail = t.memberEmail,
-                memberName = t.memberName
-            }).ToList();
-
-            ViewBag.CurrentView = "ManageTeam";
-            ViewBag.AddPlayer = add;
-            ViewBag.TeamID = teamID;
-            ViewBag.NumberOfPlayers = members?.Count ?? 0;
-            ViewBag.CaptainName = _teamService.GetTeamCaptain(teamID)?.memberName ?? "Onbekend";
-            ViewBag.NumberOfSchemes = _gameScheduleService.GetGameSchedules(teamID)?.Count ?? 0;
-            ViewBag.Schedules = _gameScheduleService.GetGameSchedules(teamID).Select(gs => new ScheduleViewModel
-            {
-                schemeID = gs.schemeID,
-                numberOfPresent = gs.numberOfPresent,
-                startDate = gs.startDate,
-                endDate = gs.endDate,
-                scheduleName = gs.scheduleName,
-                schemeDeadline = gs.schemeDeadline,
-                teamID = gs.teamID
-            }).ToList();
-
-            Team team = _teamService.GetTeamByID(teamID);
-
-            TeamViewModel model = new TeamViewModel
-            {
-                teamID = team.teamID,
-                teamName = team.teamName,
-                teamCaptainID = team.teamCaptainID,
-                members = team.teamMembers.Select(tm => new TeamMemberViewModel
+                List<TeamMemberViewModel> members = _teamService.GetTeamMembers(teamID).Select(t => new TeamMemberViewModel
                 {
-                    memberID = tm.memberID,
-                    memberEmail = tm.memberEmail,
-                    memberName = tm.memberName,
-                    teamID = tm.teamID,
-                }).ToList()
-            };
+                    teamID = t.teamID,
+                    memberID = t.memberID,
+                    memberEmail = t.memberEmail,
+                    memberName = t.memberName
+                }).ToList();
 
+                ViewBag.CurrentView = "ManageTeam";
+                ViewBag.AddPlayer = add;
+                ViewBag.TeamID = teamID;
+                ViewBag.NumberOfPlayers = members?.Count ?? 0;
+                ViewBag.CaptainName = _teamService.GetTeamCaptain(teamID)?.memberName ?? "Onbekend";
+                ViewBag.NumberOfSchemes = _gameScheduleService.GetGameSchedules(teamID)?.Count ?? 0;
+                ViewBag.Schedules = _gameScheduleService.GetGameSchedules(teamID).Select(gs => new ScheduleViewModel
+                {
+                    schemeID = gs.schemeID,
+                    numberOfPresent = gs.numberOfPresent,
+                    startDate = gs.startDate,
+                    endDate = gs.endDate,
+                    scheduleName = gs.scheduleName,
+                    schemeDeadline = gs.schemeDeadline,
+                    teamID = gs.teamID
+                }).ToList();
 
-            return View(model);
+                Team team = _teamService.GetTeamByID(teamID);
+
+                TeamViewModel model = new TeamViewModel
+                {
+                    teamID = team.teamID,
+                    teamName = team.teamName,
+                    teamCaptainID = team.teamCaptainID,
+                    members = team.teamMembers.Select(tm => new TeamMemberViewModel
+                    {
+                        memberID = tm.memberID,
+                        memberEmail = tm.memberEmail,
+                        memberName = tm.memberName,
+                        teamID = tm.teamID,
+                    }).ToList()
+                };
+
+                return View(model);
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Gegevens van het team ophalen is mislukt!";
+                return RedirectToAction("Index", "Home");
+            }
         }
 
         [HttpGet("/manage-team/player/{teamID}/{memberID}")]
@@ -433,7 +439,8 @@ namespace MatchDayPlanner.Controllers
                 TempData["GeneratedSchemeViewModel"] = JsonConvert.SerializeObject(model);
                 return RedirectToAction("GeneratedScheme", "Home", new { scheduleID = schemeID });
             }
-            return View();
+
+            return RedirectToAction("ScheduleOverview", "Home", new { scheduleID = schemeID });
         }
 
         [HttpGet("/edit-matchday/{matchdayID}")]

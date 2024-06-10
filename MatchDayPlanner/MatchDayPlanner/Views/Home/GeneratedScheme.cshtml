@@ -4,6 +4,7 @@
 
 @{
     ViewData["Title"] = "Gemaakte schema";
+    ViewBag.CurrentView = "GeneratedSchemeOverview";
 }
 
 <link rel="stylesheet" href="~/css/matchDayOverview.css" asp-append-version="true" />
@@ -20,7 +21,7 @@
                     <input type="hidden" name="team.teamID" value="@Model.team.teamID" />
                     @for (int i = 0; i < Model.matchDays.Count; i++)
                     {
-                        var matchday = Model.matchDays[i];
+                        var matchday = Model.matchDays.OrderBy(md => md.matchDayDateTime.Date).ToList()[i];
                         <input type="hidden" name="matchDays[@i].matchDayID" value="@matchday.matchDayID" />
                         <input type="hidden" name="matchDays[@i].matchDayDateTime" value="@matchday.matchDayDateTime" />
 
@@ -93,7 +94,6 @@
                         </div>
                     }
                 </div>
-                <button type="button" onclick="$('#scheme-form').submit()" class="btn btn-primary w-100 mt-3">Opslaan & publiceren</button>
             </div>
         </div>
        

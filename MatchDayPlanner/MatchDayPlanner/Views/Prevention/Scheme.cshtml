@@ -35,19 +35,29 @@
 
     <div class="position-absolute start-0 top-0" id="cal-grid" style="display: none">
         <div class="cal-grid py-3" style="grid-template-columns: repeat(2, 600px);">
-            @for (int i = Model.Scheme.startDate.Month; i < Model.Scheme.endDate.Month + 1; i++)
+            @{
+                // Get the start and end dates
+                DateTime startDate = Model.Scheme.startDate;
+                DateTime endDate = Model.Scheme.endDate;
+
+                // Calculate the total number of months between the start and end dates
+                int totalMonths = ((endDate.Year - startDate.Year) * 12) + endDate.Month - startDate.Month + 1;
+            }
+
+            @for (int i = 0; i < totalMonths; i++)
             {
-                <div class="call-month">
-                    <h3 class="text cal-month-name">@(new DateOnly(Model.Scheme.startDate.Year, i, 1).ToString("MMMM yyyy", CultureInfo.CreateSpecificCulture("nl"))) </h3>
+                DateTime currentMonth = startDate.AddMonths(i);
+                <div class="call-month pb-3">
+                    <h3 class="text cal-month-name">@(new DateOnly(currentMonth.Year, currentMonth.Month, 1).ToString("MMMM yyyy", CultureInfo.CreateSpecificCulture("nl"))) </h3>
                     <div class="cal-days">
-                        @for (int y = 0; y < (int)new DateTime(Model.Scheme.startDate.Year, i, 1).DayOfWeek - 2; y++)
+                        @for (int y = 0; y < (int)new DateTime(currentMonth.Year, currentMonth.Month, 1).DayOfWeek - 2; y++)
                         {
                             <div class="day-cell-disabled cal-day-cell"></div>
                         }
 
-                        @for (int x = 0; x < DateTime.DaysInMonth(Model.Scheme.startDate.Year, i); x++)
+                        @for (int x = 0; x < DateTime.DaysInMonth(currentMonth.Year, currentMonth.Month); x++)
                         {
-                            <div class="cal-day-cell" data-date="@i/@(x + 1)/@(Model.Scheme.startDate.Year)">
+                            <div class="cal-day-cell" data-date="@currentMonth.ToString("MM/dd/yyyy")">
                                 <h5 class="text">@(x + 1)</h5>
                             </div>
                         }
@@ -56,7 +66,7 @@
                 </div>
             }
         </div>
-        <div class="w-100 position-relative">
+        <div class="w-100 position-relative pb-3">
             <h3 class="text" style="padding-bottom: 20px !important;">Feedback</h3>
             @foreach (var feedback in Model.SchemeFeedbacks)
             {

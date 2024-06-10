@@ -11,17 +11,19 @@ namespace MatchDayPlanner.Controllers
     public class PreventionController : Controller
     {
         Database database = new Database();
+        private readonly string _dbConnectionString;
         private readonly TeamService _teamService;
         private readonly GameScheduleService _gameScheduleService;
         private readonly MatchDayService _matchdayService;
         private readonly PreventionService _preventionService;
 
-        public PreventionController()
+        public PreventionController(IConfiguration iConfig)
         {
-            _teamService = new TeamService(new TeamRepository());
-            _matchdayService = new MatchDayService(new MatchDayRepository());
-            _preventionService = new PreventionService(new PreventionRepository());
-            _gameScheduleService = new GameScheduleService(new GameScheduleRepository(), _matchdayService, _teamService);
+            _dbConnectionString = iConfig.GetSection("ConnectionStrings").GetConnectionString("DbConnection");
+            _teamService = new TeamService(new TeamRepository(_dbConnectionString));
+            _matchdayService = new MatchDayService(new MatchDayRepository(_dbConnectionString));
+            _preventionService = new PreventionService(new PreventionRepository(_dbConnectionString));
+            _gameScheduleService = new GameScheduleService(new GameScheduleRepository(_dbConnectionString), _matchdayService, _teamService);
         }
 
         [HttpGet("/prevention/{teamID}/{schemeID}")]

@@ -14,7 +14,7 @@ public class GameScheduleRepositoryTests
         _repository = new FakeGameScheduleRepository();
     }
 
-    [TestMethod]
+    [TestMethod("Create game schedule")]
     public void Create_GameSchedule_AddsToRepository()
     {
         var schedule = new GameSchedules
@@ -35,22 +35,11 @@ public class GameScheduleRepositoryTests
         Assert.AreEqual("Test Schedule", allSchedules[0].scheduleName);
     }
 
-    [TestMethod]
+    [TestMethod("Update game schedule")]
     public void Update_GameSchedule_UpdatesInRepository()
     {
-        var schedule = new GameSchedules
-        {
-            schemeID = Guid.NewGuid(),
-            teamID = Guid.NewGuid(),
-            scheduleName = "Initial Schedule",
-            schemeDeadline = DateTime.Now.AddDays(1),
-            numberOfPresent = 5,
-            startDate = DateTime.Now,
-            endDate = DateTime.Now.AddDays(7),
-            scheduleStatus = 0
-        };
-
-        _repository.Create(schedule);
+        var schedule = _repository.GetGameScheduleByID(Guid.Parse("df197f52-271c-49bb-88a5-f1d595fd224a"));
+        Assert.IsNotNull(schedule);
         schedule.scheduleName = "Updated Schedule";
         _repository.Update(schedule);
 
@@ -58,104 +47,44 @@ public class GameScheduleRepositoryTests
         Assert.AreEqual("Updated Schedule", updatedSchedule.scheduleName);
     }
 
-    [TestMethod]
+    [TestMethod("Update game schedule status")]
     public void UpdateScheduleStatus_UpdatesStatusInRepository()
     {
-        var schedule = new GameSchedules
-        {
-            schemeID = Guid.NewGuid(),
-            teamID = Guid.NewGuid(),
-            scheduleName = "Test Schedule",
-            schemeDeadline = DateTime.Now.AddDays(1),
-            numberOfPresent = 5,
-            startDate = DateTime.Now,
-            endDate = DateTime.Now.AddDays(7),
-            scheduleStatus = 0
-        };
-
-        _repository.Create(schedule);
+        var schedule = _repository.GetGameScheduleByID(Guid.Parse("df197f52-271c-49bb-88a5-f1d595fd224a"));
+        Assert.IsNotNull(schedule);
         _repository.UpdateScheduleStatus(schedule.schemeID, 1);
 
         var updatedSchedule = _repository.GetGameScheduleByID(schedule.schemeID);
         Assert.AreEqual(1, updatedSchedule.scheduleStatus);
     }
 
-    [TestMethod]
+    [TestMethod("Delete game schedule")]
     public void Delete_GameSchedule_RemovesFromRepository()
     {
-        var schedule = new GameSchedules
-        {
-            schemeID = Guid.NewGuid(),
-            teamID = Guid.NewGuid(),
-            scheduleName = "Test Schedule",
-            schemeDeadline = DateTime.Now.AddDays(1),
-            numberOfPresent = 5,
-            startDate = DateTime.Now,
-            endDate = DateTime.Now.AddDays(7),
-            scheduleStatus = 0
-        };
-
-        _repository.Create(schedule);
-        _repository.Delete(schedule);
+        var schedule = _repository.GetGameScheduleByID(Guid.Parse("a479f081-be4f-4d42-9856-756e8cdc5509"));
+        Assert.IsNotNull(schedule);
+        _repository.Delete(schedule.schemeID);
 
         var allSchedules = _repository.GetGameSchedules(schedule.teamID);
         Assert.AreEqual(0, allSchedules.Count);
     }
 
-    [TestMethod]
+    [TestMethod("Test if repository returns all schedules")]
     public void GetGameSchedules_ReturnsCorrectSchedules()
     {
-        var teamID = Guid.NewGuid();
-        var schedule1 = new GameSchedules
-        {
-            schemeID = Guid.NewGuid(),
-            teamID = teamID,
-            scheduleName = "Schedule 1",
-            schemeDeadline = DateTime.Now.AddDays(1),
-            numberOfPresent = 5,
-            startDate = DateTime.Now,
-            endDate = DateTime.Now.AddDays(7),
-            scheduleStatus = 0
-        };
-        var schedule2 = new GameSchedules
-        {
-            schemeID = Guid.NewGuid(),
-            teamID = teamID,
-            scheduleName = "Schedule 2",
-            schemeDeadline = DateTime.Now.AddDays(2),
-            numberOfPresent = 10,
-            startDate = DateTime.Now,
-            endDate = DateTime.Now.AddDays(8),
-            scheduleStatus = 0
-        };
-
-        _repository.Create(schedule1);
-        _repository.Create(schedule2);
-
+        var teamID = Guid.Parse("6a605266-4be8-43db-9a3c-e80b92d0e3ed");
         var allSchedules = _repository.GetGameSchedules(teamID);
+
         Assert.AreEqual(2, allSchedules.Count);
     }
 
-    [TestMethod]
+    [TestMethod("Get game schedule by ID")]
     public void GetGameScheduleByID_ReturnsCorrectSchedule()
     {
-        var schedule = new GameSchedules
-        {
-            schemeID = Guid.NewGuid(),
-            teamID = Guid.NewGuid(),
-            scheduleName = "Test Schedule",
-            schemeDeadline = DateTime.Now.AddDays(1),
-            numberOfPresent = 5,
-            startDate = DateTime.Now,
-            endDate = DateTime.Now.AddDays(7),
-            scheduleStatus = 0
-        };
-
-        _repository.Create(schedule);
-
-        var retrievedSchedule = _repository.GetGameScheduleByID(schedule.schemeID);
+        Guid schemeID = Guid.Parse("df197f52-271c-49bb-88a5-f1d595fd224a");
+        var retrievedSchedule = _repository.GetGameScheduleByID(schemeID);
         Assert.IsNotNull(retrievedSchedule);
-        Assert.AreEqual(schedule.schemeID, retrievedSchedule.schemeID);
+        Assert.AreEqual(schemeID, retrievedSchedule.schemeID);
     }
 }
 

@@ -72,14 +72,14 @@ namespace MatchDayPlanner.DAL
             }
         }
 
-        public void Delete(GameSchedules schedule)
+        public void Delete(Guid schemeID)
         {
             string query = "DELETE FROM GameSchedules WHERE schemeID = @schemeID";
             using (var connection = new SqlConnection(_connectionString))
             {
                 using (var command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@schemeID", schedule.schemeID);
+                    command.Parameters.AddWithValue("@schemeID", schemeID);
                     connection.Open();
                     command.ExecuteNonQuery();
                 }

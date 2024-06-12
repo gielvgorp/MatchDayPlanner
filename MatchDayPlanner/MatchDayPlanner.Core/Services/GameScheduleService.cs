@@ -52,9 +52,9 @@ namespace MatchDayPlanner.Core.Services
         {
             _gameScheduleRepository.Update(schedule);
         }
-        public void Delete(GameSchedules schedule)
+        public void Delete(Guid schemeID)
         {
-            _gameScheduleRepository.Delete(schedule);
+            _gameScheduleRepository.Delete(schemeID);
         }
         public void UpdateScheduleStatus(Guid schemeID, int statusCode)
         {

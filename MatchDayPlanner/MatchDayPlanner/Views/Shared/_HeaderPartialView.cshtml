@@ -2,22 +2,22 @@
 
 @if (ViewBag.CurrentView == "Index")
 {
-    <a class="item" href="@Url.Action("CreateTeam", "Home")">Nieuw team</a>
+    <a class="item" href="@Url.Action("CreateTeam", "Team")">Nieuw team</a>
 }
 else if (ViewBag.CurrentView == "ManageTeam")
 {
-    <a class="item" href="@Url.Action("ManageTeam", "Home", new { add = "true" })">Speler toevoegen</a>
+    <a class="item" href="@Url.Action("ManageTeam", "Team", new { add = "true" })">Speler toevoegen</a>
     <div class="item dropdown-container">
         <span>Schema's</span>
         <div class="dropdown-content">
             @foreach (ScheduleViewModel schedule in (List<ScheduleViewModel>)ViewBag.Schedules)
             {
                 <div class="dropdown-row">
-                    <a class="name" href="@Url.Action("ScheduleOverview", "Home", new { scheduleID = schedule.schemeID })">@schedule.scheduleName</a>
+                    <a class="name" href="@Url.Action("ScheduleOverview", "Schedule", new { scheduleID = schedule.schemeID })">@schedule.scheduleName</a>
                 </div>
             }
             <div class="dropdown-row">
-                <a class="name" href="@Url.Action("CreateGameSchedule", "Home", new { teamID = ViewBag.TeamID })"><i class="fa-solid fa-plus"></i> Nieuw</a>
+                <a class="name" href="@Url.Action("CreateGameSchedule", "Schedule", new { teamID = ViewBag.TeamID })"><i class="fa-solid fa-plus"></i> Nieuw</a>
             </div>
         </div>
     </div>
@@ -26,8 +26,21 @@ else if (ViewBag.CurrentView == "ScheduleOverview")
 {
     <div class="item legenda-item" data-status="matchday"><div class="legenda-color legenda-match-day"></div> Wedstrijd dag</div>
     <a class="item" href="#" onclick="copyToClipboard('@ViewBag.SharedURL')">Deel link</a>
-@*     <a class="item" href="#" onclick="matchDaySaveChanges()">Opslaan</a> *@
-    <a class="item" href="@Url.Action("GeneratedScheme", "Home", new { scheduleID = ViewBag.SchemeID })">Schema genereren</a>
+    @if (ViewBag.SchemeStatus == 1)
+    {
+        <div class="export-buttons item">
+            <button type="button" class="btn btn-success" onclick="location.href='@Url.Action("Export", "ScheduleExport", new { schemeID = ViewBag.SchemeID, format = "excel" })'">
+                <i class="fas fa-file-excel"></i> Exporteren naar Excel
+            </button>
+            <button type="button" class="btn btn-danger" onclick="location.href='@Url.Action("Export", "ScheduleExport", new { schemeID = ViewBag.SchemeID, format = "pdf" })'">
+                <i class="fas fa-file-pdf"></i> Exporteren naar PDF
+            </button>
+        </div>
+    }
+    else
+    {
+        <a class="item" href="@Url.Action("GeneratedScheme", "Schedule", new { scheduleID = ViewBag.SchemeID })">Schema genereren</a>
+    }
 }
 else if (ViewBag.CurrentView == "ReportAvailability")
 {
@@ -37,17 +50,17 @@ else if (ViewBag.CurrentView == "ReportAvailability")
 else if (ViewBag.CurrentView == "PreventionFullScheme")
 {
     <div class="export-buttons">
-        <button type="button" class="btn btn-success" onclick="location.href='@Url.Action("Export", "Home", new { schemeID = ViewBag.SchemeID, format = "excel" })'">
+        <button type="button" class="btn btn-success" onclick="location.href='@Url.Action("Export", "ScheduleExport", new { schemeID = ViewBag.SchemeID, format = "excel" })'">
             <i class="fas fa-file-excel"></i> Exporteren naar Excel
         </button>
-        <button type="button" class="btn btn-danger" onclick="location.href='@Url.Action("Export", "Home", new { schemeID = ViewBag.SchemeID, format = "pdf" })'">
+        <button type="button" class="btn btn-danger" onclick="location.href='@Url.Action("Export", "ScheduleExport", new { schemeID = ViewBag.SchemeID, format = "pdf" })'">
             <i class="fas fa-file-pdf"></i> Exporteren naar PDF
         </button>
     </div>
 }
 else if (ViewBag.CurrentView == "MatchdayOverview")
 {
-    <a class="item" href="@Url.Action("EditMatchday", "Home", new { matchdayID = ViewBag.matchdayID })">Bewerken</a>
+    <a class="item" href="@Url.Action("EditMatchday", "Schedule", new { matchdayID = ViewBag.matchdayID })">Bewerken</a>
 }
 else if (ViewBag.CurrentView == "GeneratedSchemeOverview")
 {

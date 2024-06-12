@@ -27,7 +27,7 @@ function matchDaySaveChanges() {
     console.log(dates);
 
     $.ajax({
-        url: "/Home/UpdateMatchDays",
+        url: "/Schedule/UpdateMatchDays",
         type: "post",
         data: {
             matchdays: dates
@@ -59,7 +59,7 @@ function changeMatchDay(elem, schemeID) {
 
 function setMatchday(add, date, schemeID) {
     $.ajax({
-        url: "/Home/UpdateMatchDays",
+        url: "/Schedule/UpdateMatchDays",
         type: "post",
         data: {
             date: date,

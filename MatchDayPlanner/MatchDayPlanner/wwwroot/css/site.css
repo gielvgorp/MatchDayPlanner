@@ -76,7 +76,7 @@ header{
     display: flex;
     justify-content: space-between;
     width: auto;
-    align-items: end;
+    align-items: center;
 }
 
 .menu-items .item{

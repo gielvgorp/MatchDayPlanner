@@ -8,7 +8,7 @@
 <div class="page-content teams">
     <div class="form-container">
         <h4 class="text">Voer hieronder de informatie in</h4>
-        @using (Html.BeginForm("CreateGameSchedule", "Home", FormMethod.Post))
+        @using (Html.BeginForm("CreateGameSchedule", "Schedule", FormMethod.Post))
         {
             @Html.HiddenFor(m => m.TeamID)
             <div class="form-group">

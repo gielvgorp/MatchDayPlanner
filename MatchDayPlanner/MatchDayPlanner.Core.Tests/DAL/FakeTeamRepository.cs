@@ -30,11 +30,10 @@ namespace MatchDayPlanner.Core.Tests.DAL
             };
         }
 
-        public bool CreateTeam(string teamName, Guid uid)
+        public void CreateTeam(string teamName, Guid uid)
         {
             var team = new Team { teamID = Guid.NewGuid(), teamName = teamName, teamCreatedBy = uid, teamCaptainID = Guid.NewGuid() };
             teams.Add(team);
-            return true;
         }
 
         public List<Team> GetTeams(Guid uid)

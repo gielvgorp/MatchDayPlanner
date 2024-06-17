@@ -48,7 +48,10 @@ namespace MatchDayPlanner.Core.Services
         public Team GetTeamByID(Guid teamID)
         {
             Team team = _teamRepository.GetTeamById(teamID);
-            team.teamMembers = GetTeamMembers(teamID);
+
+            if(team != null)
+                team.teamMembers = GetTeamMembers(teamID);
+
             return team;
         }
 

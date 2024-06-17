@@ -1,4 +1,5 @@
 ﻿using MatchDayPlanner.Core.Interfaces;
+using MatchDayPlanner.Core.Services;
 using MatchDayPlanner.Core.Tests.DAL;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -12,12 +13,12 @@ namespace MatchDayPlanner.Core.Tests
     [TestClass]
     public class TeamServiceTest
     {
-        private ITeamRepository _repository;
+        private TeamService _teamService;
 
         [TestInitialize]
         public void Setup()
         {
-            _repository = new FakeTeamRepository();
+            _teamService = new TeamService(new FakeTeamRepository());
         }
 
         [TestMethod]
@@ -26,10 +27,9 @@ namespace MatchDayPlanner.Core.Tests
             var teamName = "New Team";
             var createdBy = Guid.NewGuid();
 
-            var result = _repository.CreateTeam(teamName, createdBy);
+            _teamService.CreateTeam(teamName, createdBy);
 
-            Assert.IsTrue(result);
-            var teams = _repository.GetTeams(createdBy);
+            var teams = _teamService.GetAllTeams(createdBy);
             Assert.AreEqual(1, teams.Count);
             Assert.AreEqual(teamName, teams.First().teamName);
         }
@@ -39,7 +39,7 @@ namespace MatchDayPlanner.Core.Tests
         {
             var uid = Guid.Parse("df9d80d0-5dc5-4325-84f7-ab18cf4e00b3");
 
-            var teams = _repository.GetTeams(uid);
+            var teams = _teamService.GetAllTeams(uid);
 
             Assert.IsTrue(teams.Any());
         }
@@ -49,7 +49,7 @@ namespace MatchDayPlanner.Core.Tests
         {
             var teamID = Guid.Parse("a0c35710-c184-49ec-b9a2-b147c5afa8b0");
 
-            var members = _repository.GetTeamMembers(teamID);
+            var members = _teamService.GetTeamMembers(teamID);
 
             Assert.IsTrue(members.Any());
         }
@@ -59,7 +59,7 @@ namespace MatchDayPlanner.Core.Tests
         {
             var teamID = Guid.Parse("a0c35710-c184-49ec-b9a2-b147c5afa8b0");
 
-            var captain = _repository.GetTeamCaptain(teamID);
+            var captain = _teamService.GetTeamCaptain(teamID);
 
             Assert.IsNotNull(captain);
         }
@@ -67,9 +67,9 @@ namespace MatchDayPlanner.Core.Tests
         [TestMethod]
         public void GetTeamById_ReturnsTeam()
         {
-            var teamID = _repository.GetTeams(Guid.Parse("df9d80d0-5dc5-4325-84f7-ab18cf4e00b3")).First().teamID;
+            var teamID = _teamService.GetAllTeams(Guid.Parse("df9d80d0-5dc5-4325-84f7-ab18cf4e00b3")).First().teamID;
 
-            var team = _repository.GetTeamById(teamID);
+            var team = _teamService.GetTeamByID(teamID);
 
             Assert.IsNotNull(team);
         }
@@ -77,32 +77,32 @@ namespace MatchDayPlanner.Core.Tests
         [TestMethod]
         public void UpdateTeam_UpdatesTeam()
         {
-            var team = _repository.GetTeams(Guid.Parse("df9d80d0-5dc5-4325-84f7-ab18cf4e00b3")).First();
+            var team = _teamService.GetAllTeams(Guid.Parse("df9d80d0-5dc5-4325-84f7-ab18cf4e00b3")).First();
             team.teamName = "Updated Team";
 
-            _repository.UpdateTeam(team);
+            _teamService.UpdateTeam(team);
 
-            var updatedTeam = _repository.GetTeamById(team.teamID);
+            var updatedTeam = _teamService.GetTeamByID(team.teamID);
             Assert.AreEqual("Updated Team", updatedTeam.teamName);
         }
 
         [TestMethod]
         public void DeleteTeam_DeletesTeam()
         {
-            var teamID = _repository.GetTeams(Guid.Parse("df9d80d0-5dc5-4325-84f7-ab18cf4e00b3")).First().teamID;
+            var teamID = _teamService.GetAllTeams(Guid.Parse("df9d80d0-5dc5-4325-84f7-ab18cf4e00b3")).First().teamID;
 
-            _repository.DeleteTeam(teamID);
+            _teamService.DeleteTeam(teamID);
 
-            var team = _repository.GetTeamById(teamID);
+            var team = _teamService.GetTeamByID(teamID);
             Assert.IsNull(team);
         }
 
         [TestMethod]
         public void GetTeamMemberByID_ReturnsMember()
         {
-            var memberID = _repository.GetTeamMembers(Guid.Parse("a0c35710-c184-49ec-b9a2-b147c5afa8b0")).First().memberID;
+            var memberID = _teamService.GetTeamMembers(Guid.Parse("a0c35710-c184-49ec-b9a2-b147c5afa8b0")).First().memberID;
 
-            var member = _repository.GetTeamMemberByID(memberID);
+            var member = _teamService.GetTeamMemberByID(memberID);
 
             Assert.IsNotNull(member);
         }
@@ -110,48 +110,48 @@ namespace MatchDayPlanner.Core.Tests
         [TestMethod]
         public void UpdateTeamMember_UpdatesMember()
         {
-            var member = _repository.GetTeamMembers(Guid.Parse("a0c35710-c184-49ec-b9a2-b147c5afa8b0")).First();
+            var member = _teamService.GetTeamMembers(Guid.Parse("a0c35710-c184-49ec-b9a2-b147c5afa8b0")).First();
             member.memberName = "Updated Member";
 
-            _repository.UpdateTeamMember(member);
+            _teamService.UpdateTeamMember(member);
 
-            var updatedMember = _repository.GetTeamMemberByID(member.memberID);
+            var updatedMember = _teamService.GetTeamMemberByID(member.memberID);
             Assert.AreEqual("Updated Member", updatedMember.memberName);
         }
 
         [TestMethod]
         public void UpdateTeamCaptain_UpdatesCaptain()
         {
-            var memberID = _repository.GetTeamMembers(Guid.Parse("a0c35710-c184-49ec-b9a2-b147c5afa8b0")).First().memberID;
-            var teamID = _repository.GetTeams(Guid.Parse("df9d80d0-5dc5-4325-84f7-ab18cf4e00b3")).First().teamID;
+            var memberID = _teamService.GetTeamMembers(Guid.Parse("a0c35710-c184-49ec-b9a2-b147c5afa8b0")).First().memberID;
+            var teamID = _teamService.GetAllTeams(Guid.Parse("df9d80d0-5dc5-4325-84f7-ab18cf4e00b3")).First().teamID;
 
-            _repository.UpdateTeamCaptain(memberID, teamID);
+            _teamService.UpdateTeamCaptain(memberID, teamID);
 
-            var team = _repository.GetTeamById(teamID);
+            var team = _teamService.GetTeamByID(teamID);
             Assert.AreEqual(memberID, team.teamCaptainID);
         }
 
         [TestMethod]
         public void DeleteTeamMember_DeletesMember()
         {
-            var memberID = _repository.GetTeamMembers(Guid.Parse("a0c35710-c184-49ec-b9a2-b147c5afa8b0")).First().memberID;
+            var memberID = _teamService.GetTeamMembers(Guid.Parse("a0c35710-c184-49ec-b9a2-b147c5afa8b0")).First().memberID;
 
-            _repository.DeleteTeamMember(memberID);
+            _teamService.DeleteTeamMember(memberID);
 
-            var member = _repository.GetTeamMemberByID(memberID);
+            var member = _teamService.GetTeamMemberByID(memberID);
             Assert.IsNull(member);
         }
 
         [TestMethod]
         public void AddTeamMember_AddsMember()
         {
-            var teamID = _repository.GetTeams(Guid.Parse("df9d80d0-5dc5-4325-84f7-ab18cf4e00b3")).First().teamID;
+            var teamID = _teamService.GetAllTeams(Guid.Parse("df9d80d0-5dc5-4325-84f7-ab18cf4e00b3")).First().teamID;
             var playerName = "New Member";
             var playerEmail = "new.member@example.com";
 
-            _repository.AddTeamMember(teamID, playerName, playerEmail);
+            _teamService.AddTeamMember(teamID, playerName, playerEmail);
 
-            var members = _repository.GetTeamMembers(teamID);
+            var members = _teamService.GetTeamMembers(teamID);
             Assert.IsTrue(members.Any(m => m.memberName == playerName && m.memberEmail == playerEmail));
         }
 
@@ -160,7 +160,7 @@ namespace MatchDayPlanner.Core.Tests
         {
             var schemeID = Guid.NewGuid();
 
-            var members = _repository.GetTeamMembersBySchemeID(schemeID);
+            var members = _teamService.GetTeamMembersBySchemeID(schemeID);
 
             Assert.IsTrue(members.Any());
         }
@@ -170,7 +170,7 @@ namespace MatchDayPlanner.Core.Tests
         {
             var schemeID = Guid.NewGuid();
 
-            var team = _repository.GetTeamBySchemeID(schemeID);
+            var team = _teamService.GetTeamBySchemeID(schemeID);
 
             Assert.IsNotNull(team);
         }

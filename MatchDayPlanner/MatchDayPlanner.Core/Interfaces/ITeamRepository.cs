@@ -10,7 +10,7 @@ namespace MatchDayPlanner.Core.Interfaces
 {
     public interface ITeamRepository
     {
-        public bool CreateTeam(string teamName, Guid uid);
+        public void CreateTeam(string teamName, Guid uid);
         public List<Team> GetTeams(Guid uid);
         public List<TeamMember> GetTeamMembers(Guid teamID);
         public TeamMember GetTeamCaptain(Guid teamID);

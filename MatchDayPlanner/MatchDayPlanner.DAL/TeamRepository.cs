@@ -19,9 +19,9 @@ namespace MatchDayPlanner.DAL
         {
             this._connectionString = c_connectionString;
         }
-        public bool CreateTeam(string teamName, Guid uid)
+        public void CreateTeam(string teamName, Guid uid)
         {
-            return database.Insert(string.Format("INSERT INTO Teams (teamName, teamCreatedBy) VALUES ('{0}', '{1}')", teamName, uid));
+            database.Insert(string.Format("INSERT INTO Teams (teamName, teamCreatedBy) VALUES ('{0}', '{1}')", teamName, uid));
         }
 
         public List<Team> GetTeams(Guid uid)

@@ -125,10 +125,10 @@ namespace MatchDayPlanner.Core.Tests
         [TestMethod("Get prevention of member in scheme")]
         public void GetPreventionOfMember()
         {
-            var member = _service.GetAllMatchDays(Guid.Parse("dfbe2b5a-b028-4311-9103-d8a8020e08fa")).SelectMany(md => _service.GetGameScheduleOfMachday(md.matchDayID)).FirstOrDefault();
+            var member = _service.GetAllMatchDays(Guid.Parse("dfbe2b5a-b028-4311-9103-d8a8020e08fa")).SelectMany(md => _service.GetGameScheduleOfMachday(md.matchDayID)).LastOrDefault();
             Assert.IsNotNull(member);
 
-            var preventions = _service.GetPreventedOfMember(member.memberID, member.schemeID);
+            var preventions = _service.GetAvailabilityOfMember(member.memberID, member.schemeID);
             Assert.AreEqual(1, preventions.Count);
             Assert.AreEqual(ScheduleLayout.PreventionStatus.Available, preventions[0].isPresent);
         }
@@ -136,7 +136,7 @@ namespace MatchDayPlanner.Core.Tests
         [TestMethod("Get absented of member in scheme")]
         public void GetPreventedOfMember_ReturnsCorrectPreventions()
         {
-            var member = _service.GetAllMatchDays(Guid.Parse("dfbe2b5a-b028-4311-9103-d8a8020e08fa")).SelectMany(md => _service.GetGameScheduleOfMachday(md.matchDayID)).Last();
+            var member = _service.GetAllMatchDays(Guid.Parse("dfbe2b5a-b028-4311-9103-d8a8020e08fa")).SelectMany(md => _service.GetGameScheduleOfMachday(md.matchDayID)).FirstOrDefault();
             Assert.IsNotNull(member);
 
             var preventions = _service.GetPreventedOfMember(member.memberID, member.schemeID);

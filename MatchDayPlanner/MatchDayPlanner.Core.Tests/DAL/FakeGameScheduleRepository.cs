@@ -108,5 +108,15 @@ namespace MatchDayPlanner.Tests.DAL
         {
             return _gameSchedules.Find(s => s.schemeID == schemeID);
         }
+
+        public void SaveSchemeFeedback(Guid memberID, Guid schemeID, string message)
+        {
+
+        }
+
+        public List<ScheduleFeedback> GetSchemeFeedback(Guid schemeID)
+        {
+            return null;
+        }
     }
 }

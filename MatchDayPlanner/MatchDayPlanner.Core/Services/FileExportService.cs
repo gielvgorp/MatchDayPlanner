@@ -169,7 +169,7 @@ namespace MatchDayPlanner.Core.Services
 
                 var file = new FileContentResult(ms.ToArray(), "application/pdf")
                 {
-                    FileDownloadName = "Scheme.pdf"
+                    FileDownloadName = "Schedule.pdf"
                 };
                 return file;
             }

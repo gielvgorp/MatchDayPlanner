@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MatchDayPlanner.Core;
 using System.Security.Principal;
+using System.Security.Cryptography;
 
 namespace MatchDayPlanner.Core.Services
 {
@@ -22,6 +23,11 @@ namespace MatchDayPlanner.Core.Services
         public void CreateTeam(string teamName, Guid uid)
         {
             _teamRepository.CreateTeam(teamName, uid);
+        }
+
+        public void DeleteTeam(Guid teamID)
+        {
+            _teamRepository.DeleteTeam(teamID);
         }
 
         public List<Team> GetAllTeams(Guid uid)

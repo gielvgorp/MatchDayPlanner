@@ -6,6 +6,7 @@ using MatchDayPlanner.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
 using Newtonsoft.Json;
 using System.Globalization;
 using static Org.BouncyCastle.Math.EC.ECCurve;
@@ -70,6 +71,55 @@ namespace MatchDayPlanner.Controllers
             }
         }
 
+        public IActionResult EditSchedule(Guid scheduleID)
+        {
+            ScheduleViewModel model = new ScheduleViewModel();
+            GameSchedules schedule = _gameScheduleService.GetGameScheduleByID(scheduleID);
+
+            model.scheduleName = schedule.scheduleName;
+            model.startDate = schedule.startDate;
+            model.endDate = schedule.endDate;
+            model.schemeDeadline = schedule.schemeDeadline;
+            model.numberOfPresent = schedule.numberOfPresent;
+            model.teamID = schedule.teamID;
+            model.schemeID = schedule.schemeID;
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult EditSchedule(ScheduleViewModel model, string submitButton)
+        {
+            if(submitButton == "save")
+            {
+                if (ModelState.IsValid)
+                {
+                    GameSchedules schedule = new GameSchedules
+                    {
+                        scheduleName = model.scheduleName,
+                        numberOfPresent = model.numberOfPresent,
+                        startDate = model.startDate,
+                        endDate = model.endDate,
+                        scheduleStatus = 0,
+                        schemeDeadline = model.schemeDeadline,
+                        schemeID = model.schemeID,
+                        teamID = model.teamID,
+                    };
+
+                    _gameScheduleService.Update(schedule);
+                    TempData["SuccessMessage"] = "Wijzigingen opgeslagen!";
+                    return RedirectToAction("ScheduleOverview", "Schedule", new { scheduleID = model.schemeID });
+                }
+
+                TempData["ErrorMessage"] = "Voer alle velden in!";
+                return View(model);
+            }
+
+            _gameScheduleService.Delete(model.schemeID);
+            TempData["SuccessMessage"] = "Schema verwijderd!";
+            return RedirectToAction("Index", "Team");
+        }
+
         public IActionResult ScheduleOverview(Guid scheduleID)
         {
             ScheduleOverviewViewModel model = new ScheduleOverviewViewModel();
@@ -120,41 +170,54 @@ namespace MatchDayPlanner.Controllers
         [HttpGet("/MatchDayOverview/{schemeID}/{date}")]
         public IActionResult MatchDayOverview(Guid schemeID, DateTime date)
         {
-            MatchDayOverviewModel model = new MatchDayOverviewModel();
-            model.MatchDay = _matchdayService.GetMatchday(schemeID, date);
-            ViewBag.matchdayID = model.MatchDay.matchDayID;
-            ViewBag.location = model.MatchDay.location.Trim();
-            ViewBag.DateTime = model.MatchDay.matchDayDateTime;
-
-            if (model.MatchDay != null)
+            try
             {
-                var preventions = _matchdayService.GetGameScheduleOfMachday(model.MatchDay.matchDayID);
-                var teamMembers = _teamService.GetTeamMembersBySchemeID(model.MatchDay.schemeID);
+                MatchDayOverviewModel model = new MatchDayOverviewModel();
+                model.MatchDay = _matchdayService.GetMatchday(schemeID, date);
 
-                foreach (var item in preventions)
+                if (model.MatchDay == null)
+                    throw new Exception("De geselecteerde dag is geen wedstrijddag!");
+
+                ViewBag.matchdayID = model.MatchDay.matchDayID;
+                ViewBag.location = model.MatchDay.location.Trim();
+                ViewBag.DateTime = model.MatchDay.matchDayDateTime;
+
+                if (model.MatchDay != null)
                 {
-                    var member = teamMembers.FirstOrDefault(tm => tm.memberID.Equals(item.memberID));
-                    teamMembers.Remove(member);
-                    model.PreventionList.Add(new MemberPrevention
+                    var preventions = _matchdayService.GetGameScheduleOfMachday(model.MatchDay.matchDayID);
+                    var teamMembers = _teamService.GetTeamMembersBySchemeID(model.MatchDay.schemeID);
+
+                    foreach (var item in preventions)
                     {
-                        TeamMember = member,
-                        IsPresent = (MemberPrevention.PreventionStatus)item.isPresent
-                    });
+                        var member = teamMembers.FirstOrDefault(tm => tm.memberID.Equals(item.memberID));
+                        teamMembers.Remove(member);
+                        model.PreventionList.Add(new MemberPrevention
+                        {
+                            TeamMember = member,
+                            IsPresent = (MemberPrevention.PreventionStatus)item.isPresent
+                        });
+                    }
+
+                    foreach (var member in teamMembers)
+                    {
+                        model.PreventionList.Add(new MemberPrevention
+                        {
+                            TeamMember = member,
+                            IsPresent = MemberPrevention.PreventionStatus.NoResponse
+                        });
+                    }
+
+
                 }
 
-                foreach (var member in teamMembers)
-                {
-                    model.PreventionList.Add(new MemberPrevention
-                    {
-                        TeamMember = member,
-                        IsPresent = MemberPrevention.PreventionStatus.NoResponse
-                    });
-                }
-
-
+                return View(model);
             }
-
-            return View(model);
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                return RedirectToAction("ScheduleOverview", "Schedule", new { scheduleID = schemeID });
+            }
+           
         }
 
         [HttpPost]

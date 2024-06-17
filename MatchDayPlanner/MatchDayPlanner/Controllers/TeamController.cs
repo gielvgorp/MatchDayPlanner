@@ -29,7 +29,6 @@ namespace MatchDayPlanner.Controllers
 
         public IActionResult Index()
         {
-            TempData["ErrorMessage"] = null;
             ViewBag.CurrentView = "Index";
             ViewData["SubTitle"] = "Welkom terug, " + _userManager.GetUserName(this.User) + "!";
 
@@ -57,6 +56,51 @@ namespace MatchDayPlanner.Controllers
         {
             ViewBag.CurrentView = "CreateTeam";
             return View();
+        }
+
+        public IActionResult EditTeam(Guid teamID)
+        {
+            List<TeamMember> members = _teamService.GetTeamMembers(teamID);
+            ViewBag.members = members;
+            Team result = _teamService.GetTeamByID(teamID);
+            TeamViewModel model = new TeamViewModel
+            {
+                teamID = result.teamID,
+                teamName = result.teamName.Trim(),
+                teamCaptainID = result.teamCaptainID,
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult EditTeam(TeamViewModel model, string submitButton)
+        {
+            if (submitButton == "save")
+            {
+                if (ModelState.IsValid)
+                {
+                    _teamService.UpdateTeam(new Team
+                    {
+                        teamCaptainID= model.teamCaptainID,
+                        teamName= model.teamName,
+                        teamID= model.teamID
+                    });
+
+                    TempData["SuccessMessage"] = "Team wijzigingen opgeslagen!";
+                    return Redirect(string.Format("/manage-team/{0}/false", model.teamID));
+                }
+
+                List<TeamMember> members = _teamService.GetTeamMembers(model.teamID);
+                ViewBag.members = members;
+
+                TempData["ErrorMessage"] = "Vul alle velden in!";
+                return View(model);
+            }
+
+            _teamService.DeleteTeam(model.teamID);
+            TempData["SuccessMessage"] = "Team verwijderd!";
+            return RedirectToAction("Index", "Team");
         }
 
         [HttpPost]
@@ -139,7 +183,7 @@ namespace MatchDayPlanner.Controllers
 
             if (member == null)
             {
-                return RedirectToAction("MangeTeam", "Home", new { add = false, ID = teamID });
+                return RedirectToAction("MangeTeam", "Team", new { add = false, teamID = teamID });
             }
 
             TeamMemberViewModel model = new TeamMemberViewModel

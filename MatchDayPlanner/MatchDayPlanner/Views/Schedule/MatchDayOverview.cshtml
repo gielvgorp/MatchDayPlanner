@@ -35,7 +35,8 @@
                      else if(item.IsPresent == MemberPrevention.PreventionStatus.Scheduled)
                                 @("matchday") ">
                         <i class="fa-solid fa-user"></i>
-                        <p>@item.TeamMember.memberName | @if (item.IsPresent == MemberPrevention.PreventionStatus.Available)
+                        <p>
+                            @item.TeamMember.memberName | @if (item.IsPresent == MemberPrevention.PreventionStatus.Available)
                                 @("Aanwezig")
                             else if (item.IsPresent == MemberPrevention.PreventionStatus.NotAvailable)
                                 @("Afwezig")
@@ -43,7 +44,7 @@
                                 @("Ingepland")
                             else
                                 @("Niet gereageerd")
-        </p>
+                        </p>
                     </div>
                 }
             }

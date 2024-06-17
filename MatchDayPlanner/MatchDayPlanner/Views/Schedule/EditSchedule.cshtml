@@ -1,0 +1,46 @@
+﻿@using MatchDayPlanner.Models.ViewModels
+@model ScheduleViewModel
+
+@{
+    ViewData["Title"] = "Schema bewerken";
+}
+<link rel="stylesheet" href="~/css/editPlayer.css" asp-append-version="true" />
+
+<div class="page-content">
+    @using (Html.BeginForm("EditSchedule", "Schedule", FormMethod.Post))
+    {
+        @Html.HiddenFor(m => m.teamID)
+        @Html.HiddenFor(m => m.schemeID)
+        <div class="form-container p-4">
+            <div class="form-group">
+                @Html.DisplayNameFor(m => m.scheduleName)
+                @Html.TextBoxFor(m => m.scheduleName, new { @class = "form-control", aria_describedby = "emailHelp", placeholder = "Schema naam" })
+            </div>
+            <div class="form-group mt-3">
+                @Html.DisplayNameFor(m => m.numberOfPresent)
+                <input type="number" asp-for="numberOfPresent" class="form-control" />
+            </div>
+            <div class="form-group mt-3">
+                @Html.DisplayNameFor(m => m.schemeDeadline)
+                <input type="datetime-local" asp-for="schemeDeadline" class="form-control" />
+            </div>
+            <div class="form-group mt-3">
+                <div class="row">
+                    <div class="form-group">
+                        @Html.DisplayNameFor(m => m.startDate)
+                        <input type="date" asp-for="startDate" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        @Html.DisplayNameFor(m => m.endDate)
+                        <input type="date" asp-for="endDate" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group mt-3">
+                <button class="btn btn-primary" name="submitButton" value="save" type="submit">Opslaan</button>
+                <button class="btn btn-danger" name="submitButton" value="delete" type="submit">Verwijder</button>
+            </div>
+        </div>
+    }
+</div>

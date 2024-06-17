@@ -9,7 +9,7 @@ namespace MatchDayPlanner.Core.Services
         private Guid schemeID { get; set; }
         public Team team { get; set; }
         public List<MatchDay> matchDays { set; get; }
-        public int numberOfPlayers = 3;
+        public int numberOfPlayers = 0;
         public int error = 0;
         private List<MatchDay> schemeLayout { get; set; } = new List<MatchDay>();
 
@@ -31,6 +31,7 @@ namespace MatchDayPlanner.Core.Services
             var captain = _teamService.GetTeamCaptain(result.teamID);
             var matchdays = _matchDayService.GetAllMatchDays(schemeID);
             var teamMembers = _teamService.GetTeamMembers(result.teamID);
+            numberOfPlayers = _gameScheduleService.GetGameScheduleByID(schemeID).numberOfPresent;
 
             this.matchDays = matchdays.Select(m => new MatchDay(m.matchDayID, m.matchDayDateTime, m.location)).ToList();
             this.schemeID = schemeID;
@@ -39,9 +40,11 @@ namespace MatchDayPlanner.Core.Services
                 teamID = result.teamID,
                 teamName = result.teamName,
                 teamCreatedBy = result.teamCreatedBy,
-                teamCaptain = new TeamMember(captain.memberID, captain.teamID, captain.memberName, GetPreventionOfMember(captain.memberID, schemeID), true, 0),
                 members = teamMembers.Select(t => new TeamMember(t.memberID, t.teamID, t.memberName, GetPreventionOfMember(t.memberID, schemeID), false, 0)).ToList()
             };
+
+            if (captain != null)
+                team.teamCaptain = new TeamMember(captain.memberID, captain.teamID, captain.memberName, GetPreventionOfMember(captain.memberID, schemeID), true, 0);
 
             return GenerateScheme();
         }
@@ -195,6 +198,7 @@ namespace MatchDayPlanner.Core.Services
         private void ValidateSchemeData(List<MatchDay> layout, Guid schemeID)
         {
             var scheme = _gameScheduleService.GetGameScheduleByID(schemeID);
+            numberOfPlayers = scheme.numberOfPresent;
             int numberOfScheduled = scheme.numberOfPresent;
 
             foreach (var matchday in layout)

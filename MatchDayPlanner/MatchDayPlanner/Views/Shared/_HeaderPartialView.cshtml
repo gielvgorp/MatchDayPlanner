@@ -21,9 +21,11 @@ else if (ViewBag.CurrentView == "ManageTeam")
             </div>
         </div>
     </div>
+    <a class="item" href="@Url.Action("EditTeam", "Team", new { teamID = ViewBag.TeamID })">Bewerken</a>
 }
 else if (ViewBag.CurrentView == "ScheduleOverview")
 {
+    <a class="item" href="@Url.Action("EditSchedule", "Schedule", new { scheduleID = ViewBag.SchemeID })">Bewerken</a>
     <div class="item legenda-item" data-status="matchday"><div class="legenda-color legenda-match-day"></div> Wedstrijd dag</div>
     <a class="item" href="#" onclick="copyToClipboard('@ViewBag.SharedURL')">Deel link</a>
     @if (ViewBag.SchemeStatus == 1)

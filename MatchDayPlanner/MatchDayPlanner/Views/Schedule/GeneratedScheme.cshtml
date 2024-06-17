@@ -37,23 +37,44 @@
                             {
                                 <div class="prevention-list-item mt-3 matchday" onclick="changeMemberPrevention(this)">
                                     <i class="fa-solid fa-user"></i>
-                                    <p>@sortedSchemeLayout[j].memberName | @sortedSchemeLayout[j].memberPrevention</p>
+                                    <p>
+                                        @sortedSchemeLayout[j].memberName | @if (sortedSchemeLayout[j].memberPrevention == SchemeTeamMember.PreventionStatus.Available)
+                                            @("Aanwezig")
+                                        else if (sortedSchemeLayout[j].memberPrevention == SchemeTeamMember.PreventionStatus.NotAvailable)
+                                            @("Afwezig")
+                                        else if (sortedSchemeLayout[j].memberPrevention == SchemeTeamMember.PreventionStatus.Scheduled)
+                                            @("Ingepland")
+                                        else
+                                            @("Niet gereageerd")
+                                    </p>
                                     <input type="hidden" name="matchDays[@i].schemeLayout[@j].memberPrevention" value="@sortedSchemeLayout[j].memberPrevention" />
                                     <input type="hidden" name="matchDays[@i].schemeLayout[@j].memberName" value="@sortedSchemeLayout[j].memberName" />
                                     <input type="hidden" name="matchDays[@i].schemeLayout[@j].memberID" value="@sortedSchemeLayout[j].memberID" />
                                 </div>
                             }
 
-                            @* Uncomment and adjust if you need to handle notResponseMembers as well
+                           @*  Uncomment and adjust if you need to handle notResponseMembers as well *@
                             @for (int m = 0; m < matchday.notResponseMembers.Count; m++)
                             {
-                            <div class="prevention-list-item unknown">
+                                <div class="prevention-list-item unknown" onclick="changeMemberPrevention(this)">
                             <i class="fa-solid fa-user"></i>
-                            <input type="text" name="matchDays[@i].notResponseMembers[@m].memberName" value="@matchday.notResponseMembers[m].memberName" class="form-control" />
-                            <input type="hidden" name="matchDays[@i].notResponseMembers[@m].Id" value="@matchday.notResponseMembers[m].Id" />
+                            <p>
+                                @sortedSchemeLayout[m].memberName | @if (sortedSchemeLayout[m].memberPrevention == SchemeTeamMember.PreventionStatus.Available)
+                                    @("Aanwezig")
+                                        else if (sortedSchemeLayout[m].memberPrevention == SchemeTeamMember.PreventionStatus.NotAvailable)
+                                    @("Afwezig")
+                                        else if (sortedSchemeLayout[m].memberPrevention == SchemeTeamMember.PreventionStatus.Scheduled)
+                                    @("Ingepland")
+                                else
+                                    @("Niet gereageerd")
+
+                            </p>
+                            <input type="hidden" name="matchDays[@i].schemeLayout[@m].memberPrevention" value="@sortedSchemeLayout[m].memberPrevention" />
+                            <input type="hidden" name="matchDays[@i].schemeLayout[@m].memberName" value="@sortedSchemeLayout[m].memberName" />
+                            <input type="hidden" name="matchDays[@i].schemeLayout[@m].memberID" value="@sortedSchemeLayout[m].memberID" />
                             <p> | Niet gereageerd</p>
                             </div>
-                            } *@
+                            }
                         </div>
                     }
                 </form>

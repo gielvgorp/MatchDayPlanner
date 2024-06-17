@@ -35,7 +35,13 @@ else if (ViewBag.CurrentView == "SchemePrevention")
 {
     <div class="stats-item">
         <p class="name">Deadline:</p>
-        <p class="value">@ViewBag.SchemeDeadline</p>
+        <p class="value">
+            @if (ViewBag.SchemeDeadline.ToString("HH:mm") != "00:00")
+            {
+                @(ViewBag.SchemeDeadline.ToString("HH:mm") + " - ")
+            }
+            @(new DateOnly(ViewBag.SchemeDeadline.Year, ViewBag.SchemeDeadline.Month, ViewBag.SchemeDeadline.Day).ToString("dd MMMM yyyy", CultureInfo.CreateSpecificCulture("nl")))
+        </p>
     </div>
 }
 else if (ViewBag.CurrentView == "MatchdayOverview")
@@ -44,6 +50,6 @@ else if (ViewBag.CurrentView == "MatchdayOverview")
         <p class="name"><i class="fa-solid fa-location-dot pe-2"></i> @if (string.IsNullOrEmpty(ViewBag.location)) @("Locatie onbekend") else @(ViewBag.location)</p>
     </div>
     <div class="stats-item">
-        <p class="name"><i class="fa-solid fa-calendar-xmark pe-2"></i> @if (ViewBag.DateTime.ToString("HH:mm") != "00:00"){ @(ViewBag.DateTime.ToString("HH:mm") + "-") } @(new DateOnly(ViewBag.DateTime.Year, ViewBag.DateTime.Month, ViewBag.DateTime.Day).ToString("dd MMMM yyyy", CultureInfo.CreateSpecificCulture("nl")))</p>
+        <p class="name"><i class="fa-solid fa-calendar-xmark pe-2"></i> @if (ViewBag.DateTime.ToString("HH:mm") != "00:00"){ @(ViewBag.DateTime.ToString("HH:mm") + " - ") } @(new DateOnly(ViewBag.DateTime.Year, ViewBag.DateTime.Month, ViewBag.DateTime.Day).ToString("dd MMMM yyyy", CultureInfo.CreateSpecificCulture("nl")))</p>
     </div>
 }

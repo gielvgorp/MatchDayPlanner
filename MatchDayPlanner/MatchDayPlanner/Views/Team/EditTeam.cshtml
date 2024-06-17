@@ -1,0 +1,41 @@
+﻿@using MatchDayPlanner.Models.ViewModels
+@model TeamViewModel
+
+@{
+    ViewData["Title"] = "Team bewerken";
+}
+<link rel="stylesheet" href="~/css/editPlayer.css" asp-append-version="true" />
+
+<div class="page-content">
+    @using (Html.BeginForm("EditTeam", "Team", FormMethod.Post))
+    {
+        @Html.HiddenFor(m => m.teamID);
+        <div class="form-container p-4">
+            <div class="form-group">
+                @Html.DisplayNameFor(m => m.teamName)
+                @Html.TextBoxFor(m => m.teamName, new { @class = "form-control", aria_describedby = "emailHelp", placeholder = "Team naam" })
+            </div>
+            <div class="form-group mt-3">
+                @Html.DisplayNameFor(m => m.teamCaptainID)
+                <select class="form-control" asp-for="teamCaptainID">
+                    @foreach (var member in ViewBag.members)
+                    {
+                        if(member.memberID == Model.teamCaptainID)
+                        {
+                            <option value="@member.memberID" selected>@member.memberName</option>
+                        }
+                        else{
+                            <option value="@member.memberID">@member.memberName</option>
+                        }
+                    
+                    }
+                    <option value="@Guid.Empty">Geen captain</option>
+                </select>
+            </div>
+            <div class="form-group mt-3">
+                <button class="btn btn-primary" name="submitButton" value="save" type="submit">Opslaan</button>
+                <button class="btn btn-danger" name="submitButton" value="delete" type="submit">Verwijder</button>
+            </div>
+        </div>
+    }
+</div>

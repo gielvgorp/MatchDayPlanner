@@ -19,7 +19,7 @@ namespace MatchDayPlanner.Controllers
         {
             await _signInManager.SignOutAsync();
             TempData["SuccessMessage"] = "Je bent uitgelogd!";
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Team");
         }
     }
 }

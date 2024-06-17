@@ -86,5 +86,29 @@ public class GameScheduleRepositoryTests
         Assert.IsNotNull(retrievedSchedule);
         Assert.AreEqual(schemeID, retrievedSchedule.schemeID);
     }
+
+    [TestMethod("Save game schedule")]
+    public void SaveGameScheduleFeedback()
+    {
+        Guid schemeID = Guid.Parse("01200101-0b00-45e0-bf45-f0dd4617b913");
+        string message = "Unit test";
+        Guid uid = Guid.NewGuid();
+
+        _repository.SaveSchemeFeedback(uid, schemeID, message);
+        var feedback = _repository.GetSchemeFeedback(schemeID);
+
+        Assert.IsNotNull(feedback);
+        Assert.AreEqual(uid, feedback.Select(f => f.memberID).FirstOrDefault());
+    }
+
+    [TestMethod("Get game schedule feedback by scheme ID")]
+    public void GetGameScheduleFeedback()
+    {
+        Guid schemeID = Guid.Parse("df197f52-271c-49bb-88a5-f1d595fd224a");
+        var feedback = _repository.GetSchemeFeedback(schemeID);
+
+        Assert.IsNotNull(feedback);
+        Assert.AreEqual(schemeID, feedback.Select(f => f.schemeID).FirstOrDefault());
+    }
 }
 

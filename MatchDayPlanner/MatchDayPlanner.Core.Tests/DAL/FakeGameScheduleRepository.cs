@@ -9,9 +9,21 @@ namespace MatchDayPlanner.Tests.DAL
     public class FakeGameScheduleRepository : IGameScheduleRepository
     {
         private readonly List<GameSchedules> _gameSchedules = new List<GameSchedules>();
-
+        private readonly List<ScheduleFeedback> _gameSchedulesFeedback = new List<ScheduleFeedback>();
         public FakeGameScheduleRepository()
         {
+            #region add feedback to repository
+            _gameSchedulesFeedback.Add(new ScheduleFeedback
+            {
+                feedbackID = Guid.Parse("6d6fbc55-2d9b-4273-a277-fe55e43103c3"),
+                schemeID = Guid.Parse("df197f52-271c-49bb-88a5-f1d595fd224a"),
+                feedbackDateTime = DateTime.Now,
+                feedbackMessage = "What an amazing schedule!",
+                memberID = Guid.Parse("fe7685df-0d75-41b6-b89a-89c0467d91ee")
+            });
+            #endregion
+
+            #region add data to fake repository
             _gameSchedules.Add(new GameSchedules
             {
                 teamID = Guid.Parse("6a605266-4be8-43db-9a3c-e80b92d0e3ed"),
@@ -59,6 +71,8 @@ namespace MatchDayPlanner.Tests.DAL
                 numberOfPresent = 3,
                 scheduleStatus = 0
             });
+
+            #endregion
         }
 
         public void Create(GameSchedules schedule)
@@ -111,12 +125,21 @@ namespace MatchDayPlanner.Tests.DAL
 
         public void SaveSchemeFeedback(Guid memberID, Guid schemeID, string message)
         {
+            ScheduleFeedback feedback = new ScheduleFeedback
+            {
+                feedbackID = Guid.NewGuid(),
+                feedbackDateTime = DateTime.Now,
+                feedbackMessage = message,
+                memberID = memberID,
+                schemeID = schemeID
+            };
 
+            _gameSchedulesFeedback.Add(feedback);
         }
 
         public List<ScheduleFeedback> GetSchemeFeedback(Guid schemeID)
         {
-            return null;
+            return _gameSchedulesFeedback.Where(f => f.schemeID == schemeID).ToList();
         }
     }
 }

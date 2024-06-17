@@ -1,6 +1,9 @@
 ﻿@{
     ViewData["Title"] = "Schema overzicht";
     ViewBag.CurrentView = "ScheduleOverview";
+
+    ViewBag.CanEdit = true;
+    ViewBag.EditURL = Url.Action("EditSchedule", "Schedule", new { scheduleID = Model.Scheme.schemeID });
 }
 
 @using System.Globalization;

@@ -3,6 +3,8 @@
 
 @{
     ViewData["Title"] = "Team beheren";
+    ViewBag.CanEdit = true;
+    ViewBag.EditURL = Url.Action("EditTeam", "Team", new { teamID = Model.teamID });
 }
 <link rel="stylesheet" href="~/css/manageTeam.css" asp-append-version="true" />
 

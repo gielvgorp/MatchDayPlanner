@@ -1,6 +1,9 @@
 ﻿@{
     ViewData["Title"] = "Wedstrijddag overzicht";
     ViewBag.CurrentView = "MatchdayOverview";
+
+    ViewBag.CanEdit = true;
+    ViewBag.EditURL = Url.Action("EditMatchday", "Schedule", new { matchdayID = Model.MatchDay.matchDayID });
 }
 @using MatchDayPlanner.Models.ViewModels
 @model MatchDayOverviewModel

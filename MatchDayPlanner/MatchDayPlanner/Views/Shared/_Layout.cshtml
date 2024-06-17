@@ -34,7 +34,13 @@
     {
         <header>
             <div class="header-top positition-relative">
-                <h3 class="title">@ViewData["Title"]</h3>
+                <h3 class="title">
+                    @ViewData["Title"]
+                    @if (ViewBag.CanEdit != null && ViewBag.CanEdit)
+                    {
+                        <a href="@ViewBag.EditURL" class="text-white ps-2"><i class="fa-solid fa-pen-to-square"></i></a>
+                    }
+                </h3>
                 @if (ViewData["SubTitle"] != null)
                 {
                     <p class="sub-title">@ViewData["SubTitle"]</p>

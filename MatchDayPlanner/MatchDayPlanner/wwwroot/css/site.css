@@ -167,6 +167,8 @@ header .sub-title {
     color: white;
     font-family: var(--font);
     text-decoration: none;
+    text-wrap: nowrap;
+    font-size: .8rem;
 }
 
 .dropdown-container:hover .dropdown-content{

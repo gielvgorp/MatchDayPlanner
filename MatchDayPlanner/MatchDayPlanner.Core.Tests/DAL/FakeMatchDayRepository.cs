@@ -24,8 +24,8 @@ namespace MatchDayPlanner.Core.Tests.DAL
 
             _schedules = new List<ScheduleLayout>
             {
-                new ScheduleLayout { matchDayID = _matchDays[0].matchDayID, memberID = Guid.Parse("d973efcc-187f-41af-bc0f-46078535b088"), isPresent = ScheduleLayout.PreventionStatus.Unavailable, schemeID = _matchDays[0].schemeID },
-                new ScheduleLayout { matchDayID = _matchDays[1].matchDayID, memberID = Guid.Parse("d973efcc-187f-41af-bc0f-46078535b088"), isPresent = ScheduleLayout.PreventionStatus.Available, schemeID = _matchDays[0].schemeID },
+                new ScheduleLayout { matchDayID = _matchDays[0].matchDayID, memberID = Guid.Parse("d973efcc-187f-41af-bc0f-46078535b088"), isPresent = ScheduleLayout.PreventionStatus.Available, schemeID = _matchDays[0].schemeID },
+                new ScheduleLayout { matchDayID = _matchDays[1].matchDayID, memberID = Guid.Parse("d973efcc-187f-41af-bc0f-46078535b088"), isPresent = ScheduleLayout.PreventionStatus.Unavailable, schemeID = _matchDays[0].schemeID },
                 new ScheduleLayout { matchDayID = _matchDays[2].matchDayID, memberID = Guid.Parse("8704e398-7fec-4032-a327-b065f7621e9e"), isPresent = ScheduleLayout.PreventionStatus.Unavailable, schemeID = _matchDays[1].schemeID },
                 new ScheduleLayout { matchDayID = _matchDays[2].matchDayID, memberID = Guid.Parse("8704e398-7fec-4032-a327-b065f7621e9e"), isPresent = ScheduleLayout.PreventionStatus.Available, schemeID = _matchDays[2].schemeID }
             };

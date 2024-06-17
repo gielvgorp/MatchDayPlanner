@@ -1,6 +1,4 @@
-﻿// global.js
-
-// Function to show a warning popup
+﻿// Function to show a warning popup
 function showWarningPopup(message) {
     Swal.fire({
         position: "top-end",

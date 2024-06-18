@@ -13,15 +13,17 @@
         @Html.HiddenFor(m => m.matchDayID)
         <div class="form-container p-4">
             <div class="form-group">
-                @Html.DisplayNameFor(m => m.matchDayDateTime)
+                @Html.LabelFor(m => m.matchDayDateTime, new { @class = "form-label text" })
                 <input type="time" class="form-control" name="matchdayTime" value="@Model.matchDayDateTime.ToString("HH:mm")" />
             </div>
             <div class="form-group mt-3">
-                @Html.DisplayNameFor(m => m.location)
+                @Html.LabelFor(m => m.location, new { @class = "form-label text" })
                 @Html.TextBoxFor(m => m.location, new { @class = "form-control", aria_describedby = "emailHelp", placeholder = "Locatie van wedstrijd" })
             </div>
-            <div class="form-group mt-3">
-                <button class="btn btn-primary" name="submitButton" value="save" type="submit">Opslaan</button>
+            <div class="form-group row mt-3">
+                <div class="form-group col-12">
+                    <button class="btn btn-primary w-100" name="submitButton" value="save" type="submit">Opslaan</button>
+                </div>
             </div>
         </div>
     }

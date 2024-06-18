@@ -109,7 +109,8 @@ namespace MatchDayPlanner.DAL
                                 schemeDeadline = reader.GetDateTime(reader.GetOrdinal("schemeDeadline")),
                                 numberOfPresent = reader.GetInt32(reader.GetOrdinal("numberOfPresent")),
                                 startDate = reader.GetDateTime(reader.GetOrdinal("startDate")),
-                                endDate = reader.GetDateTime(reader.GetOrdinal("endDate"))
+                                endDate = reader.GetDateTime(reader.GetOrdinal("endDate")),
+                                scheduleStatus = reader.GetInt32(reader.GetOrdinal("scheduleStatus"))
                             });
                         }
                     }

@@ -15,23 +15,21 @@ namespace MatchDayPlanner.Core.Services
         private TeamService _teamService;
         private GameScheduleService _gameScheduleService;
         private MatchDayService _matchDayService;
-        private readonly Guid userID;
 
-        public PermissionService(Guid c_uid, TeamService c_teamService, GameScheduleService c_gameScheduleService, MatchDayService c_matchdayService) 
+        public PermissionService(TeamService c_teamService, GameScheduleService c_gameScheduleService, MatchDayService c_matchdayService) 
         {
-            userID = c_uid;
             _teamService = c_teamService;
             _gameScheduleService = c_gameScheduleService;
             _matchDayService = c_matchdayService;
         }
 
 
-        public void AllowedToFetchTeam(Guid teamID)
+        public void AllowedToFetchTeam(Guid teamID, Guid uid)
         {
             Team team = _teamService.GetTeamByID(teamID);
             if (team != null) 
             {
-                if (team.teamCreatedBy != userID)
+                if (team.teamCreatedBy != uid)
                     throw new Exception("Gebruiker heeft geen rechten om dit team op te vragen!");
 
                 return;
@@ -41,11 +39,11 @@ namespace MatchDayPlanner.Core.Services
         }
 
 
-        public void AllowedToFetchTeamMember(Guid teamID, Guid teamMember) 
+        public void AllowedToFetchTeamMember(Guid teamID, Guid teamMember, Guid uid) 
         {
             Team team = _teamService.GetTeamByID(teamID);
             TeamMember member = _teamService.GetTeamMemberByID(teamMember);
-            AllowedToFetchTeam(teamID);
+            AllowedToFetchTeam(teamID, uid);
 
             if (member != null)
             {
@@ -54,7 +52,7 @@ namespace MatchDayPlanner.Core.Services
             }
         }
 
-        public void AllowedToFetchSchedule(Guid scheduleID)
+        public void AllowedToFetchSchedule(Guid scheduleID, Guid uid)
         {
             GameSchedules scheme = _gameScheduleService.GetGameScheduleByID(scheduleID);
 
@@ -62,19 +60,19 @@ namespace MatchDayPlanner.Core.Services
             {
                 Team team = _teamService.GetTeamByID(scheme.teamID);
 
-                if (team.teamCreatedBy == userID) return;
+                if (team.teamCreatedBy == uid) return;
             }
 
             throw new Exception("Gebruiker heeft geen rechten voor deze handeling");
         }
 
-        public void CheckMatchdayPermission(Guid matchdayID)
+        public void CheckMatchdayPermission(Guid matchdayID, Guid uid)
         {
             SchemeMatchDay matchday = _matchDayService.GetMatchdayByID(matchdayID);
 
             if (matchday != null)
             {
-                AllowedToFetchSchedule(matchday.schemeID);
+                AllowedToFetchSchedule(matchday.schemeID, uid);
                 return;
             }
 

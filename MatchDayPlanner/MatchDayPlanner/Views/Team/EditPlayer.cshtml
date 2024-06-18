@@ -11,21 +11,24 @@
     {
         <div class="form-container p-4">
             <div class="form-group">
-                @Html.DisplayNameFor(m => m.memberName)
+                @Html.LabelFor(m => m.memberName, new { @class = "form-label text" })
                 @Html.TextBoxFor(m => m.memberName, new { @class = "form-control", aria_describedby = "emailHelp", placeholder = "Full name" })
             </div>
             <div class="form-group mt-3">
-                @Html.DisplayNameFor(m => m.memberEmail)
+                @Html.LabelFor(m => m.memberEmail, new { @class = "form-label text" })
                 @Html.TextBoxFor(m => m.memberEmail, new { @class = "form-control", aria_describedby = "emailHelp", placeholder = "Email address" })
-                <small id="emailHelp" class="form-text text-white">Het email adres hebben we nodig op uw leden up-to-date te houden</small>
             </div>
             <div class="form-group form-check mt-3">
                 <input type="checkbox" name="isCaptain" class="form-check-input" id="ckb-iscaptain">
-                <label class="form-check-label" for="ckb-iscaptain">Is team captain</label>
+                <label class="form-check-label text" for="ckb-iscaptain">Is team captain</label>
             </div>
-            <div class="form-group mt-3">
-                <button class="btn btn-primary" name="submitButton" value="save" type="submit">Opslaan</button>
-                <button class="btn btn-danger" name="submitButton" value="delete" type="submit">Verwijder</button>
+            <div class="form-group row mt-3">
+                <div class="form-group col-6">
+                    <button class="btn btn-primary w-100" name="submitButton" value="save" type="submit">Opslaan</button>
+                </div>
+                <div class="form-group col-6">
+                    <button class="btn btn-danger w-100" name="submitButton" value="delete" type="submit">Verwijder</button>
+                </div>
             </div>
         </div>
     }

@@ -47,12 +47,31 @@
                             @for (int i = 0; i < totalMonths; i++)
                             {
                                 DateTime currentMonth = startDate.AddMonths(i);
+                                var monthName = new DateOnly(currentMonth.Year, currentMonth.Month, 1).ToString("MMMM yyyy", CultureInfo.CreateSpecificCulture("nl"));
+
+                                // Capitalize the first letter
+                                if (!string.IsNullOrEmpty(monthName))
+                                {
+                                    monthName = char.ToUpper(monthName[0]) + monthName.Substring(1);
+                                }
                                 <div class="call-month">
-                                    <h3 class="text cal-month-name">@(new DateOnly(currentMonth.Year, currentMonth.Month, 1).ToString("MMMM yyyy", CultureInfo.CreateSpecificCulture("nl"))) </h3>
+                                    <h3 class="text cal-month-name">@(monthName) </h3>
                                     <div class="cal-days">
-                                        @for (int y = 0; y < (int)new DateTime(currentMonth.Year, currentMonth.Month, 1).DayOfWeek - 2; y++)
+                                        <p class="text text-center fw-bold" style="width: 50px;">Ma</p>
+                                        <p class="text text-center fw-bold" style="width: 50px;">Di</p>
+                                        <p class="text text-center fw-bold" style="width: 50px;">Wo</p>
+                                        <p class="text text-center fw-bold" style="width: 50px;">Do</p>
+                                        <p class="text text-center fw-bold" style="width: 50px;">Vr</p>
+                                        <p class="text text-center fw-bold" style="width: 50px;">Za</p>
+                                        <p class="text text-center fw-bold" style="width: 50px;">Zo</p>
+
+                                        @{
+                                            int days = (int)new DateTime(currentMonth.Year, currentMonth.Month, 1).DayOfWeek - 1;
+                                            int startDay = (int)DateTime.DaysInMonth(currentMonth.Year, currentMonth.AddMonths(-1).Month) - (days - 1);
+                                        }
+                                        @for (int y = 0; y < days; y++)
                                         {
-                                            <div class="day-cell-disabled cal-day-cell"></div>
+                                            <div class="day-cell-disabled cal-day-cell">@(startDay + y)</div>
                                         }
 
                                         @for (int x = 0; x < DateTime.DaysInMonth(currentMonth.Year, currentMonth.Month); x++)

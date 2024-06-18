@@ -19,13 +19,21 @@
                         const dateTimeString = response.memberScheme[i].matchday.matchDayDateTime;
                         const dateObj = new Date(dateTimeString);
 
-                        const month = dateObj.getMonth() + 1;
-                        const day = dateObj.getDate();
-                        const year = dateObj.getFullYear();
+                        var month = dateObj.getMonth() + 1;
+                        var day = dateObj.getDate();
+                        var year = dateObj.getFullYear();
+
+                        if (month < 10)
+                            month = "0" + month;
+
+                        if (day < 10)
+                            day = "0" + day;
 
                         const formattedDate = `${month}/${day}/${year}`;
+                        console.log(formattedDate);
 
                         var result = $(".cal-day-cell[data-date='" + formattedDate + "']");
+                        console.log(result);
 
                         if (result) {
                             switch (response.memberScheme[i].member.memberPrevention) {

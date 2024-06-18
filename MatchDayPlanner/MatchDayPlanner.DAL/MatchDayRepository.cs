@@ -233,6 +233,7 @@ namespace MatchDayPlanner.DAL
                         {
                             result.Add(new ScheduleLayout
                             {
+                                preventionID = reader.GetGuid(reader.GetOrdinal("preventionID")),
                                 matchDayID = reader.GetGuid(reader.GetOrdinal("matchDayID")),
                                 memberID = reader.GetGuid(reader.GetOrdinal("memberID")),
                                 isPresent = (ScheduleLayout.PreventionStatus)reader.GetInt32(reader.GetOrdinal("isPresent")),

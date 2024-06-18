@@ -80,7 +80,7 @@ namespace MatchDayPlanner.Core.Tests
         [TestMethod("Get all presented members on matchday")]
         public void GetAllPresents()
         {
-            var matchDay = _service.GetAllMatchDays(Guid.Parse("2b466d2b-2371-4b5b-b192-3c0bf922b7fe")).First();
+            var matchDay = _service.GetAllMatchDays(Guid.Parse("8a5e0759-33fc-4696-9f53-815c13abe704")).First();
 
             var presents = _service.GetAllPresents(matchDay.matchDayID);
             Assert.AreEqual(1, presents.Count);
@@ -90,7 +90,7 @@ namespace MatchDayPlanner.Core.Tests
         [TestMethod("Get all presented and absented members of matchday")]
         public void GetMembersOfScheduleByStatus()
         {
-            var matchDay = _service.GetAllMatchDays(Guid.Parse("2b466d2b-2371-4b5b-b192-3c0bf922b7fe")).First();
+            var matchDay = _service.GetAllMatchDays(Guid.Parse("8a5e0759-33fc-4696-9f53-815c13abe704")).First();
 
             var presents = _service.GetMembersOfScheduleByStatus((int)ScheduleLayout.PreventionStatus.Available, matchDay.matchDayID);
             Assert.AreEqual(1, presents.Count);
@@ -104,7 +104,7 @@ namespace MatchDayPlanner.Core.Tests
         [TestMethod("Get all absent members of matchday")]
         public void GetAllAbsents_ReturnsOnlyAbsentMembers()
         {
-            var matchDay = _service.GetAllMatchDays(Guid.Parse("2b466d2b-2371-4b5b-b192-3c0bf922b7fe")).Last();
+            var matchDay = _service.GetAllMatchDays(Guid.Parse("8a5e0759-33fc-4696-9f53-815c13abe704")).Last();
 
             var absents = _service.GetAllAbsents(matchDay.matchDayID);
             Assert.AreEqual(1, absents.Count);
@@ -114,7 +114,7 @@ namespace MatchDayPlanner.Core.Tests
         [TestMethod("Get schedule of matchday by ID")]
         public void GetGameScheduleOfMatchday()
         {
-            var schemeID = Guid.Parse("2b466d2b-2371-4b5b-b192-3c0bf922b7fe");
+            var schemeID = Guid.Parse("8a5e0759-33fc-4696-9f53-815c13abe704");
             var matchDay = _service.GetAllMatchDays(schemeID).FirstOrDefault();
             Assert.IsNotNull(matchDay);
 

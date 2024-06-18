@@ -26,7 +26,7 @@ namespace MatchDayPlanner.Core.Services
         }
 
 
-        public void AllowedToFetchTeam(Guid teamID)
+        public bool AllowedToFetchTeam(Guid teamID)
         {
             Team team = _teamService.GetTeamByID(teamID);
             if (team != null) 
@@ -34,14 +34,14 @@ namespace MatchDayPlanner.Core.Services
                 if (team.teamCreatedBy != userID)
                     throw new Exception("Gebruiker heeft geen rechten om dit team op te vragen!");
 
-                return;
+                return true;
             }
 
             throw new Exception("Opgevraagde team niet gevonden!");
         }
 
 
-        public void AllowedToFetchTeamMember(Guid teamID, Guid teamMember) 
+        public bool AllowedToFetchTeamMember(Guid teamID, Guid teamMember) 
         {
             Team team = _teamService.GetTeamByID(teamID);
             TeamMember member = _teamService.GetTeamMemberByID(teamMember);
@@ -52,9 +52,11 @@ namespace MatchDayPlanner.Core.Services
                 if (team.teamID != member.teamID)
                     throw new Exception("Team lid hoort niet bij het opgevraagde team!");
             }
+
+            return true;
         }
 
-        public void AllowedToFetchSchedule(Guid scheduleID)
+        public bool AllowedToFetchSchedule(Guid scheduleID)
         {
             GameSchedules scheme = _gameScheduleService.GetGameScheduleByID(scheduleID);
 
@@ -62,23 +64,26 @@ namespace MatchDayPlanner.Core.Services
             {
                 Team team = _teamService.GetTeamByID(scheme.teamID);
 
-                if (team.teamCreatedBy == userID) return;
+                if (team != null && team.teamCreatedBy == userID)
+                {
+                    return true;
+                }
             }
 
-            throw new Exception("Gebruiker heeft geen rechten voor deze handeling");
+            throw new Exception("Gebruiker heeft geen rechten voor deze handeling!");
         }
 
-        public void CheckMatchdayPermission(Guid matchdayID)
+        public bool CheckMatchdayPermission(Guid matchdayID)
         {
             SchemeMatchDay matchday = _matchDayService.GetMatchdayByID(matchdayID);
 
             if (matchday != null)
             {
                 AllowedToFetchSchedule(matchday.schemeID);
-                return;
+                return true;
             }
 
-            throw new Exception("Gebruiker heeft geen rechten voor deze handeling");
+            throw new Exception("Gebruiker heeft geen rechten voor deze handeling!");
         }
     }
 }

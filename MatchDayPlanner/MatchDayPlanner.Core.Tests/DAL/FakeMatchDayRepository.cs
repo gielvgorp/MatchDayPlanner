@@ -19,7 +19,7 @@ namespace MatchDayPlanner.Core.Tests.DAL
             {
                 new SchemeMatchDay { matchDayID = Guid.Parse("69fa1576-7ea0-419d-9557-c2d505494761"), schemeID = Guid.Parse("dfbe2b5a-b028-4311-9103-d8a8020e08fa"), matchDayDateTime = DateTime.Now, location = "Location 1" },
                 new SchemeMatchDay { matchDayID = Guid.Parse("5319ca28-819a-467f-86dc-712f93df90de"), schemeID = Guid.Parse("dfbe2b5a-b028-4311-9103-d8a8020e08fa"), matchDayDateTime = DateTime.Now.AddDays(1), location = "Location 2" },
-                new SchemeMatchDay { matchDayID = Guid.Parse("baeae1f1-f12a-4147-a29c-f3a1311050c2"), schemeID = Guid.Parse("2b466d2b-2371-4b5b-b192-3c0bf922b7fe"), matchDayDateTime = DateTime.Now.AddDays(1), location = "Location 2" }
+                new SchemeMatchDay { matchDayID = Guid.Parse("baeae1f1-f12a-4147-a29c-f3a1311050c2"), schemeID = Guid.Parse("8a5e0759-33fc-4696-9f53-815c13abe704"), matchDayDateTime = DateTime.Now.AddDays(1), location = "Location 2" }
             };
 
             _schedules = new List<ScheduleLayout>

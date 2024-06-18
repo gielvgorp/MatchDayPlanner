@@ -62,7 +62,7 @@ namespace MatchDayPlanner.Tests.DAL
 
             _gameSchedules.Add(new GameSchedules
             {
-                teamID = Guid.Parse("26678504-66d6-4a47-aea5-76ab8a3ae44c"),
+                teamID = Guid.Parse("a0c35710-c184-49ec-b9a2-b147c5afa8b0"),
                 schemeID = Guid.Parse("8a5e0759-33fc-4696-9f53-815c13abe704"),
                 scheduleName = "Schedule 4",
                 schemeDeadline = new DateTime(2023, 11, 1),

@@ -18,14 +18,15 @@ namespace MatchDayPlanner.Core.Tests.DAL
             teams = new List<Team>
             {
                 new Team { teamID = Guid.Parse("a0c35710-c184-49ec-b9a2-b147c5afa8b0"), teamName = "Team A", teamCreatedBy = Guid.Parse("df9d80d0-5dc5-4325-84f7-ab18cf4e00b3"), teamCaptainID = Guid.Parse("df9d80d0-5dc5-4325-84f7-ab18cf4e00b3") },
-                new Team { teamID = Guid.Parse("c8a699be-3934-48d0-ad8e-fe5a842ff572"), teamName = "Team B", teamCreatedBy = Guid.NewGuid(), teamCaptainID = Guid.NewGuid() }
+                new Team { teamID = Guid.Parse("c8a699be-3934-48d0-ad8e-fe5a842ff572"), teamName = "Team B", teamCreatedBy = Guid.Parse("3062a26f-86ee-41f4-ac92-d579c733acc9"), teamCaptainID = Guid.NewGuid() },
+                new Team { teamID = Guid.Parse("d32d9805-1472-4d17-9f4c-199a2b978aea"), teamName = "Team C", teamCreatedBy = Guid.Parse("3062a26f-86ee-41f4-ac92-d579c733acc9"), teamCaptainID = Guid.NewGuid() }
             };
 
             teamMembers = new List<TeamMember>
             {
                 new TeamMember { memberID = Guid.Parse("df9d80d0-5dc5-4325-84f7-ab18cf4e00b3"), teamID = teams[0].teamID, memberName = "John Doe", memberEmail = "john.doe@example.com" },
-                new TeamMember { memberID = Guid.NewGuid(), teamID = teams[0].teamID, memberName = "Doe John", memberEmail = "doe.john@example.com" },
-                new TeamMember { memberID = Guid.NewGuid(), teamID = teams[1].teamID, memberName = "John Doe", memberEmail = "john.doe@example.com" },
+                new TeamMember { memberID = Guid.Parse("dd658ccb-67b1-4060-a9e0-d00d6535f074"), teamID = teams[0].teamID, memberName = "Doe John", memberEmail = "doe.john@example.com" },
+                new TeamMember { memberID = Guid.Parse("e28d4bdb-dd2d-4744-bff2-f16d65605b11"), teamID = teams[1].teamID, memberName = "John Doe", memberEmail = "john.doe@example.com" },
 
             };
         }

@@ -16,6 +16,7 @@ namespace MatchDayPlanner.Controllers
         private readonly GameScheduleService _gameScheduleService;
         private readonly MatchDayService _matchdayService;
         private readonly FileExportService _fileExportService;
+        private readonly PermissionService _permissionService;
         private readonly string _dbConnectionString = "";
         public ScheduleExportController(IConfiguration iConfig, UserManager<ApplicationUser> userManager)
         {
@@ -23,6 +24,8 @@ namespace MatchDayPlanner.Controllers
             _teamService = new TeamService(new TeamRepository(_dbConnectionString));
             _matchdayService = new MatchDayService(new MatchDayRepository(_dbConnectionString));
             _gameScheduleService = new GameScheduleService(new GameScheduleRepository(_dbConnectionString), _matchdayService, _teamService);
+            _userManager = userManager;
+            _permissionService = new PermissionService(Guid.Parse(_userManager.GetUserId(this.User)), _teamService, _gameScheduleService, _matchdayService);
             _fileExportService = new FileExportService();
         }
 
@@ -31,6 +34,8 @@ namespace MatchDayPlanner.Controllers
         {
             try
             {
+                _permissionService.AllowedToFetchSchedule(schemeID);
+
                 var scheme = _gameScheduleService.GetFullScheme(schemeID);
                 if (scheme == null)
                 {

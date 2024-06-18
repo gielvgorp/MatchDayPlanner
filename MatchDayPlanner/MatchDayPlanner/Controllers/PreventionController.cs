@@ -15,6 +15,7 @@ namespace MatchDayPlanner.Controllers
         private readonly GameScheduleService _gameScheduleService;
         private readonly MatchDayService _matchdayService;
         private readonly PreventionService _preventionService;
+        private readonly PermissionService _permissionService;
 
         public PreventionController(IConfiguration iConfig)
         {
@@ -23,6 +24,7 @@ namespace MatchDayPlanner.Controllers
             _matchdayService = new MatchDayService(new MatchDayRepository(_dbConnectionString));
             _preventionService = new PreventionService(new PreventionRepository(_dbConnectionString));
             _gameScheduleService = new GameScheduleService(new GameScheduleRepository(_dbConnectionString), _matchdayService, _teamService);
+            _permissionService = new PermissionService(Guid.Parse(""), _teamService, _gameScheduleService, _matchdayService);
         }
 
         [HttpGet("/prevention/{teamID}/{schemeID}")]

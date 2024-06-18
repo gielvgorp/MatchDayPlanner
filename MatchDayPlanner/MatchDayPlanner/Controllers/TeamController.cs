@@ -25,8 +25,8 @@ namespace MatchDayPlanner.Controllers
             _teamService = new TeamService(new TeamRepository(_dbConnectionString));
             _matchdayService = new MatchDayService(new MatchDayRepository(_dbConnectionString));
             _gameScheduleService = new GameScheduleService(new GameScheduleRepository(_dbConnectionString), _matchdayService, _teamService);
-            _permissionService = new PermissionService(_teamService);
             _userManager = userManager;
+            _permissionService = new PermissionService(Guid.Parse(_userManager.GetUserId(this.User)), _teamService, _gameScheduleService, _matchdayService);
         }
 
         public IActionResult Index()
@@ -64,7 +64,7 @@ namespace MatchDayPlanner.Controllers
         {
             try
             {
-                _permissionService.AllowedToFetchTeam(teamID, Guid.Parse(_userManager.GetUserId(this.User)));
+                _permissionService.AllowedToFetchTeam(teamID);
 
                 List<TeamMember> members = _teamService.GetTeamMembers(teamID);
                 ViewBag.members = members;
@@ -92,7 +92,7 @@ namespace MatchDayPlanner.Controllers
         {
             try
             {
-                _permissionService.AllowedToFetchTeam(model.teamID, Guid.Parse(_userManager.GetUserId(this.User)));
+                _permissionService.AllowedToFetchTeam(model.teamID);
 
                 if (submitButton == "save")
                 {
@@ -145,7 +145,7 @@ namespace MatchDayPlanner.Controllers
         {
             try
             {
-                _permissionService.AllowedToFetchTeam(teamID, Guid.Parse(_userManager.GetUserId(this.User)));
+                _permissionService.AllowedToFetchTeam(teamID);
 
                 List<TeamMemberViewModel> members = _teamService.GetTeamMembers(teamID).Select(t => new TeamMemberViewModel
                 {
@@ -207,7 +207,7 @@ namespace MatchDayPlanner.Controllers
         {
             try
             {
-                _permissionService.AllowedToFetchTeamMember(teamID, memberID, Guid.Parse(_userManager.GetUserId(this.User)));
+                _permissionService.AllowedToFetchTeamMember(teamID, memberID);
 
                 TeamMember member = _teamService.GetTeamMemberByID(memberID);
 
@@ -238,7 +238,7 @@ namespace MatchDayPlanner.Controllers
         {
             try
             {
-                _permissionService.AllowedToFetchTeamMember(teamID, memberID, Guid.Parse(_userManager.GetUserId(this.User)));
+                _permissionService.AllowedToFetchTeamMember(teamID, memberID);
 
                 if (!ModelState.IsValid)
                 {
@@ -289,7 +289,7 @@ namespace MatchDayPlanner.Controllers
         {
             try
             {
-                _permissionService.AllowedToFetchTeam(Guid.Parse(teamID), Guid.Parse(_userManager.GetUserId(this.User)));
+                _permissionService.AllowedToFetchTeam(Guid.Parse(teamID));
 
                 _teamService.AddTeamMember(Guid.Parse(teamID), playerName, playerEmail);
                 return RedirectToAction("ManageTeam", "Team", new { add = "true", teamID = teamID });

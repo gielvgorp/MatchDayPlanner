@@ -1,50 +1,15 @@
 ﻿@{
     Layout = "/Views/Shared/_Layout.cshtml";
 }
-
-<div class="row justify-content-center">
-    <div class="col-5 mt-5">
-       @*  <div class="card login-logout-card">
-            <div class="card-header">
-                <ul class="nav nav-tabs card-header-tabs">
-                    <li class="nav-item">
-                        <a href="/Identity/Account/Login" class="nav-link">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/Identity/Account/Register" class="nav-link">Registreren</a>
-                    </li>
-                </ul>
-            </div>
-            <div class="card-body">
-                <div class="row justify-content-center">
-                    <div class="col-10 my-4">
-                        @RenderBody()
-                    </div>
-                </div>
-            </div>
-        </div> *@
-
-        <div class="login-logout-container card login-logout-card">
-            <div class="card-header">
-                <ul class="nav nav-tabs card-header-tabs">
-                    <li class="nav-item text">
-                        <a href="/Identity/Account/Login" class="nav-link">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/Identity/Account/Register" class="nav-link">Registreren</a>
-                    </li>
-                </ul>
-            </div>
-            <div class="card-body">
-                <div class="row justify-content-center">
-                    <div class="col-10 my-4">
-                        @RenderBody()
-                    </div>
-                </div>
-            </div>
+<link rel="stylesheet" href="~/css/AuthStyleSheet.css" asp-append-version="true" />
+<main class="w-100 h-100 d-flex justify-content-center align-items-center">
+    <div class="main-container d-flex flex-column">
+        <h4 class="text text-center pt-4">Welkom bij Matchday Planner!</h4>
+        <div class="w-100 h-100 p-3 d-flex align-items-center render-body">
+            @RenderBody()
         </div>
     </div>
-</div>
+</main>
 
 @section Scripts{
     @await RenderSectionAsync("Scripts", required: false)

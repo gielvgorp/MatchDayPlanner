@@ -16,6 +16,7 @@ builder.Services.AddRazorPages();
 builder.Services.Configure<IdentityOptions>(options =>
 {
     options.Password.RequireUppercase = false;
+    options.User.RequireUniqueEmail = true;
 });
 
 var app = builder.Build();

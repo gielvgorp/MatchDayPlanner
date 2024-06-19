@@ -79,7 +79,7 @@ namespace MatchDayPlanner.DAL
                                 matchDayID = reader.GetGuid(reader.GetOrdinal("matchDayID")),
                                 schemeID = reader.GetGuid(reader.GetOrdinal("schemeID")),
                                 matchDayDateTime = reader.GetDateTime(reader.GetOrdinal("matchDayDateTime")),
-                                location = reader.GetString(reader.GetOrdinal("location"))
+                                location = reader.GetString(reader.GetOrdinal("location")).Trim()
                             };
                         }
                     }
@@ -123,7 +123,7 @@ namespace MatchDayPlanner.DAL
                                 matchDayID = reader.GetGuid(reader.GetOrdinal("matchDayID")),
                                 schemeID = reader.GetGuid(reader.GetOrdinal("schemeID")),
                                 matchDayDateTime = reader.GetDateTime(reader.GetOrdinal("matchDayDateTime")),
-                                location = reader.GetString(reader.GetOrdinal("location"))
+                                location = reader.GetString(reader.GetOrdinal("location")).Trim()
                             });
                         }
                     }
@@ -322,7 +322,7 @@ namespace MatchDayPlanner.DAL
                                 matchDayID = reader.GetGuid(reader.GetOrdinal("matchDayID")),
                                 schemeID  = reader.GetGuid(reader.GetOrdinal("schemeID")),
                                 matchDayDateTime = reader.GetDateTime(reader.GetOrdinal("matchDayDateTime")),
-                                location = reader.GetString(reader.GetOrdinal("location"))
+                                location = reader.GetString(reader.GetOrdinal("location")).Trim()
                             };
                         }
                     }

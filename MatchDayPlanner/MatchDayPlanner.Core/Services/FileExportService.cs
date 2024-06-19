@@ -14,10 +14,20 @@ namespace MatchDayPlanner.Core.Services
 {
     public class FileExportService
     {
+        private readonly GameScheduleService _scheduleService;
+        private readonly TeamService _teamService;
+
+        public FileExportService(GameScheduleService c_scheduleService, TeamService c_teamService) 
+        { 
+            _scheduleService = c_scheduleService;
+            _teamService = c_teamService;
+        }
         public FileContentResult ExportToExcel(Scheme scheme)
         {
             byte[] fileContents;
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            var schedule = _scheduleService.GetGameScheduleByID(scheme.GetSchemeID());
+            var team = _teamService.GetTeamBySchemeID(scheme.GetSchemeID());
 
             using (var package = new ExcelPackage())
             {
@@ -28,80 +38,108 @@ namespace MatchDayPlanner.Core.Services
                 worksheet.Cells[2, 1].Value = "Date";
                 worksheet.Cells[2, 1].Style.Font.Bold = true;
                 worksheet.Cells[2, 1].Style.Font.Size = 20;
+                worksheet.Cells[2, 1].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
 
-                worksheet.Cells["B2:D2"].Merge = true;
-                worksheet.Cells["B2:D2"].Value = "Ingepland";
-                worksheet.Cells["B2:D2"].Style.Font.Bold = true;
-                worksheet.Cells["B2:D2"].Style.Font.Size = 20;
-                worksheet.Cells["B2:D2"].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
-                worksheet.Cells["B2:D2"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                int scheduledCount = schedule.numberOfPresent;
+                char endChar = (char)('B' + scheduledCount - 1);
+                string cellRange = $"B2:{endChar}2";
 
-                worksheet.Cells[2, 5].Merge = true;
-                worksheet.Cells[2, 5].Value = "Reserve";
-                worksheet.Cells[2, 5].Style.Font.Bold = true;
-                worksheet.Cells[2, 5].Style.Font.Size = 20;
-                worksheet.Cells[2, 5].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
-                worksheet.Cells[2, 5].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                worksheet.Cells[cellRange].Merge = true;
+                worksheet.Cells[cellRange].Value = "Ingepland";
+                worksheet.Cells[cellRange].Style.Font.Bold = true;
+                worksheet.Cells[cellRange].Style.Font.Size = 20;
+                worksheet.Cells[cellRange].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                worksheet.Cells[cellRange].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
 
-                worksheet.Cells[2, 6].Merge = true;
-                worksheet.Cells[2, 6].Value = "Locatie";
-                worksheet.Cells[2, 6].Style.Font.Bold = true;
-                worksheet.Cells[2, 6].Style.Font.Size = 20;
-                worksheet.Cells[2, 6].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
-                worksheet.Cells[2, 6].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                endChar++;
+                cellRange = $"{endChar}2";
 
-                worksheet.Cells[2, 7].Merge = true;
-                worksheet.Cells[2, 7].Value = "Tijd";
-                worksheet.Cells[2, 7].Style.Font.Bold = true;
-                worksheet.Cells[2, 7].Style.Font.Size = 20;
-                worksheet.Cells[2, 7].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
-                worksheet.Cells[2, 7].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                worksheet.Cells[cellRange].Merge = true;
+                worksheet.Cells[cellRange].Value = "Reserve";
+                worksheet.Cells[cellRange].Style.Font.Bold = true;
+                worksheet.Cells[cellRange].Style.Font.Size = 20;
+                worksheet.Cells[cellRange].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                worksheet.Cells[cellRange].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
 
+                endChar++;
+                cellRange = $"{endChar}2";
+
+                worksheet.Cells[cellRange].Merge = true;
+                worksheet.Cells[cellRange].Value = "Locatie";
+                worksheet.Cells[cellRange].Style.Font.Bold = true;
+                worksheet.Cells[cellRange].Style.Font.Size = 20;
+                worksheet.Cells[cellRange].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                worksheet.Cells[cellRange].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+
+                endChar++;
+                cellRange = $"{endChar}2";
+
+                worksheet.Cells[cellRange].Merge = true;
+                worksheet.Cells[cellRange].Value = "Tijd";
+                worksheet.Cells[cellRange].Style.Font.Bold = true;
+                worksheet.Cells[cellRange].Style.Font.Size = 20;
+                worksheet.Cells[cellRange].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+                worksheet.Cells[cellRange].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+
+                int colCount = 0;
                 for (int i = 0; i < matchdays.Count; i++)
                 {
-                    worksheet.Cells[(i+3), 1].Value = matchdays[i].matchDayDateTime.Date.ToString("dd/MM/yyyy");
-                    worksheet.Cells[(i + 3), 1].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
-                   
+                    colCount = 1 + matchdays[i].schemeLayout.Where(s => s.memberPrevention == TeamMember.PreventionStatus.Scheduled).ToList().Count;
 
+                    // displaying matchday date
+                    worksheet.Cells[(i+3), 1].Value = matchdays[i].matchDayDateTime.Date.ToString("dd/MM/yyyy");
+                    worksheet.Cells[(i + 3), 1].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                   
+                    // displaying scheduled members
                     for (int k = 0; k < matchdays[i].schemeLayout.Where(s => s.memberPrevention == TeamMember.PreventionStatus.Scheduled).ToList().Count; k++)
                     {
                         worksheet.Cells[(i + 3), (k + 2)].Value = matchdays[i].schemeLayout.Where(s => s.memberPrevention == TeamMember.PreventionStatus.Scheduled).ToList()[k].memberName;
                         worksheet.Cells[(i + 3), (k + 2)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
                     }
 
+                    // dipslaying reserve members
                     string reserve = "";
                     for (int k = 0; k < matchdays[i].schemeLayout.Where(s => s.memberPrevention == TeamMember.PreventionStatus.Reserve).ToList().Count; k++)
                     {
                         reserve += matchdays[i].schemeLayout.Where(s => s.memberPrevention == TeamMember.PreventionStatus.Reserve).ToList()[k].memberName + ", ";
                     }
 
-                    worksheet.Cells[i + 3, 5].Value = reserve;
+                    if (string.IsNullOrEmpty(reserve)) reserve = "Geen reserve";
+                    if (string.IsNullOrEmpty(matchdays[i].location)) matchdays[i].location = "Locatie onbekend";
 
-                    worksheet.Cells[i + 3, 6].Value = matchdays[i].location;
-                    worksheet.Cells[i + 3, 7].Value = matchdays[i].matchDayDateTime.ToString("HH:mm");
+                    worksheet.Cells[i + 3, colCount+1].Value = reserve;
+                    worksheet.Cells[i + 3, colCount + 1].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+
+                    worksheet.Cells[i + 3, colCount+2].Value = matchdays[i].location;
+                    worksheet.Cells[i + 3, colCount+2].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+
+                    worksheet.Cells[i + 3, colCount+3].Value = matchdays[i].matchDayDateTime.ToString("HH:mm");
+                    worksheet.Cells[i + 3, colCount+3].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
                 }
 
                 worksheet.Column(1).Width = 16;
-                worksheet.Column(2).AutoFit();
-                worksheet.Column(3).AutoFit();
-                worksheet.Column(4).AutoFit(); 
-                worksheet.Column(5).AutoFit();   
-                worksheet.Column(6).AutoFit();   
-                worksheet.Column(7).AutoFit();   
 
-                // Convert the Excel package to a byte array
+                // set auto with to all columns
+                for (int i = 2; i < (colCount + 3); i++)
+                {
+                    worksheet.Column(i).AutoFit();
+                    worksheet.Column(i).Width += 2;     // add padding
+                }
+
                 fileContents = package.GetAsByteArray();
             }
 
-            // Return the file as a download
             return new FileContentResult(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
             {
-                FileDownloadName = "Schedule.xlsx"
+                FileDownloadName = string.Format("Schema van {0} - {1}.xlsx", team.teamName, schedule.scheduleName)
             };
         }
 
         public IActionResult ExportToPdf(Scheme scheme)
         {
+            var schedule = _scheduleService.GetGameScheduleByID(scheme.GetSchemeID());
+            var team = _teamService.GetTeamBySchemeID(scheme.GetSchemeID());
+
             using (var ms = new MemoryStream())
             {
                 var document = new iTextSharp.text.Document();
@@ -112,7 +150,7 @@ namespace MatchDayPlanner.Core.Services
 
                 // Adding title
                 var titleFont = FontFactory.GetFont("Arial", 16, Font.BOLD);
-                var titleParagraph = new Paragraph("Scheme", titleFont);
+                var titleParagraph = new Paragraph("Schema van " + schedule.scheduleName, titleFont);
                 titleParagraph.Alignment = Element.ALIGN_CENTER;
                 document.Add(titleParagraph);
 
@@ -148,6 +186,9 @@ namespace MatchDayPlanner.Core.Services
                         reserve += matchDay.schemeLayout.Where(s => s.memberPrevention == TeamMember.PreventionStatus.Reserve).ToList()[k].memberName + ", ";
                     }
 
+                    if (string.IsNullOrEmpty(reserve)) reserve = "Geen reserve";
+                    if (string.IsNullOrEmpty(matchDay.location)) matchDay.location = "Locatie onbekend";
+
                     table.AddCell(matchDay.matchDayDateTime.ToString("yyyy-MM-dd"));
                     table.AddCell(matchDay.matchDayDateTime.ToString("HH:mm"));
                     table.AddCell(matchDay.location);
@@ -169,8 +210,9 @@ namespace MatchDayPlanner.Core.Services
 
                 var file = new FileContentResult(ms.ToArray(), "application/pdf")
                 {
-                    FileDownloadName = "Schedule.pdf"
+                    FileDownloadName = string.Format("Schema van {0} - {1}.xlsx", team.teamName, schedule.scheduleName)
                 };
+
                 return file;
             }
         }

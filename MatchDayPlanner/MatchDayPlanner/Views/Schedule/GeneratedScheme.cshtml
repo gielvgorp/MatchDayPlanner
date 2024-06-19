@@ -4,6 +4,9 @@
 
 @{
     ViewData["Title"] = "Gemaakte schema";
+    ViewBag.Members = Model.team.members;
+    ViewBag.Matchdays = Model.matchDays;
+
     ViewBag.CurrentView = "GeneratedSchemeOverview";
 }
 
@@ -85,7 +88,7 @@
             }
         </div>
         <div class="col-2 d-flex flex-column justify-content-between">
-            <div class="legenda-container" style="height: auto !important;">
+            <div class="legenda-container" style="height: 90% !important;">
                 <h5 class="title">Legenda</h5>
                 <div class="legenda-item" data-status="Scheduled">
                     <div class="legenda-color matchday"></div>
@@ -102,18 +105,6 @@
                 <div class="legenda-item" data-status="NoResponse">
                     <div class="legenda-color unknown"></div>
                     <span>Onbekend</span>
-                </div>
-            </div>
-            <div>
-                <div class="legenda-container" style="height: auto !important;">
-                    <h5 class="title">Schema info</h5>
-                    @foreach (var item in Model.team.members)
-                    {
-                        <div class="legenda-item">
-                            <span>@item.memberName:</span>
-                            <span class="ms-2">@Model.matchDays.SelectMany(m => m.schemeLayout).Where(m => m.memberID.Equals(item.memberID) && m.memberPrevention == SchemeTeamMember.PreventionStatus.Scheduled).ToList().Count</span>
-                        </div>
-                    }
                 </div>
             </div>
         </div>

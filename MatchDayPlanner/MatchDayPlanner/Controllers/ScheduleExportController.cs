@@ -26,7 +26,7 @@ namespace MatchDayPlanner.Controllers
             _gameScheduleService = new GameScheduleService(new GameScheduleRepository(_dbConnectionString), _matchdayService, _teamService);
             _userManager = userManager;
             _permissionService = new PermissionService(_teamService, _gameScheduleService, _matchdayService);
-            _fileExportService = new FileExportService();
+            _fileExportService = new FileExportService(_gameScheduleService, _teamService);
         }
 
         [HttpGet("/export/{format}/{schemeID}")]

@@ -25,7 +25,7 @@
     padding-right: 10px;
 }
 
-.prevention-main-container{
+.prevention-main-container {
     width: 100%;
     height: auto;
     display: flex;
@@ -46,12 +46,14 @@
     font-family: var(--font);
 }
 
-.prevention-list-container{
+.prevention-list-container {
     flex: 1;
     height: auto;
     display: flex;
     flex-direction: column;
     gap: 15px;
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
 }
 
 .prevention-list-item{

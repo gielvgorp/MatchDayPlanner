@@ -14,25 +14,25 @@
         <div class="form-container p-4">
             <div class="form-group">
                 @Html.LabelFor(m => m.scheduleName, new { @class = "form-label text" })
-                @Html.TextBoxFor(m => m.scheduleName, new { @class = "form-control", aria_describedby = "emailHelp", placeholder = "Schema naam" })
+                @Html.TextBoxFor(m => m.scheduleName, new { @class = "form-control", autocomplete = "off", aria_describedby = "emailHelp", placeholder = "Schema naam" })
             </div>
             <div class="form-group mt-3">
                 @Html.LabelFor(m => m.numberOfPresent, new { @class = "form-label text" })
-                <input type="number" asp-for="numberOfPresent" class="form-control" />
+                <input type="number" autocomplete="off"  asp-for="numberOfPresent" class="form-control" />
             </div>
             <div class="form-group mt-3">
                 @Html.LabelFor(m => m.schemeDeadline, new { @class = "form-label text" })
-                <input type="datetime-local" asp-for="schemeDeadline" class="form-control" />
+                <input type="datetime-local" autocomplete="off" asp-for="schemeDeadline" class="form-control" />
             </div>
             <div class="form-group mt-3">
                 <div class="row">
                     <div class="form-group col-6">
                         @Html.LabelFor(m => m.startDate, new { @class = "form-label text" })
-                        <input type="date" asp-for="startDate" class="form-control" />
+                        <input type="date" autocomplete="off" asp-for="startDate" class="form-control" />
                     </div>
                     <div class="form-group col-6">
                         @Html.LabelFor(m => m.endDate, new { @class = "form-label text" })
-                        <input type="date" asp-for="endDate" class="form-control" />
+                        <input type="date" autocomplete="off" asp-for="endDate" class="form-control" />
                     </div>
                 </div>
             </div>

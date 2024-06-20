@@ -23,10 +23,10 @@ namespace MatchDayPlanner.Controllers
             _dbConnectionString = iConfig.GetConnectionString("DbConnection");
             _teamService = new TeamService(new TeamRepository(_dbConnectionString));
             _matchdayService = new MatchDayService(new MatchDayRepository(_dbConnectionString));
-            _gameScheduleService = new GameScheduleService(new GameScheduleRepository(_dbConnectionString), _matchdayService, _teamService);
+            _gameScheduleService = new GameScheduleService(new GameScheduleRepository(_dbConnectionString), _matchdayService, _teamService, new PreventionService(new PreventionRepository(_dbConnectionString)));
             _userManager = userManager;
-            _permissionService = new PermissionService(Guid.Parse(_userManager.GetUserId(this.User)), _teamService, _gameScheduleService, _matchdayService);
-            _fileExportService = new FileExportService();
+            _permissionService = new PermissionService(_teamService, _gameScheduleService, _matchdayService);
+            _fileExportService = new FileExportService(_gameScheduleService, _teamService);
         }
 
         [HttpGet("/export/{format}/{schemeID}")]
@@ -34,7 +34,7 @@ namespace MatchDayPlanner.Controllers
         {
             try
             {
-                _permissionService.AllowedToFetchSchedule(schemeID);
+                _permissionService.AllowedToFetchSchedule(schemeID, Guid.Parse(_userManager.GetUserId(this.User)));
 
                 var scheme = _gameScheduleService.GetFullScheme(schemeID);
                 if (scheme == null)

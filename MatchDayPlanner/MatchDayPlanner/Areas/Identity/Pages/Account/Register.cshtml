@@ -5,10 +5,7 @@
     Layout = "~/Areas/Identity/Pages/_AuthLayout.cshtml";
 }
 
-<h2>@ViewData["Title"]</h2>
-<form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-    <h5>Maak hieronder gratis je account aan!</h5>
-    <hr />
+<form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="w-100 pt-3">
     <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
     <div class="row">
         <div class="col-6">
@@ -45,6 +42,11 @@
         <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
     </div>
     <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+    <div>
+        <p>
+            <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl">Heb je al een account?</a>
+        </p>
+    </div>
 </form>
 
 @section Scripts {

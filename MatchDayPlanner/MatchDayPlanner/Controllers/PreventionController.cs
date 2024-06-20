@@ -23,8 +23,8 @@ namespace MatchDayPlanner.Controllers
             _teamService = new TeamService(new TeamRepository(_dbConnectionString));
             _matchdayService = new MatchDayService(new MatchDayRepository(_dbConnectionString));
             _preventionService = new PreventionService(new PreventionRepository(_dbConnectionString));
-            _gameScheduleService = new GameScheduleService(new GameScheduleRepository(_dbConnectionString), _matchdayService, _teamService);
-            _permissionService = new PermissionService(Guid.Parse(""), _teamService, _gameScheduleService, _matchdayService);
+            _gameScheduleService = new GameScheduleService(new GameScheduleRepository(_dbConnectionString), _matchdayService, _teamService, _preventionService);
+            _permissionService = new PermissionService( _teamService, _gameScheduleService, _matchdayService);
         }
 
         [HttpGet("/prevention/{teamID}/{schemeID}")]

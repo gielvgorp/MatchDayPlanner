@@ -22,16 +22,18 @@ namespace MatchDayPlanner.Controllers
         private readonly MatchDayService _matchdayService;
         private readonly SchemePlannerService _schemePlannerService;
         private readonly PermissionService _permissionService;
+        private readonly PreventionService _preventionService;
         private readonly string _dbConnectionString = "";
         public ScheduleController(IConfiguration iConfig, UserManager<ApplicationUser> userManager)
         {
             _dbConnectionString = iConfig.GetConnectionString("DbConnection");
             _teamService = new TeamService(new TeamRepository(_dbConnectionString));
             _matchdayService = new MatchDayService(new MatchDayRepository(_dbConnectionString));
-            _gameScheduleService = new GameScheduleService(new GameScheduleRepository(_dbConnectionString), _matchdayService, _teamService);
+            _gameScheduleService = new GameScheduleService(new GameScheduleRepository(_dbConnectionString), _matchdayService, _teamService, new PreventionService(new PreventionRepository(_dbConnectionString)));
             _schemePlannerService = new SchemePlannerService(_teamService, _gameScheduleService, _matchdayService, new PreventionService(new PreventionRepository(_dbConnectionString)));
+            _preventionService = new PreventionService(new PreventionRepository(_dbConnectionString));
             _userManager = userManager;
-            _permissionService = new PermissionService(Guid.Parse(_userManager.GetUserId(this.User)), _teamService, _gameScheduleService, _matchdayService);
+            _permissionService = new PermissionService(_teamService, _gameScheduleService, _matchdayService);
         }
 
         [HttpGet("/team/add/{teamID}")]
@@ -39,7 +41,7 @@ namespace MatchDayPlanner.Controllers
         {
             try
             {
-                _permissionService.AllowedToFetchTeam(TeamID);
+                _permissionService.AllowedToFetchTeam(TeamID, Guid.Parse(_userManager.GetUserId(this.User)));
 
                 CreateScheduleViewModel model = new CreateScheduleViewModel();
                 model.TeamID = TeamID;
@@ -63,7 +65,7 @@ namespace MatchDayPlanner.Controllers
                     return View(model);
                 }
 
-                _permissionService.AllowedToFetchTeam(teamID);
+                _permissionService.AllowedToFetchTeam(teamID, Guid.Parse(_userManager.GetUserId(this.User)));
 
                 GameSchedules schedule = new GameSchedules
                 {
@@ -91,7 +93,7 @@ namespace MatchDayPlanner.Controllers
         {
             try
             {
-                _permissionService.AllowedToFetchSchedule(scheduleID);
+                _permissionService.AllowedToFetchSchedule(scheduleID, Guid.Parse(_userManager.GetUserId(this.User)));
 
                 ScheduleViewModel model = new ScheduleViewModel();
                 GameSchedules schedule = _gameScheduleService.GetGameScheduleByID(scheduleID);
@@ -118,7 +120,7 @@ namespace MatchDayPlanner.Controllers
         {
             try
             {
-                _permissionService.AllowedToFetchSchedule(model.schemeID);
+                _permissionService.AllowedToFetchSchedule(model.schemeID, Guid.Parse(_userManager.GetUserId(this.User)));
 
                 if (submitButton == "save")
                 {
@@ -146,6 +148,17 @@ namespace MatchDayPlanner.Controllers
                 }
 
                 _gameScheduleService.Delete(model.schemeID);
+
+                _preventionService.DeleteAllPresentComment(model.schemeID);
+                _gameScheduleService.DeleteSchemeFeedbackBySchemeID(model.schemeID);
+
+                foreach (SchemeMatchDay matchDay in _matchdayService.GetAllMatchDays(model.schemeID))
+                {
+                    _matchdayService.RemoveMatchday(matchDay.schemeID, matchDay.matchDayDateTime.ToString());
+                    _preventionService.DeleteAllPreventions(matchDay.schemeID);
+                    _preventionService.DeleteAllPresentComment(model.schemeID);
+                }
+
                 TempData["SuccessMessage"] = "Schema verwijderd!";
                 return RedirectToAction("Index", "Team");
             }
@@ -161,10 +174,18 @@ namespace MatchDayPlanner.Controllers
         {
             try
             {
-                _permissionService.AllowedToFetchSchedule(scheduleID);
+                _permissionService.AllowedToFetchSchedule(scheduleID, Guid.Parse(_userManager.GetUserId(this.User)));
 
                 ScheduleOverviewViewModel model = new ScheduleOverviewViewModel();
                 model.Scheme = _gameScheduleService.GetGameScheduleByID(scheduleID);
+                model.presentComments = _preventionService.GetAllPresentComments(scheduleID);
+                model.SchemeFeedback = _gameScheduleService.GetScheduleFeedbacks(scheduleID);
+
+                foreach (var comment in model.presentComments)
+                {
+                    comment.teamMember = _teamService.GetTeamMemberByID(comment.memberID);
+                }
+
                 model.SchemeMatchDay = _matchdayService.GetAllMatchDays(scheduleID);
                 ViewBag.SharedURL = string.Format("https://localhost:7294/prevention/{0}/{1}", model.Scheme.teamID, model.Scheme.schemeID);
                 ViewBag.SchemeID = scheduleID;
@@ -185,7 +206,7 @@ namespace MatchDayPlanner.Controllers
         {
             try
             {
-                _permissionService.CheckMatchdayPermission(matchdayID);
+                _permissionService.CheckMatchdayPermission(matchdayID, Guid.Parse(_userManager.GetUserId(this.User)));
 
                 var scheme = _matchdayService.GetMatchdayByID(matchdayID);
 
@@ -211,7 +232,7 @@ namespace MatchDayPlanner.Controllers
         {
             try
             {
-                _permissionService.CheckMatchdayPermission(model.matchDayID);
+                _permissionService.CheckMatchdayPermission(model.matchDayID, Guid.Parse(_userManager.GetUserId(this.User)));
 
                 DateTime matchdayDateTime = _matchdayService.GetMatchdayByID(model.matchDayID).matchDayDateTime;
                 TimeSpan ts = matchdayTime;
@@ -245,10 +266,10 @@ namespace MatchDayPlanner.Controllers
                 MatchDayOverviewModel model = new MatchDayOverviewModel();
                 model.MatchDay = _matchdayService.GetMatchday(schemeID, date);
 
-                _permissionService.CheckMatchdayPermission(model.MatchDay.matchDayID);
-
                 if (model.MatchDay == null)
                     throw new Exception("De geselecteerde dag is geen wedstrijddag!");
+
+                _permissionService.CheckMatchdayPermission(model.MatchDay.matchDayID, Guid.Parse(_userManager.GetUserId(this.User)));
 
                 ViewBag.matchdayID = model.MatchDay.matchDayID;
                 ViewBag.location = model.MatchDay.location.Trim();
@@ -295,7 +316,11 @@ namespace MatchDayPlanner.Controllers
         {
             try
             {
-                _permissionService.AllowedToFetchSchedule(schemeID);
+                _permissionService.AllowedToFetchSchedule(schemeID, Guid.Parse(_userManager.GetUserId(this.User)));
+                int status = _gameScheduleService.GetGameScheduleByID(schemeID).scheduleStatus;
+
+                if(status == 1)
+                    throw new Exception("Schema is al gepubliceerd");
 
                 if (add)
                 {
@@ -319,7 +344,7 @@ namespace MatchDayPlanner.Controllers
         {
             try
             {
-                _permissionService.AllowedToFetchSchedule(scheduleID);
+                _permissionService.AllowedToFetchSchedule(scheduleID, Guid.Parse(_userManager.GetUserId(this.User)));
 
                 if (TempData["ErrorMessage"] != null)
                 {
@@ -414,7 +439,7 @@ namespace MatchDayPlanner.Controllers
         {
             try
             {
-                _permissionService.AllowedToFetchSchedule(schemeID);
+                _permissionService.AllowedToFetchSchedule(schemeID, Guid.Parse(_userManager.GetUserId(this.User)));
 
                 List<MatchDayPlanner.Core.SchemePlanner.MatchDay> matchDays = new List<MatchDayPlanner.Core.SchemePlanner.MatchDay>();
                 matchDays.AddRange(model.matchDays.Select(m => new MatchDayPlanner.Core.SchemePlanner.MatchDay

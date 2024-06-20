@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using MatchDayPlanner.Data;
 using MatchDayPlanner.Areas.Identity.Data;
 var builder = WebApplication.CreateBuilder(args);
-var connectionString = builder.Configuration.GetConnectionString("AuthDbContextConnection") ?? throw new InvalidOperationException("Connection string 'AuthDbContextConnection' not found.");
+var connectionString = builder.Configuration.GetConnectionString("AuthDbConnection") ?? throw new InvalidOperationException("Connection string 'DbConnection' not found.");
 
 builder.Services.AddDbContext<AuthDbContext>(options => options.UseSqlServer(connectionString));
 
@@ -16,6 +16,7 @@ builder.Services.AddRazorPages();
 builder.Services.Configure<IdentityOptions>(options =>
 {
     options.Password.RequireUppercase = false;
+    options.User.RequireUniqueEmail = true;
 });
 
 var app = builder.Build();

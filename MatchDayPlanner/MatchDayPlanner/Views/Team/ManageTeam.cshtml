@@ -8,7 +8,7 @@
 }
 <link rel="stylesheet" href="~/css/manageTeam.css" asp-append-version="true" />
 
-<div class="page-content players">
+<div class="page-content players pb-2">
     @foreach (TeamMemberViewModel member in Model.members.OrderByDescending(m => m.memberID == Model.teamCaptainID))
     {
         <div class="player-container">
@@ -30,8 +30,8 @@
         @using (Html.BeginForm("AddPlayer", "Team", FormMethod.Post, new { @style = "width: 100%"}))
         {
             <div class="player-container add-player">
-                <input name="playerName" class="text" placeholder="John Doe" />
-                <input name="playerEmail" class="text" placeholder="Johndoe@example.com" />
+                <input name="playerName" class="text" placeholder="John Doe" autocomplete="off" />
+                <input name="playerEmail" class="text" placeholder="Johndoe@example.com" autocomplete="off" />
                 <input name="teamID" value="@ViewBag.TeamID" type="hidden" />
                 <div class="submit text">
                     <button class="text">Toevoegen</button>

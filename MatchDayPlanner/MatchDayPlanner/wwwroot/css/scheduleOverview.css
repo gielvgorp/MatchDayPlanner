@@ -58,5 +58,7 @@
 
 .day-cell-disabled {
     pointer-events: none;
+    cursor: not-allowed;
     background: #71797E;
+    color: lightgray;
 }

@@ -24,7 +24,7 @@ namespace MatchDayPlanner.Core.Services
         }
 
 
-        public void AllowedToFetchTeam(Guid teamID, Guid uid)
+        public bool AllowedToFetchTeam(Guid teamID, Guid uid)
         {
             Team team = _teamService.GetTeamByID(teamID);
             if (team != null) 
@@ -39,7 +39,7 @@ namespace MatchDayPlanner.Core.Services
         }
 
 
-        public void AllowedToFetchTeamMember(Guid teamID, Guid teamMember, Guid uid) 
+        public bool AllowedToFetchTeamMember(Guid teamID, Guid teamMember, Guid uid) 
         {
             Team team = _teamService.GetTeamByID(teamID);
             TeamMember member = _teamService.GetTeamMemberByID(teamMember);
@@ -54,7 +54,7 @@ namespace MatchDayPlanner.Core.Services
             return true;
         }
 
-        public void AllowedToFetchSchedule(Guid scheduleID, Guid uid)
+        public bool AllowedToFetchSchedule(Guid scheduleID, Guid uid)
         {
             GameSchedules scheme = _gameScheduleService.GetGameScheduleByID(scheduleID);
 
@@ -62,7 +62,7 @@ namespace MatchDayPlanner.Core.Services
             {
                 Team team = _teamService.GetTeamByID(scheme.teamID);
 
-                if (team != null && team.teamCreatedBy == userID)
+                if (team != null && team.teamCreatedBy == uid)
                 {
                     return true;
                 }

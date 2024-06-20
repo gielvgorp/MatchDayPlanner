@@ -22,6 +22,16 @@ namespace MatchDayPlanner.Core.Services
             _preventionRepository.DeletePrevention(matchDayID, memberID);
         }
 
+        public void DeleteAllPreventions(Guid matchdayID)
+        {
+            _preventionRepository.DeleteAllPreventions(matchdayID);
+        }
+
+        public void DeleteAllPresentComment(Guid schemeID)
+        {
+            _preventionRepository.DeleteAllPresentComment(schemeID);
+        }
+
         public void AddPrevention(Guid matchDayID, Guid memberID, Guid schemeID, int status)
         {
             _preventionRepository.AddPrevention(matchDayID, memberID, schemeID, status);
@@ -30,6 +40,13 @@ namespace MatchDayPlanner.Core.Services
         public SchedulePresentComment GetPresentComment(Guid schemeID, Guid memberID)
         {
             return _preventionRepository.GetPresentComment(schemeID, memberID);
+        }
+
+        public List<SchedulePresentComment> GetAllPresentComments(Guid schemeID)
+        {
+            var comments = _preventionRepository.GetAllPresentComments(schemeID);
+
+            return comments;
         }
 
         public List<ScheduleLayout> GetPreventionsOfMember(Guid schemeID, Guid memberID)

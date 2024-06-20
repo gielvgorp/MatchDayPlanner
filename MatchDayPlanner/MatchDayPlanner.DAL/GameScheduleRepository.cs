@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data.SqlClient;
 using Microsoft.AspNetCore.Mvc;
+using MatchDayPlanner.Core.SchemePlanner;
 
 namespace MatchDayPlanner.DAL
 {
@@ -195,6 +196,48 @@ namespace MatchDayPlanner.DAL
             }
 
             return result;
+        }
+
+        public void DeleteSchemeFeedbackByID(Guid feedbackID)
+        {
+            string query = "DELETE FROM SchedulesFeedback WHERE FeedbackID = @feedbackID";
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@feedbackID", feedbackID);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void DeleteSchemeFeedbackByMemberID(Guid memberID)
+        {
+            string query = "DELETE FROM SchedulesFeedback WHERE MemberID = @memberID";
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@memberID", memberID);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void DeleteSchemeFeedbackBySchemeID(Guid schemeID)
+        {
+            string query = "DELETE FROM SchedulesFeedback WHERE SchemeID = @schemeID";
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@schemeID", schemeID);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
         }
     }
 }

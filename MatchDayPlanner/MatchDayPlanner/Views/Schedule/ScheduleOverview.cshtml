@@ -73,4 +73,49 @@
             </div>
         }
     </div>
+    <div class="row">
+        <div class="col-6">
+            <h3 class="text">Verhinder opmerkingen:</h3>
+            @if (Model.presentComments.Count == 0)
+            {
+                <p class="text">Geen feedback gevonden</p>
+            }
+
+
+            @foreach (var feedback in Model.presentComments)
+            {
+                <div class="feedback-container ps-2 pt-2 pb-3">
+                    <div class="d-flex gap-2 align-items-center">
+                        <h6 class="text">@feedback.teamMember.memberName</h6>
+                    </div>
+                    <p class="w-50 text-white fw-light">
+                        @feedback.comment
+                    </p>
+                    <hr class="text-white w-50" />
+                </div>
+            }
+        </div>
+        <div class="col-6">
+            <h3 class="text">Schema opmerkingen:</h3>
+
+                @if (Model.SchemeFeedback.Count == 0)
+                {
+                    <p class="text">Geen feedback gevonden</p>
+                }
+
+                @foreach (var feedback in Model.SchemeFeedback)
+                {
+                    <div class="feedback-container ps-2 pt-2 pb-3">
+                        <div class="d-flex gap-2 align-items-center">
+                            <h6 class="text">@feedback.member.memberName</h6>
+                            <span class="text text-secondary"> - @(new DateOnly(feedback.feedbackDateTime.Year, feedback.feedbackDateTime.Month, feedback.feedbackDateTime.Day).ToString("dd MMMM yyyy", CultureInfo.CreateSpecificCulture("nl"))) @feedback.feedbackDateTime.ToString("HH:mm")</span>
+                        </div>
+                        <p class="w-50 text-white fw-light">
+                            @feedback.feedbackMessage
+                        </p>
+                        <hr class="text-white w-50" />
+                    </div>
+                }
+        </div>
+    </div>
 </div>

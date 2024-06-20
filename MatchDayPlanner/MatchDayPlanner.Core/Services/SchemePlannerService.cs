@@ -54,10 +54,23 @@ namespace MatchDayPlanner.Core.Services
             List<MatchDay> matchdays = new List<MatchDay>();
             var preventions = _matchDayService.GetPreventedOfMember(memberID, schemeID);
 
-            preventions.ForEach(m =>
+            foreach (var item in preventions)
             {
-                matchdays.Add(new MatchDay(m.matchDayID, matchDays.Where(md => md.matchDayID == m.matchDayID).FirstOrDefault().matchDayDateTime, matchDays.Where(md => md.matchDayID == m.matchDayID).FirstOrDefault().location));
-            });
+                if(_matchDayService.GetMatchdayByID(item.matchDayID) != null)
+                {
+                    MatchDay md = new MatchDay();
+                    md.matchDayID = item.matchDayID;
+                    md.matchDayDateTime = this.matchDays.Where(m => m.matchDayID == item.matchDayID).FirstOrDefault().matchDayDateTime;
+                    md.location = this.matchDays.Where(m => md.matchDayID == item.matchDayID).FirstOrDefault().location;
+
+                    matchdays.Add(md);
+                }
+            }
+
+          /*  preventions.ForEach(m =>
+            {
+                matchdays.Add(new MatchDay(m.matchDayID, this.matchDays.Where(md => md.matchDayID == m.matchDayID).FirstOrDefault().matchDayDateTime, this.matchDays.Where(md => md.matchDayID == m.matchDayID).FirstOrDefault().location));
+            });*/
 
             return matchdays;
         }

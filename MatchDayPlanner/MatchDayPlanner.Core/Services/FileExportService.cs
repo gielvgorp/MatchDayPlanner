@@ -35,7 +35,7 @@ namespace MatchDayPlanner.Core.Services
                 var worksheet = package.Workbook.Worksheets.Add("Sheet1");
                 var matchdays = scheme.GetSchemeLayout();
 
-                worksheet.Cells[2, 1].Value = "Date";
+                worksheet.Cells[2, 1].Value = "Datum";
                 worksheet.Cells[2, 1].Style.Font.Bold = true;
                 worksheet.Cells[2, 1].Style.Font.Size = 20;
                 worksheet.Cells[2, 1].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;

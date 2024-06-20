@@ -1,5 +1,6 @@
 ﻿using MatchDayPlanner.Core.Entities;
 using MatchDayPlanner.Core.Interfaces;
+using MatchDayPlanner.Core.SchemePlanner;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -33,8 +34,25 @@ namespace MatchDayPlanner.DAL
             }
         }
 
+        public void DeleteAllPreventions(Guid matchdayID)
+        {
+            string query = "DELETE FROM ScheduleLayout WHERE matchDayID = @matchDayID";
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@matchDayID", matchdayID);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+
         public void AddPrevention(Guid matchDayID, Guid memberID, Guid schemeID, int preventionStatus)
         {
+            if (memberID == Guid.Empty)
+                throw new Exception("Member ID kan niet leeg zijn!");
+
             string query = "INSERT INTO ScheduleLayout (matchDayID, memberID, isPresent, schemeID) VALUES (@matchDayID, @memberID, @preventionStatus, @schemeID)";
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -132,6 +150,33 @@ namespace MatchDayPlanner.DAL
             return null;
         }
 
+        public List<SchedulePresentComment> GetAllPresentComments(Guid schemeID)
+        {
+            string query = "SELECT * FROM SchedulePresentComments WHERE schemeID = @schemeID";
+            var result = new List<SchedulePresentComment>();
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@schemeID", schemeID);
+                    connection.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            SchedulePresentComment comment = new SchedulePresentComment();
+                            comment.schemeID = reader.GetGuid(reader.GetOrdinal("schemeID"));
+                            comment.memberID = reader.GetGuid(reader.GetOrdinal("memberID"));
+                            comment.comment = reader.GetString(reader.GetOrdinal("comment"));
+
+                            result.Add(comment);
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
         public void UpdatePresentComment(Guid schemeID, Guid memberID, string message)
         {
             string query = "INSERT INTO SchedulePresentComments (schemeID, memberID, comment) VALUES (@schemeID, @memberID, @comment)";
@@ -157,6 +202,20 @@ namespace MatchDayPlanner.DAL
                 {
                     command.Parameters.AddWithValue("@schemeID", schemeID);
                     command.Parameters.AddWithValue("@memberID", memberID);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void DeleteAllPresentComment(Guid schemeID)
+        {
+            string query = "DELETE FROM SchedulePresentComments WHERE schemeID = @schemeID";
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@schemeID", schemeID);
                     connection.Open();
                     command.ExecuteNonQuery();
                 }

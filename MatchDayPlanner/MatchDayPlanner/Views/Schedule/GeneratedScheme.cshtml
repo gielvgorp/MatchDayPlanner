@@ -50,7 +50,7 @@
                                         else
                                             @("Niet gereageerd")
                                     </p>
-                                    <input type="hidden" name="matchDays[@i].schemeLayout[@j].memberPrevention" value="@sortedSchemeLayout[j].memberPrevention" />
+                                    <input type="hidden" id="prevention-status" name="matchDays[@i].schemeLayout[@j].memberPrevention" value="@sortedSchemeLayout[j].memberPrevention" />
                                     <input type="hidden" name="matchDays[@i].schemeLayout[@j].memberName" value="@sortedSchemeLayout[j].memberName" />
                                     <input type="hidden" name="matchDays[@i].schemeLayout[@j].memberID" value="@sortedSchemeLayout[j].memberID" />
                                 </div>
@@ -72,7 +72,7 @@
                                     @("Niet gereageerd")
 
                             </p>
-                            <input type="hidden" name="matchDays[@i].schemeLayout[@m].memberPrevention" value="@sortedSchemeLayout[m].memberPrevention" />
+                                    <input type="hidden" id="prevention-status" name="matchDays[@i].schemeLayout[@m].memberPrevention" value="@sortedSchemeLayout[m].memberPrevention" />
                             <input type="hidden" name="matchDays[@i].schemeLayout[@m].memberName" value="@sortedSchemeLayout[m].memberName" />
                             <input type="hidden" name="matchDays[@i].schemeLayout[@m].memberID" value="@sortedSchemeLayout[m].memberID" />
                             <p> | Niet gereageerd</p>

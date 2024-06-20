@@ -6,6 +6,7 @@ using MatchDayPlanner.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.TagHelpers;
 
 namespace MatchDayPlanner.Controllers
 {
@@ -14,6 +15,7 @@ namespace MatchDayPlanner.Controllers
     {
         private readonly TeamService _teamService;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly PreventionService _preventionService;
         private readonly MatchDayService _matchdayService;
         private readonly GameScheduleService _gameScheduleService;
         private readonly PermissionService _permissionService;
@@ -24,8 +26,9 @@ namespace MatchDayPlanner.Controllers
         {
             _dbConnectionString = iConfig.GetConnectionString("DbConnection");
             _teamService = new TeamService(new TeamRepository(_dbConnectionString));
+            _preventionService = new PreventionService(new PreventionRepository(_dbConnectionString));
             _matchdayService = new MatchDayService(new MatchDayRepository(_dbConnectionString));
-            _gameScheduleService = new GameScheduleService(new GameScheduleRepository(_dbConnectionString), _matchdayService, _teamService);
+            _gameScheduleService = new GameScheduleService(new GameScheduleRepository(_dbConnectionString), _matchdayService, _teamService, new PreventionService(new PreventionRepository(_dbConnectionString)));
             _userManager = userManager;
             _permissionService = new PermissionService(_teamService, _gameScheduleService, _matchdayService);
         }
@@ -118,6 +121,28 @@ namespace MatchDayPlanner.Controllers
                 }
 
                 _teamService.DeleteTeam(model.teamID);
+
+                // delete all team members that belongs to that team
+                foreach (TeamMember member in _teamService.GetTeamMembers(model.teamID))
+                {
+                    _teamService.DeleteTeamMember(member.memberID);
+                }
+
+                // Delete all scheme data in database that belongs to that team
+                foreach (GameSchedules schedule in _gameScheduleService.GetGameSchedules(model.teamID))
+                {
+                    _gameScheduleService.Delete(schedule.schemeID);
+                    _preventionService.DeleteAllPresentComment(schedule.schemeID);
+                    _gameScheduleService.DeleteSchemeFeedbackBySchemeID(schedule.schemeID);
+
+                    foreach (SchemeMatchDay matchDay in _matchdayService.GetAllMatchDays(schedule.schemeID))
+                    {
+                        _matchdayService.RemoveMatchday(matchDay.schemeID, matchDay.matchDayDateTime.ToString());
+                        _preventionService.DeleteAllPreventions(matchDay.schemeID);
+                        _preventionService.DeleteAllPresentComment(schedule.schemeID);
+                    }
+                }
+
                 TempData["SuccessMessage"] = "Team verwijderd!";
                 return RedirectToAction("Index", "Team");
             }
@@ -191,7 +216,7 @@ namespace MatchDayPlanner.Controllers
 
                 return View(model);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 TempData["ErrorMessage"] = "Gegevens van het team ophalen is mislukt!";
                 return RedirectToAction("Index", "Team");
@@ -278,6 +303,7 @@ namespace MatchDayPlanner.Controllers
                     }
 
                     _teamService.DeleteTeamMember(model.memberID);
+
                 }
 
                 TempData["SuccessMessage"] = "Veranderingen opgeslagen!";

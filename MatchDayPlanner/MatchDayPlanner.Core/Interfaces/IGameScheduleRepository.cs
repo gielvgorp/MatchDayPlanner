@@ -17,5 +17,8 @@ namespace MatchDayPlanner.Core.Interfaces
         public void UpdateScheduleStatus(Guid schemeID, int statusCode);
         public void SaveSchemeFeedback(Guid memberID, Guid schemeID, string message);
         public List<ScheduleFeedback> GetSchemeFeedback(Guid schemeID);
+        public void DeleteSchemeFeedbackByID(Guid feedbackID);
+        public void DeleteSchemeFeedbackByMemberID(Guid memberID);
+        public void DeleteSchemeFeedbackBySchemeID(Guid schemeID);
     }
 }

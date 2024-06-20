@@ -22,14 +22,16 @@ namespace MatchDayPlanner.Controllers
         private readonly MatchDayService _matchdayService;
         private readonly SchemePlannerService _schemePlannerService;
         private readonly PermissionService _permissionService;
+        private readonly PreventionService _preventionService;
         private readonly string _dbConnectionString = "";
         public ScheduleController(IConfiguration iConfig, UserManager<ApplicationUser> userManager)
         {
             _dbConnectionString = iConfig.GetConnectionString("DbConnection");
             _teamService = new TeamService(new TeamRepository(_dbConnectionString));
             _matchdayService = new MatchDayService(new MatchDayRepository(_dbConnectionString));
-            _gameScheduleService = new GameScheduleService(new GameScheduleRepository(_dbConnectionString), _matchdayService, _teamService);
+            _gameScheduleService = new GameScheduleService(new GameScheduleRepository(_dbConnectionString), _matchdayService, _teamService, new PreventionService(new PreventionRepository(_dbConnectionString)));
             _schemePlannerService = new SchemePlannerService(_teamService, _gameScheduleService, _matchdayService, new PreventionService(new PreventionRepository(_dbConnectionString)));
+            _preventionService = new PreventionService(new PreventionRepository(_dbConnectionString));
             _userManager = userManager;
             _permissionService = new PermissionService(_teamService, _gameScheduleService, _matchdayService);
         }
@@ -146,6 +148,17 @@ namespace MatchDayPlanner.Controllers
                 }
 
                 _gameScheduleService.Delete(model.schemeID);
+
+                _preventionService.DeleteAllPresentComment(model.schemeID);
+                _gameScheduleService.DeleteSchemeFeedbackBySchemeID(model.schemeID);
+
+                foreach (SchemeMatchDay matchDay in _matchdayService.GetAllMatchDays(model.schemeID))
+                {
+                    _matchdayService.RemoveMatchday(matchDay.schemeID, matchDay.matchDayDateTime.ToString());
+                    _preventionService.DeleteAllPreventions(matchDay.schemeID);
+                    _preventionService.DeleteAllPresentComment(model.schemeID);
+                }
+
                 TempData["SuccessMessage"] = "Schema verwijderd!";
                 return RedirectToAction("Index", "Team");
             }
@@ -165,6 +178,14 @@ namespace MatchDayPlanner.Controllers
 
                 ScheduleOverviewViewModel model = new ScheduleOverviewViewModel();
                 model.Scheme = _gameScheduleService.GetGameScheduleByID(scheduleID);
+                model.presentComments = _preventionService.GetAllPresentComments(scheduleID);
+                model.SchemeFeedback = _gameScheduleService.GetScheduleFeedbacks(scheduleID);
+
+                foreach (var comment in model.presentComments)
+                {
+                    comment.teamMember = _teamService.GetTeamMemberByID(comment.memberID);
+                }
+
                 model.SchemeMatchDay = _matchdayService.GetAllMatchDays(scheduleID);
                 ViewBag.SharedURL = string.Format("https://localhost:7294/prevention/{0}/{1}", model.Scheme.teamID, model.Scheme.schemeID);
                 ViewBag.SchemeID = scheduleID;

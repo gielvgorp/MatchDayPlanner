@@ -14,11 +14,13 @@ namespace MatchDayPlanner.Core.Services
         private readonly IGameScheduleRepository _gameScheduleRepository;
         private readonly MatchDayService _matchdayService;
         private readonly TeamService _teamService;
+        private readonly PreventionService _preventionService;
 
-        public GameScheduleService(IGameScheduleRepository c_gameScheduleRepository, MatchDayService c_matchdayService, TeamService c_teamService)
+        public GameScheduleService(IGameScheduleRepository c_gameScheduleRepository, MatchDayService c_matchdayService, TeamService c_teamService, PreventionService c_preventionService)
         {
             _gameScheduleRepository = c_gameScheduleRepository;
             _teamService = c_teamService;
+            _preventionService = c_preventionService;
             this._matchdayService = c_matchdayService;
         }
 
@@ -55,6 +57,17 @@ namespace MatchDayPlanner.Core.Services
         public void Delete(Guid schemeID)
         {
             _gameScheduleRepository.Delete(schemeID);
+
+            var matchdays = _matchdayService.GetAllMatchDays(schemeID);
+
+            foreach (var item in matchdays)
+            {
+                _matchdayService.RemoveMatchday(item.schemeID, item.matchDayDateTime.ToString());
+                var preventions = _matchdayService.GetPreventions(item.matchDayID);
+
+                _preventionService.DeleteAllPreventions(item.matchDayID);
+                _preventionService.DeleteAllPresentComment(schemeID);
+            }
         }
         public void UpdateScheduleStatus(Guid schemeID, int statusCode)
         {
@@ -127,6 +140,21 @@ namespace MatchDayPlanner.Core.Services
             });
 
             return feedback;
+        }
+
+        public void DeleteSchemeFeedbackByID(Guid feedbackID)
+        {
+            _gameScheduleRepository.DeleteSchemeFeedbackByID(feedbackID);
+        }
+
+        public void DeleteSchemeFeedbackByMemberID(Guid memberID)
+        {
+            _gameScheduleRepository.DeleteSchemeFeedbackByMemberID(memberID);
+        }
+
+        public void DeleteSchemeFeedbackBySchemeID(Guid schemeID)
+        {
+            _gameScheduleRepository.DeleteSchemeFeedbackBySchemeID(schemeID);
         }
     }
 }

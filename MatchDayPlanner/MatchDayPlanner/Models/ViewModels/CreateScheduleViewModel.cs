@@ -14,6 +14,7 @@ namespace MatchDayPlanner.Models.ViewModels
         [Display(Name = "Einde periode"), Required]
         public DateTime DateEnd { get; set; }
         [Display(Name = "Aantal verplichte aanwezige"), Required]
+        [Range(1, int.MaxValue, ErrorMessage = "Waarde moet boven 0 zijn!")]
         public int numberOfPresent { get; set; }
     }
 }

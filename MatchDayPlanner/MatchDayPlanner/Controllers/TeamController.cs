@@ -161,6 +161,11 @@ namespace MatchDayPlanner.Controllers
                 List<TeamViewModel> teams = new List<TeamViewModel> { new TeamViewModel { teamID = Guid.NewGuid(), teamCaptainID = Guid.NewGuid(), teamName = model.TeamName } };
                 _teamService.CreateTeam(model.TeamName, Guid.Parse(_userManager.GetUserId(this.User)));
             }
+            else
+            {
+                TempData["ErrorMessage"] = "Voer een team naam in!";
+                return View(model);
+            }
 
             TempData["SuccessMessage"] = "Team succesvol aangemaakt!";
             return RedirectToAction("Index", "Team");
@@ -321,6 +326,9 @@ namespace MatchDayPlanner.Controllers
         {
             try
             {
+                if (string.IsNullOrEmpty(playerName))
+                    throw new Exception("Spelernaam is leeg!");
+
                 _permissionService.AllowedToFetchTeam(Guid.Parse(teamID), Guid.Parse(_userManager.GetUserId(this.User)));
 
                 _teamService.AddTeamMember(Guid.Parse(teamID), playerName, playerEmail);
@@ -329,7 +337,7 @@ namespace MatchDayPlanner.Controllers
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = ex.Message;
-                return RedirectToAction("Index", "Team");
+                return RedirectToAction("ManageTeam", "Team", new { add = "true", teamID = teamID });
             }
         }
     }

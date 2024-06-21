@@ -8,14 +8,12 @@ using MatchDayPlanner.Core.Tests.DAL;
 [TestClass]
 public class GameScheduleRepositoryTests
 {
-   // private IGameScheduleRepository _repository;
     private GameScheduleService _gameScheduleService;
 
     [TestInitialize]
     public void Setup()
     {
-        _gameScheduleService = new GameScheduleService(new FakeGameScheduleRepository(), new MatchDayService(new FakeMatchDayRepository()), new TeamService(new FakeTeamRepository()));
-        //_repository = new FakeGameScheduleRepository();
+        _gameScheduleService = new GameScheduleService(new FakeGameScheduleRepository(), new MatchDayService(new FakeMatchDayRepository()), new TeamService(new FakeTeamRepository()), new PreventionService(null));
     }
 
     [TestMethod("Create game schedule")]

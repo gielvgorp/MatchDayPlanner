@@ -71,14 +71,14 @@ namespace MatchDayPlanner.Core.Services
             throw new Exception("Gebruiker heeft geen rechten voor deze handeling!");
         }
 
-        public void CheckMatchdayPermission(Guid matchdayID, Guid uid)
+        public bool CheckMatchdayPermission(Guid matchdayID, Guid uid)
         {
             SchemeMatchDay matchday = _matchDayService.GetMatchdayByID(matchdayID);
 
             if (matchday != null)
             {
                 AllowedToFetchSchedule(matchday.schemeID, uid);
-                return;
+                return true;
             }
 
             throw new Exception("Gebruiker heeft geen rechten voor deze handeling!");

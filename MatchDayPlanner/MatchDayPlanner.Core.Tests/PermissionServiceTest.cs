@@ -22,9 +22,9 @@ namespace MatchDayPlanner.Core.Tests
         {
             _teamService = new TeamService(new FakeTeamRepository());
             _matchDayService = new MatchDayService(new FakeMatchDayRepository());
-            _gameScheduleService = new GameScheduleService(new FakeGameScheduleRepository(), _matchDayService, _teamService);
+            _gameScheduleService = new GameScheduleService(new FakeGameScheduleRepository(), _matchDayService, _teamService, new PreventionService(null));
            
-            _permissionService = new PermissionService(userID, _teamService, _gameScheduleService, _matchDayService);
+            _permissionService = new PermissionService(_teamService, _gameScheduleService, _matchDayService);
         }
 
         [TestMethod("User wants to fetch team and have permission")]
@@ -32,7 +32,7 @@ namespace MatchDayPlanner.Core.Tests
         {
             Guid teamID = Guid.Parse("a0c35710-c184-49ec-b9a2-b147c5afa8b0");
 
-            bool result = _permissionService.AllowedToFetchTeam(teamID);
+            bool result = _permissionService.AllowedToFetchTeam(teamID, userID);
 
             Assert.IsTrue(result);
         }
@@ -42,7 +42,7 @@ namespace MatchDayPlanner.Core.Tests
         {
             Guid teamID = Guid.Parse("c8a699be-3934-48d0-ad8e-fe5a842ff572");
 
-            var exception = Assert.ThrowsException<Exception>(() => _permissionService.AllowedToFetchTeam(teamID));
+            var exception = Assert.ThrowsException<Exception>(() => _permissionService.AllowedToFetchTeam(teamID, userID));
 
             Assert.AreEqual("Gebruiker heeft geen rechten om dit team op te vragen!", exception.Message);
         }
@@ -53,7 +53,7 @@ namespace MatchDayPlanner.Core.Tests
             Guid memberID = Guid.Parse("df9d80d0-5dc5-4325-84f7-ab18cf4e00b3");
             Guid teamID = Guid.Parse("a0c35710-c184-49ec-b9a2-b147c5afa8b0");
 
-            bool result = _permissionService.AllowedToFetchTeamMember(teamID, memberID);
+            bool result = _permissionService.AllowedToFetchTeamMember(teamID, memberID, userID);
 
             Assert.IsTrue(result);
         }
@@ -64,7 +64,7 @@ namespace MatchDayPlanner.Core.Tests
             Guid memberID = Guid.Parse("e28d4bdb-dd2d-4744-bff2-f16d65605b11");
             Guid teamID = Guid.Parse("a0c35710-c184-49ec-b9a2-b147c5afa8b0");
 
-            var exception = Assert.ThrowsException<Exception>(() => _permissionService.AllowedToFetchTeamMember(teamID, memberID));
+            var exception = Assert.ThrowsException<Exception>(() => _permissionService.AllowedToFetchTeamMember(teamID, memberID, userID));
 
             Assert.AreEqual("Team lid hoort niet bij het opgevraagde team!", exception.Message);
         }
@@ -74,7 +74,7 @@ namespace MatchDayPlanner.Core.Tests
         {
             Guid scheduleID = Guid.Parse("8a5e0759-33fc-4696-9f53-815c13abe704");
 
-            bool result = _permissionService.AllowedToFetchSchedule(scheduleID);
+            bool result = _permissionService.AllowedToFetchSchedule(scheduleID, userID);
 
             Assert.IsTrue(result);
         }
@@ -84,7 +84,7 @@ namespace MatchDayPlanner.Core.Tests
         {
             Guid scheduleID = Guid.Parse("a479f081-be4f-4d42-9856-756e8cdc5509");
 
-            var exception = Assert.ThrowsException<Exception>(() => _permissionService.AllowedToFetchSchedule(scheduleID));
+            var exception = Assert.ThrowsException<Exception>(() => _permissionService.AllowedToFetchSchedule(scheduleID, userID));
 
             Assert.AreEqual("Gebruiker heeft geen rechten voor deze handeling!", exception.Message);
         }
@@ -94,7 +94,7 @@ namespace MatchDayPlanner.Core.Tests
         {
             Guid matchdayID = Guid.Parse("baeae1f1-f12a-4147-a29c-f3a1311050c2");
 
-            bool result = _permissionService.CheckMatchdayPermission(matchdayID);
+            bool result = _permissionService.CheckMatchdayPermission(matchdayID, userID);
 
             Assert.IsTrue(result);
         }
@@ -104,7 +104,7 @@ namespace MatchDayPlanner.Core.Tests
         {
             Guid matchdayID = Guid.Parse("5319ca28-819a-467f-86dc-712f93df90de");
 
-            var exception = Assert.ThrowsException<Exception>(() => _permissionService.CheckMatchdayPermission(matchdayID));
+            var exception = Assert.ThrowsException<Exception>(() => _permissionService.CheckMatchdayPermission(matchdayID, userID));
 
             Assert.AreEqual("Gebruiker heeft geen rechten voor deze handeling!", exception.Message);
         }

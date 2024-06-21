@@ -141,5 +141,38 @@ namespace MatchDayPlanner.Tests.DAL
         {
             return _gameSchedulesFeedback.Where(f => f.schemeID == schemeID).ToList();
         }
+
+        public void DeleteSchemeFeedbackByID(Guid feedbackID)
+        {
+            var feedback = _gameSchedulesFeedback.FirstOrDefault(f => f.feedbackID == feedbackID);
+
+            if (feedback != null)
+            {
+                _gameSchedulesFeedback.Remove(feedback);
+            }
+        }
+
+        public void DeleteSchemeFeedbackByMemberID(Guid memberID)
+        {
+            var feedback = _gameSchedulesFeedback.FirstOrDefault(f => f.memberID == memberID);
+
+            if (feedback != null)
+            {
+                _gameSchedulesFeedback.Remove(feedback);
+            }
+        }
+
+        public void DeleteSchemeFeedbackBySchemeID(Guid schemeID)
+        {
+            var feedbacks = _gameSchedulesFeedback.Where(f => f.schemeID == schemeID).ToList();
+
+            if (feedbacks != null)
+            {
+                foreach (var feedback in feedbacks)
+                {
+                    _gameSchedulesFeedback.Remove(feedback);
+                }
+            }
+        }
     }
 }

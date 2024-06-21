@@ -22,11 +22,20 @@ namespace MatchDayPlanner.Core.Services
 
         public void CreateTeam(string teamName, Guid uid)
         {
+            if (string.IsNullOrEmpty(teamName))
+                throw new Exception("Team naam kan niet leeg zijn!");
+
+            if (uid == null || Guid.Empty == uid)
+                throw new Exception("Gebruiker onbekend!");
+
             _teamRepository.CreateTeam(teamName, uid);
         }
 
         public void DeleteTeam(Guid teamID)
         {
+            if (teamID == null || teamID == Guid.Empty)
+                throw new Exception("Team onbekend!");
+
             _teamRepository.DeleteTeam(teamID);
         }
 
@@ -57,6 +66,9 @@ namespace MatchDayPlanner.Core.Services
 
         public void UpdateTeam(Team team)
         {
+            if (team == null || team.teamID== Guid.Empty)
+                throw new Exception("Team onbekend!");
+
             _teamRepository.UpdateTeam(team);
         }
 
@@ -67,16 +79,25 @@ namespace MatchDayPlanner.Core.Services
 
         public void UpdateTeamMember(TeamMember member)
         {
+            if (member == null || member.memberID == Guid.Empty)
+                throw new Exception("Gebruiker onbekend!");
+
             _teamRepository.UpdateTeamMember(member);
         }
 
         public void UpdateTeamCaptain(Guid memberID, Guid teamID)
         {
+            if (memberID == null || teamID == null || memberID == Guid.Empty || teamID == Guid.Empty)
+                throw new Exception("Gebruiker onbekend!");
+
             _teamRepository.UpdateTeamCaptain(memberID, teamID);
         }
 
         public void DeleteTeamMember(Guid memberID)
         {
+            if (memberID == null || memberID == Guid.Empty)
+                throw new Exception("Gebruiker onbekend!");
+
             _teamRepository.DeleteTeamMember(memberID);
         }
 
@@ -93,7 +114,10 @@ namespace MatchDayPlanner.Core.Services
         public Team GetTeamBySchemeID(Guid schemeID)
         {
             Team team = _teamRepository.GetTeamBySchemeID(schemeID);
-            team.teamMembers = _teamRepository.GetTeamMembers(team.teamID);
+
+            if(team != null)
+                team.teamMembers = _teamRepository.GetTeamMembers(team.teamID);
+
             return team;
         }
     }

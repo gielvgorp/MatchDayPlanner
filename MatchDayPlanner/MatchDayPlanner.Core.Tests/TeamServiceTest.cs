@@ -1,4 +1,5 @@
-﻿using MatchDayPlanner.Core.Interfaces;
+﻿using MatchDayPlanner.Core.Entities;
+using MatchDayPlanner.Core.Interfaces;
 using MatchDayPlanner.Core.Services;
 using MatchDayPlanner.Core.Tests.DAL;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -14,11 +15,13 @@ namespace MatchDayPlanner.Core.Tests
     public class TeamServiceTest
     {
         private TeamService _teamService;
+        private FakeTeamRepository _fakeTeamRepository;
 
         [TestInitialize]
         public void Setup()
         {
-            _teamService = new TeamService(new FakeTeamRepository());
+            _fakeTeamRepository = new FakeTeamRepository();
+            _teamService = new TeamService(_fakeTeamRepository);
         }
 
         [TestMethod]
@@ -35,6 +38,24 @@ namespace MatchDayPlanner.Core.Tests
         }
 
         [TestMethod]
+        public void CreateTeam_WithEmptyName_ThrowsException()
+        {
+            var teamName = "";
+            var createdBy = Guid.NewGuid();
+
+            Assert.ThrowsException<Exception>(() => _teamService.CreateTeam(teamName, createdBy));
+        }
+
+        [TestMethod]
+        public void CreateTeam_WithNullCreatedBy_ThrowsException()
+        {
+            var teamName = "New Team";
+            Guid createdBy = Guid.Empty;
+
+            Assert.ThrowsException<Exception>(() => _teamService.CreateTeam(teamName, createdBy));
+        }
+
+        [TestMethod]
         public void GetTeams_ReturnsTeams()
         {
             var uid = Guid.Parse("df9d80d0-5dc5-4325-84f7-ab18cf4e00b3");
@@ -42,6 +63,16 @@ namespace MatchDayPlanner.Core.Tests
             var teams = _teamService.GetAllTeams(uid);
 
             Assert.IsTrue(teams.Any());
+        }
+
+        [TestMethod]
+        public void GetTeams_WithInvalidUserID_ReturnsEmptyList()
+        {
+            var uid = Guid.NewGuid(); // Assuming this ID doesn't exist in the repository
+
+            var teams = _teamService.GetAllTeams(uid);
+
+            Assert.IsFalse(teams.Any());
         }
 
         [TestMethod]
@@ -55,6 +86,16 @@ namespace MatchDayPlanner.Core.Tests
         }
 
         [TestMethod]
+        public void GetTeamMembers_WithInvalidTeamID_ReturnsEmptyList()
+        {
+            var teamID = Guid.NewGuid(); // Assuming this ID doesn't exist in the repository
+
+            var members = _teamService.GetTeamMembers(teamID);
+
+            Assert.IsFalse(members.Any());
+        }
+
+        [TestMethod]
         public void GetTeamCaptain_ReturnsCaptain()
         {
             var teamID = Guid.Parse("a0c35710-c184-49ec-b9a2-b147c5afa8b0");
@@ -65,6 +106,16 @@ namespace MatchDayPlanner.Core.Tests
         }
 
         [TestMethod]
+        public void GetTeamCaptain_WithInvalidTeamID_ReturnsNull()
+        {
+            var teamID = Guid.NewGuid(); // Assuming this ID doesn't exist in the repository
+
+            var captain = _teamService.GetTeamCaptain(teamID);
+
+            Assert.IsNull(captain);
+        }
+
+        [TestMethod]
         public void GetTeamById_ReturnsTeam()
         {
             var teamID = _teamService.GetAllTeams(Guid.Parse("df9d80d0-5dc5-4325-84f7-ab18cf4e00b3")).First().teamID;
@@ -72,6 +123,16 @@ namespace MatchDayPlanner.Core.Tests
             var team = _teamService.GetTeamByID(teamID);
 
             Assert.IsNotNull(team);
+        }
+
+        [TestMethod]
+        public void GetTeamById_WithInvalidID_ReturnsNull()
+        {
+            var teamID = Guid.NewGuid(); // Assuming this ID doesn't exist in the repository
+
+            var team = _teamService.GetTeamByID(teamID);
+
+            Assert.IsNull(team);
         }
 
         [TestMethod]
@@ -108,6 +169,16 @@ namespace MatchDayPlanner.Core.Tests
         }
 
         [TestMethod]
+        public void GetTeamMemberByID_WithInvalidID_ReturnsNull()
+        {
+            var memberID = Guid.NewGuid(); // Assuming this ID doesn't exist in the repository
+
+            var member = _teamService.GetTeamMemberByID(memberID);
+
+            Assert.IsNull(member);
+        }
+
+        [TestMethod]
         public void UpdateTeamMember_UpdatesMember()
         {
             var member = _teamService.GetTeamMembers(Guid.Parse("a0c35710-c184-49ec-b9a2-b147c5afa8b0")).First();
@@ -117,6 +188,14 @@ namespace MatchDayPlanner.Core.Tests
 
             var updatedMember = _teamService.GetTeamMemberByID(member.memberID);
             Assert.AreEqual("Updated Member", updatedMember.memberName);
+        }
+
+        [TestMethod]
+        public void UpdateTeamMember_WithInvalidMember_ThrowsException()
+        {
+            TeamMember member = null;
+
+            Assert.ThrowsException<Exception>(() => _teamService.UpdateTeamMember(member));
         }
 
         [TestMethod]
@@ -143,6 +222,14 @@ namespace MatchDayPlanner.Core.Tests
         }
 
         [TestMethod]
+        public void DeleteTeamMember_WithInvalidID_ThrowsException()
+        {
+            var memberID = Guid.Empty; // Assuming this ID doesn't exist in the repository
+
+            Assert.ThrowsException<Exception>(() => _teamService.DeleteTeamMember(memberID));
+        }
+
+        [TestMethod]
         public void AddTeamMember_AddsMember()
         {
             var teamID = _teamService.GetAllTeams(Guid.Parse("df9d80d0-5dc5-4325-84f7-ab18cf4e00b3")).First().teamID;
@@ -166,13 +253,33 @@ namespace MatchDayPlanner.Core.Tests
         }
 
         [TestMethod]
+        public void GetTeamMembersBySchemeID_WithInvalidSchemeID_ReturnsEmptyList()
+        {
+            var schemeID = Guid.NewGuid(); // Assuming this ID doesn't exist in the repository
+
+            var members = _teamService.GetTeamMembersBySchemeID(schemeID);
+
+            Assert.IsFalse(members.Count == 0);
+        }
+
+        [TestMethod]
         public void GetTeamBySchemeID_ReturnsTeam()
         {
-            var schemeID = Guid.NewGuid();
+            var schemeID = Guid.Parse("df197f52-271c-49bb-88a5-f1d595fd224a");
 
             var team = _teamService.GetTeamBySchemeID(schemeID);
 
             Assert.IsNotNull(team);
+        }
+
+        [TestMethod]
+        public void GetTeamBySchemeID_WithInvalidSchemeID_ReturnsNull()
+        {
+            var schemeID = Guid.NewGuid();
+
+            Team team = _teamService.GetTeamBySchemeID(schemeID);
+
+            Assert.IsNull(team);
         }
     }
 }

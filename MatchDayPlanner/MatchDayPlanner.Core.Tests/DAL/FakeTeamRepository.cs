@@ -12,6 +12,7 @@ namespace MatchDayPlanner.Core.Tests.DAL
     {
         private List<Team> teams;
         private List<TeamMember> teamMembers;
+        private List<GameSchedules> _gameSchedules;
 
         public FakeTeamRepository()
         {
@@ -19,7 +20,8 @@ namespace MatchDayPlanner.Core.Tests.DAL
             {
                 new Team { teamID = Guid.Parse("a0c35710-c184-49ec-b9a2-b147c5afa8b0"), teamName = "Team A", teamCreatedBy = Guid.Parse("df9d80d0-5dc5-4325-84f7-ab18cf4e00b3"), teamCaptainID = Guid.Parse("df9d80d0-5dc5-4325-84f7-ab18cf4e00b3") },
                 new Team { teamID = Guid.Parse("c8a699be-3934-48d0-ad8e-fe5a842ff572"), teamName = "Team B", teamCreatedBy = Guid.Parse("3062a26f-86ee-41f4-ac92-d579c733acc9"), teamCaptainID = Guid.NewGuid() },
-                new Team { teamID = Guid.Parse("d32d9805-1472-4d17-9f4c-199a2b978aea"), teamName = "Team C", teamCreatedBy = Guid.Parse("3062a26f-86ee-41f4-ac92-d579c733acc9"), teamCaptainID = Guid.NewGuid() }
+                new Team { teamID = Guid.Parse("d32d9805-1472-4d17-9f4c-199a2b978aea"), teamName = "Team C", teamCreatedBy = Guid.Parse("3062a26f-86ee-41f4-ac92-d579c733acc9"), teamCaptainID = Guid.NewGuid() },
+                new Team { teamID = Guid.Parse("6a605266-4be8-43db-9a3c-e80b92d0e3ed"), teamName = "Team D", teamCreatedBy = Guid.Parse("3062a26f-86ee-41f4-ac92-d579c733acc9"), teamCaptainID = Guid.NewGuid() }
             };
 
             teamMembers = new List<TeamMember>
@@ -27,7 +29,21 @@ namespace MatchDayPlanner.Core.Tests.DAL
                 new TeamMember { memberID = Guid.Parse("df9d80d0-5dc5-4325-84f7-ab18cf4e00b3"), teamID = teams[0].teamID, memberName = "John Doe", memberEmail = "john.doe@example.com" },
                 new TeamMember { memberID = Guid.Parse("dd658ccb-67b1-4060-a9e0-d00d6535f074"), teamID = teams[0].teamID, memberName = "Doe John", memberEmail = "doe.john@example.com" },
                 new TeamMember { memberID = Guid.Parse("e28d4bdb-dd2d-4744-bff2-f16d65605b11"), teamID = teams[1].teamID, memberName = "John Doe", memberEmail = "john.doe@example.com" },
+            };
 
+            _gameSchedules = new List<GameSchedules>
+            {
+                new GameSchedules
+                {
+                    teamID = Guid.Parse("6a605266-4be8-43db-9a3c-e80b92d0e3ed"),
+                    schemeID = Guid.Parse("df197f52-271c-49bb-88a5-f1d595fd224a"),
+                    scheduleName = "Schedule 1",
+                    schemeDeadline = new DateTime(2023, 11, 1),
+                    startDate = new DateTime(2023, 12, 1),
+                    endDate = new DateTime(2024, 12, 1),
+                    numberOfPresent = 3,
+                    scheduleStatus = 0
+                }
             };
         }
 
@@ -120,22 +136,26 @@ namespace MatchDayPlanner.Core.Tests.DAL
         {
             // Assuming a predefined list of GameSchedules for simplicity
             var gameSchedules = new List<GameSchedules>
-        {
-            new GameSchedules { schemeID = schemeID, teamID = teams.First().teamID }
-        };
+            {
+                new GameSchedules { schemeID = schemeID, teamID = teams.First().teamID }
+            };
+
             var teamIDs = gameSchedules.Where(gs => gs.schemeID == schemeID).Select(gs => gs.teamID).ToList();
             return teamMembers.Where(tm => teamIDs.Contains(tm.teamID)).ToList();
         }
 
         public Team GetTeamBySchemeID(Guid schemeID)
         {
-            // Assuming a predefined list of GameSchedules for simplicity
-            var gameSchedules = new List<GameSchedules>
+            var schedule = _gameSchedules.Where(g => g.schemeID == schemeID).FirstOrDefault();
+
+            if (schedule != null)
             {
-                new GameSchedules { schemeID = schemeID, teamID = teams.First().teamID }
-            };
-            var teamID = gameSchedules.FirstOrDefault(gs => gs.schemeID == schemeID)?.teamID;
-            return teams.FirstOrDefault(t => t.teamID == teamID);
+                var teamID = schedule.teamID;
+
+                return teams.FirstOrDefault(t => t.teamID == teamID);
+            }
+
+            return null;
         }
     }
 }

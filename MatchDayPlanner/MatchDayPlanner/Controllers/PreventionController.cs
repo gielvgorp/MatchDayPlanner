@@ -172,7 +172,7 @@ namespace MatchDayPlanner.Controllers
         }
 
         [HttpPost]
-        public JsonResult SetPrevention(bool add, DateTime date, Guid schemeID, Guid playerID, string status)
+        public JsonResult SetPrevention(bool add, DateTime date, Guid schemeID, Guid memberID, string status)
         {
             try
             {
@@ -180,10 +180,10 @@ namespace MatchDayPlanner.Controllers
 
                 if (matchday != null)
                 {
-                    _preventionService.DeletePrevention(matchday.matchDayID, playerID);
+                    _preventionService.DeletePrevention(matchday.matchDayID, memberID);
 
                     if (add && status != "no-response")
-                        _preventionService.AddPrevention(matchday.matchDayID, playerID, schemeID, Convert.ToInt16(status == "available"));
+                        _preventionService.AddPrevention(matchday.matchDayID, memberID, schemeID, Convert.ToInt16(status == "available"));
 
                     return new JsonResult(Ok("success"));
                 }

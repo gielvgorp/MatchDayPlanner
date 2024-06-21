@@ -51,7 +51,7 @@ namespace MatchDayPlanner.DAL
         public void AddPrevention(Guid matchDayID, Guid memberID, Guid schemeID, int preventionStatus)
         {
             if (memberID == Guid.Empty)
-                throw new Exception("Member ID kan niet leeg zijn!");
+                throw new Exception("Gebruiker is onbekend!");
 
             string query = "INSERT INTO ScheduleLayout (matchDayID, memberID, isPresent, schemeID) VALUES (@matchDayID, @memberID, @preventionStatus, @schemeID)";
             using (var connection = new SqlConnection(_connectionString))

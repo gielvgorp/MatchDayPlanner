@@ -112,7 +112,7 @@ namespace MatchDayPlanner.DAL
                         {
                             var teamCaptainID = reader.GetGuid(reader.GetOrdinal("teamCaptainID"));
 
-                            reader.Close(); // Ensure reader is closed before next command
+                            reader.Close();
 
                             using (var captainCommand = new SqlCommand(queryCaptain, connection))
                             {

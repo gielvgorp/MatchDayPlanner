@@ -116,7 +116,7 @@ function setPrevention(add, date, schemeID, playerID, elem, status) {
             date: date,
             add: add,
             schemeID: schemeID,
-            playerID: playerID,
+            memberID: playerID,
             status: available_status
         },
         success: function (response) {
@@ -136,7 +136,6 @@ function setPrevention(add, date, schemeID, playerID, elem, status) {
 
 function getPreventionComment(schemeID) {
     const memberID = $("#player-select").val();
-    console.log(memberID);
 
     $.ajax({
         url: "/prevention/GetPreventionComment",

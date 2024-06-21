@@ -84,15 +84,18 @@
 
             @foreach (var feedback in Model.presentComments)
             {
-                <div class="feedback-container ps-2 pt-2 pb-3">
-                    <div class="d-flex gap-2 align-items-center">
-                        <h6 class="text">@feedback.teamMember.memberName</h6>
+                if(feedback.teamMember != null)
+                {
+                    <div class="feedback-container ps-2 pt-2 pb-3">
+                        <div class="d-flex gap-2 align-items-center">
+                            <h6 class="text">@feedback.teamMember.memberName</h6>
+                        </div>
+                        <p class="w-50 text-white fw-light">
+                            @feedback.comment
+                        </p>
+                        <hr class="text-white w-50" />
                     </div>
-                    <p class="w-50 text-white fw-light">
-                        @feedback.comment
-                    </p>
-                    <hr class="text-white w-50" />
-                </div>
+                }
             }
         </div>
         <div class="col-6">

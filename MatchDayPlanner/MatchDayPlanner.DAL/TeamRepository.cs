@@ -226,6 +226,7 @@ namespace MatchDayPlanner.DAL
         public void UpdateTeamMember(TeamMember member)
         {
             string query = "UPDATE TeamMembers SET memberName = @memberName, memberEmail = @memberEmail WHERE memberID = @memberID";
+
             using (var connection = new SqlConnection(_connectionString))
             {
                 using (var command = new SqlCommand(query, connection))

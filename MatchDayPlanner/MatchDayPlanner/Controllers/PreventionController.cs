@@ -243,9 +243,16 @@ namespace MatchDayPlanner.Controllers
         [HttpPost]
         public IActionResult SubmitPrevention(string comment, Guid schemeID, Guid memberID)
         {
-            _preventionService.DeletePresentComment(schemeID, memberID);
             Team team = _teamService.GetTeamBySchemeID(schemeID);
 
+            if (memberID == Guid.Empty)
+            {
+                TempData["ErrorMessage"] = "Versturen van de verhindering is mislukt! Gebruiker onbekend!";
+                return RedirectToAction("Index", "prevention", new { teamID = team.teamID, schemeID = schemeID });
+            }
+
+            _preventionService.DeletePresentComment(schemeID, memberID);
+            
             if (!string.IsNullOrEmpty(comment))
                 _preventionService.UpdatePresentComment(schemeID, memberID, comment);
 

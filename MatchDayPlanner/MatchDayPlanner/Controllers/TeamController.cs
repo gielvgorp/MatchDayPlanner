@@ -276,7 +276,7 @@ namespace MatchDayPlanner.Controllers
                     TeamMember member = new TeamMember
                     {
                         memberID = model.memberID,
-                        memberEmail = model.memberEmail,
+                        memberEmail = model.memberEmail ?? "",
                         memberName = model.memberName,
                         teamID = model.teamID
                     };

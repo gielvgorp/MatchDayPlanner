@@ -5,7 +5,7 @@ namespace MatchDayPlanner.DAL
 {
     public class Database
     {
-        string connectionString = "Server=DESKTOP-SML637F;Database=MatchDayPlanner;Trusted_Connection=True;TrustServerCertificate=True;";
+        string connectionString = "Server=(localdb)\\SQLEXPRESS;Database=MatchDayPlanner;Trusted_Connection=True;TrustServerCertificate=True;";
 
         public List<T> Query<T>(string query) where T : new()
         {

@@ -2,6 +2,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MatchDayPlanner.Data;
 using MatchDayPlanner.Areas.Identity.Data;
+using MatchDayPlanner.Features.GameSchedules.Create;
+using MatchDayPlanner.Core.Interfaces;
+using MatchDayPlanner.DAL;
+
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("AuthDbConnection") ?? throw new InvalidOperationException("Connection string 'DbConnection' not found.");
 
@@ -17,6 +21,23 @@ builder.Services.Configure<IdentityOptions>(options =>
 {
     options.Password.RequireUppercase = false;
     options.User.RequireUniqueEmail = true;
+});
+
+builder.Services.AddScoped<CreateGameScheduleValidator>();
+
+builder.Services.AddScoped<CreateGameScheduleHandler>();
+
+builder.Services.AddScoped<IGameScheduleRepository>(provider =>
+{
+    var configuration =
+        provider.GetRequiredService<IConfiguration>();
+
+    var connectionString =
+        configuration.GetConnectionString("DbConnection")
+        ?? throw new InvalidOperationException(
+            "Connection string 'DbConnection' is missing.");
+
+    return new GameScheduleRepository(connectionString);
 });
 
 var app = builder.Build();

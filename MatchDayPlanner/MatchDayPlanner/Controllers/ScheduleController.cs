@@ -6,10 +6,9 @@ using MatchDayPlanner.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
 using Newtonsoft.Json;
 using System.Globalization;
-using static Org.BouncyCastle.Math.EC.ECCurve;
+using MatchDayPlanner.Features.GameSchedules.Create;
 
 namespace MatchDayPlanner.Controllers
 {
@@ -24,7 +23,9 @@ namespace MatchDayPlanner.Controllers
         private readonly PermissionService _permissionService;
         private readonly PreventionService _preventionService;
         private readonly string _dbConnectionString = "";
-        public ScheduleController(IConfiguration iConfig, UserManager<ApplicationUser> userManager)
+        private readonly CreateGameScheduleHandler _createGameScheduleHandler;
+
+        public ScheduleController(IConfiguration iConfig, UserManager<ApplicationUser> userManager, CreateGameScheduleHandler createGameScheduleHandler)
         {
             _dbConnectionString = iConfig.GetConnectionString("DbConnection");
             _teamService = new TeamService(new TeamRepository(_dbConnectionString));
@@ -34,6 +35,8 @@ namespace MatchDayPlanner.Controllers
             _preventionService = new PreventionService(new PreventionRepository(_dbConnectionString));
             _userManager = userManager;
             _permissionService = new PermissionService(_teamService, _gameScheduleService, _matchdayService);
+
+            _createGameScheduleHandler = createGameScheduleHandler;
         }
 
         [HttpGet("/team/add/{teamID}")]
@@ -55,6 +58,40 @@ namespace MatchDayPlanner.Controllers
            
         }
 
+        //[HttpPost("/team/add/{teamID}")]
+        //public IActionResult CreateGameSchedule(CreateScheduleViewModel model, Guid teamID)
+        //{
+        //    try
+        //    {
+        //        if (!ModelState.IsValid)
+        //        {
+        //            return View(model);
+        //        }
+
+        //        _permissionService.AllowedToFetchTeam(teamID, Guid.Parse(_userManager.GetUserId(this.User)));
+
+        //        GameSchedules schedule = new GameSchedules
+        //        {
+        //            teamID = model.TeamID,
+        //            scheduleName = model.ScheduleName,
+        //            startDate = model.DateStart,
+        //            endDate = model.DateEnd,
+        //            schemeDeadline = model.Deadline,
+        //            numberOfPresent = model.numberOfPresent
+        //        };
+
+        //        _gameScheduleService.Create(schedule);
+
+        //        TempData["SuccessMessage"] = "Schema aangemaakt!";
+        //        return Redirect(string.Format("/manage-team/{0}/false", model.TeamID));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        TempData["ErrorMessage"] = ex.Message;
+        //        return View(model);
+        //    }
+        //}
+
         [HttpPost("/team/add/{teamID}")]
         public IActionResult CreateGameSchedule(CreateScheduleViewModel model, Guid teamID)
         {
@@ -65,26 +102,30 @@ namespace MatchDayPlanner.Controllers
                     return View(model);
                 }
 
+                // Preserve the existing authorization check
                 _permissionService.AllowedToFetchTeam(teamID, Guid.Parse(_userManager.GetUserId(this.User)));
 
-                GameSchedules schedule = new GameSchedules
-                {
-                    teamID = model.TeamID,
-                    scheduleName = model.ScheduleName,
-                    startDate = model.DateStart,
-                    endDate = model.DateEnd,
-                    schemeDeadline = model.Deadline,
-                    numberOfPresent = model.numberOfPresent
-                };
+                // Map the ViewModel to the Vertical Slice request
+                var request = new CreateGameScheduleRequest(
+                    model.TeamID,
+                    model.ScheduleName,
+                    model.DateStart,
+                    model.DateEnd,
+                    model.Deadline,
+                    model.numberOfPresent
+                );
 
-                _gameScheduleService.Create(schedule);
+                // Execute the Vertical Slice
+                _createGameScheduleHandler.Handle(request);
 
                 TempData["SuccessMessage"] = "Schema aangemaakt!";
+
                 return Redirect(string.Format("/manage-team/{0}/false", model.TeamID));
             }
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = ex.Message;
+
                 return View(model);
             }
         }

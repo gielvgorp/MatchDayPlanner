@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.8.34511.84
+# Visual Studio Version 18
+VisualStudioVersion = 18.10.12224.181 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MatchDayPlanner", "MatchDayPlanner\MatchDayPlanner.csproj", "{2FE4F95B-62B4-4815-A26F-9C33D66C448E}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MatchDayPlanner.DAL", "MatchDayPlanner.DAL\MatchDayPlanner.DAL.csproj", "{AC3833FA-107F-47F9-942C-B133255461C7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchDayPlanner.Core.Tests", "MatchDayPlanner.Core.Tests\MatchDayPlanner.Core.Tests.csproj", "{EA9CDA9D-901A-4FE9-BE4F-36D4DA619EFD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchDayPlanner.VSA.Tests", "MatchDayPlanner.VSA.Tests\MatchDayPlanner.VSA.Tests.csproj", "{A55A4094-E70B-4315-9CBC-12F4F1F6B4A5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{EA9CDA9D-901A-4FE9-BE4F-36D4DA619EFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA9CDA9D-901A-4FE9-BE4F-36D4DA619EFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EA9CDA9D-901A-4FE9-BE4F-36D4DA619EFD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A55A4094-E70B-4315-9CBC-12F4F1F6B4A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A55A4094-E70B-4315-9CBC-12F4F1F6B4A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A55A4094-E70B-4315-9CBC-12F4F1F6B4A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A55A4094-E70B-4315-9CBC-12F4F1F6B4A5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -117,10 +117,33 @@ namespace MatchDayPlanner.VSA.Tests.Features.GameSchedules
                 new DateTime(2026, 11, 1),
                 new DateTime(2026, 12, 15));
 
-            Assert.AreEqual(
-                "De eind datum kan niet eerder zijn dan de start datum!",
-                _validator.Validate(request));
+            Assert.AreEqual("De eind datum kan niet eerder zijn dan de start datum!", _validator.Validate(request));
         }
 
+        [TestMethod]
+        [DataRow("2026-01-01", "2026-12-31", true)]
+        [DataRow("2026-01-01", "2027-01-01", true)]
+        [DataRow("2026-01-01", "2027-01-02", false)]
+        [DataRow("2026-01-01", "2027-12-31", false)]
+        [DataRow("2026-12-01", "2026-11-01", false)]
+        public void Validate_MaximumScheduleDuration_ReturnsExpectedResult(string startDate, string endDate, bool expectedValid)
+        {
+            // Arrange
+            var validator = new CreateGameScheduleValidator();
+
+            var request = new CreateGameScheduleRequest(
+                Guid.NewGuid(),
+                "Cycle 4 Test",
+                DateTime.Parse(startDate),
+                DateTime.Parse(endDate),
+                new DateTime(2025, 12, 1),
+                5);
+
+            // Act
+            string? validationError = validator.Validate(request);
+
+            // Assert
+            Assert.AreEqual(expectedValid, validationError == null);
+        }
     }
 }

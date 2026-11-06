@@ -58,40 +58,6 @@ namespace MatchDayPlanner.Controllers
            
         }
 
-        //[HttpPost("/team/add/{teamID}")]
-        //public IActionResult CreateGameSchedule(CreateScheduleViewModel model, Guid teamID)
-        //{
-        //    try
-        //    {
-        //        if (!ModelState.IsValid)
-        //        {
-        //            return View(model);
-        //        }
-
-        //        _permissionService.AllowedToFetchTeam(teamID, Guid.Parse(_userManager.GetUserId(this.User)));
-
-        //        GameSchedules schedule = new GameSchedules
-        //        {
-        //            teamID = model.TeamID,
-        //            scheduleName = model.ScheduleName,
-        //            startDate = model.DateStart,
-        //            endDate = model.DateEnd,
-        //            schemeDeadline = model.Deadline,
-        //            numberOfPresent = model.numberOfPresent
-        //        };
-
-        //        _gameScheduleService.Create(schedule);
-
-        //        TempData["SuccessMessage"] = "Schema aangemaakt!";
-        //        return Redirect(string.Format("/manage-team/{0}/false", model.TeamID));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        TempData["ErrorMessage"] = ex.Message;
-        //        return View(model);
-        //    }
-        //}
-
         [HttpPost("/team/add/{teamID}")]
         public IActionResult CreateGameSchedule(CreateScheduleViewModel model, Guid teamID)
         {

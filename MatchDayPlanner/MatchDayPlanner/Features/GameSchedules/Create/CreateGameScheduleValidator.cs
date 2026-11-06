@@ -4,12 +4,14 @@
     {
         public string? Validate(CreateGameScheduleRequest request)
         {
+            var maximumEndPeriod = schedule.startDate.AddMonths(12);
+
             if (request.StartDate > request.EndDate)
             {
                 return "De eind datum kan niet eerder zijn dan de start datum!";
             }
 
-            if ((request.EndDate.Year - request.StartDate.Year) > 1)
+            if (request.EndDate > maximumEndPeriod)
             {
                 return "Je kan een schema maken voor maximaal 1 jaar!";
             }

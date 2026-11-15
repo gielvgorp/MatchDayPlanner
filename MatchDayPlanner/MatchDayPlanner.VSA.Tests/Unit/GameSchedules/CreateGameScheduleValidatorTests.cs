@@ -1,4 +1,6 @@
-﻿using MatchDayPlanner.Features.GameSchedules.Create;
+﻿using MatchDayPlanner.Core.Interfaces;
+using MatchDayPlanner.Features.GameSchedules.Create;
+using Moq;
 
 namespace MatchDayPlanner.VSA.Tests.Features.GameSchedules
 {
@@ -145,5 +147,97 @@ namespace MatchDayPlanner.VSA.Tests.Features.GameSchedules
             // Assert
             Assert.AreEqual(expectedValid, validationError == null);
         }
+
+        [DataTestMethod]
+        [DataRow(0, false)]
+        [DataRow(3, false)]
+        [DataRow(4, true)]
+        [DataRow(5, true)]
+        [DataRow(10, true)]
+        public void ValidateTeamMembers_ReturnsExpectedResult(int memberCount, bool expectedValid)
+        {
+            // Arrange
+            var validator = new CreateGameScheduleValidator();
+
+            // Act
+            var result = validator.ValidateTeamMembers(memberCount);
+
+            // Assert
+            Assert.AreEqual(expectedValid, result == null);
+        }
+
+
+        [DataTestMethod]
+        [DataRow(0, true)]
+        [DataRow(3, true)]
+        [DataRow(4, true)]
+        [DataRow(5, false)]
+        [DataRow(6, false)]
+        public void Handle_ValidatesMaximumNumberOfSchedules(int existingScheduleCount, bool expectedValid)
+        {
+            // Arrange
+            var teamId = Guid.NewGuid();
+
+            var repositoryMock = new Mock<IGameScheduleRepository>();
+            var teamRepositoryMock = new Mock<ITeamRepository>();
+
+            var existingSchedules = Enumerable.Range(
+                0, existingScheduleCount)
+                .Select(_ => new MatchDayPlanner.Core.Entities.GameSchedules
+                {
+                    schemeID = Guid.NewGuid(),
+                    teamID = teamId
+                })
+                .ToList();
+
+            repositoryMock
+                .Setup(x => x.GetGameSchedules(teamId))
+                .Returns(existingSchedules);
+
+
+            var validator = new CreateGameScheduleValidator();
+
+            var handler = new CreateGameScheduleHandler(
+                repositoryMock.Object,
+                teamRepositoryMock.Object,
+                validator
+            );
+
+            var request = new CreateGameScheduleRequest(
+                teamId,
+                "Cycle 4 Test",
+                new DateTime(2026, 1, 1),
+                new DateTime(2026, 8, 1),
+                new DateTime(2025, 12, 1),
+                5);
+
+            // Act & Assert
+            if (expectedValid)
+            {
+                handler.Handle(request);
+
+                repositoryMock.Verify(
+                    x => x.Create(It.IsAny<MatchDayPlanner.Core.Entities.GameSchedules>()),
+                    Times.Once);
+            }
+            else
+            {
+                var exception = Assert.Throws<Exception>(
+                    () => handler.Handle(request));
+
+                Assert.AreEqual(
+                    "Een team mag maximaal 5 schema's hebben!",
+                    exception.Message);
+
+                repositoryMock.Verify(
+                    x => x.Create(It.IsAny<MatchDayPlanner.Core.Entities.GameSchedules>()),
+                    Times.Never);
+            }
+
+            repositoryMock.Verify(
+                x => x.GetGameSchedules(teamId),
+                Times.Once);
+        }
+
     }
 }

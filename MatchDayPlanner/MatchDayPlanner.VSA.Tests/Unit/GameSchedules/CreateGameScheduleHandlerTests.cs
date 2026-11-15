@@ -1,5 +1,6 @@
 using MatchDayPlanner.Core.Entities;
 using MatchDayPlanner.Core.Interfaces;
+using MatchDayPlanner.DAL;
 using MatchDayPlanner.Features.GameSchedules.Create;
 using Moq;
 
@@ -9,6 +10,7 @@ namespace MatchDayPlanner.VSA.Tests
     public class CreateGameScheduleHandlerTests
     {
         private Mock<IGameScheduleRepository> _repository = null!;
+        private Mock<ITeamRepository> _teamRepository = null!;
         private CreateGameScheduleHandler _handler = null!;
 
         [TestInitialize]
@@ -17,8 +19,12 @@ namespace MatchDayPlanner.VSA.Tests
             _repository = new Mock<IGameScheduleRepository>(
                 MockBehavior.Strict);
 
+            _teamRepository = new Mock<ITeamRepository>(
+                MockBehavior.Strict);
+
             _handler = new CreateGameScheduleHandler(
                 _repository.Object,
+                _teamRepository.Object,
                 new CreateGameScheduleValidator());
         }
 

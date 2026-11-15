@@ -48,6 +48,7 @@ namespace MatchDayPlanner.VSA.Tests.Integration
 
             _handler = new CreateGameScheduleHandler(
                 _repository,
+                new TeamRepository(_connectionString),
                 new CreateGameScheduleValidator());
         }
 

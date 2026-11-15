@@ -4,7 +4,7 @@
     {
         public string? Validate(CreateGameScheduleRequest request)
         {
-            var maximumEndPeriod = schedule.startDate.AddMonths(12);
+            var maximumEndPeriod = request.StartDate.AddMonths(12);
 
             if (request.StartDate > request.EndDate)
             {
@@ -19,6 +19,30 @@
             if (request.Deadline > request.StartDate)
             {
                 return "De deadline is na de start datum!";
+            }
+
+            return null;
+        }
+
+        public string? ValidateTeamMembers(int memberCount)
+        {
+            var minimumTeamMembers = 4;
+
+            if (memberCount < minimumTeamMembers)
+            {
+                return "Er moeten minimaal 4 leden in je team zitten!";
+            }
+
+            return null;
+        }
+
+        public string? ValidateMaximumTeamSchedules(int scheduleCount)
+        {
+            var maximumSchedules = 5;
+
+            if (scheduleCount >= maximumSchedules)
+            {
+                return "Je mag niet meer dan 5 schemas maken voor dit team!";
             }
 
             return null;
